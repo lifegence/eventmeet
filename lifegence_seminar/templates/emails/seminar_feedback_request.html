@@ -1,0 +1,3 @@
+<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p>{{ _("Thank you for attending {0}. Please take a minute to answer our survey.").format(seminar.title | e) }}</p>
+<p><a href="{{ feedback_url }}">{{ _("Answer the survey") }}</a></p>

@@ -1,0 +1,278 @@
+{
+ "actions": [],
+ "autoname": "format:SREG-{YYYY}-{######}",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "seminar",
+  "ticket_type",
+  "status",
+  "column_break_1",
+  "attendee_name",
+  "email",
+  "company",
+  "phone",
+  "payment_section",
+  "amount",
+  "currency",
+  "paid_at",
+  "column_break_payment",
+  "stripe_checkout_session",
+  "stripe_payment_intent",
+  "refunded_amount",
+  "online_section",
+  "conference_registrant_id",
+  "join_url",
+  "column_break_online",
+  "attended_online",
+  "online_minutes",
+  "onsite_section",
+  "checked_in",
+  "checked_in_at",
+  "checked_in_by",
+  "column_break_onsite",
+  "access_token",
+  "reminder_sent",
+  "feedback_requested"
+ ],
+ "fields": [
+  {
+   "fieldname": "seminar",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Seminar",
+   "options": "Seminar",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ticket_type",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Ticket Type",
+   "reqd": 1
+  },
+  {
+   "default": "Pending Payment",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Pending Payment\nConfirmed\nCancelled\nExpired\nRefunded",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attendee_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Attendee Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_standard_filter": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fieldname": "phone",
+   "fieldtype": "Data",
+   "label": "Phone",
+   "options": "Phone"
+  },
+  {
+   "fieldname": "payment_section",
+   "fieldtype": "Section Break",
+   "label": "Payment"
+  },
+  {
+   "fieldname": "amount",
+   "fieldtype": "Currency",
+   "label": "Amount",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "currency",
+   "fieldtype": "Link",
+   "label": "Currency",
+   "options": "Currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "paid_at",
+   "fieldtype": "Datetime",
+   "label": "Paid At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_payment",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "stripe_checkout_session",
+   "fieldtype": "Data",
+   "label": "Stripe Checkout Session",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "stripe_payment_intent",
+   "fieldtype": "Data",
+   "label": "Stripe Payment Intent",
+   "read_only": 1
+  },
+  {
+   "fieldname": "refunded_amount",
+   "fieldtype": "Currency",
+   "label": "Refunded Amount",
+   "options": "currency",
+   "read_only": 1
+  },
+  {
+   "fieldname": "online_section",
+   "fieldtype": "Section Break",
+   "label": "Online"
+  },
+  {
+   "fieldname": "conference_registrant_id",
+   "fieldtype": "Data",
+   "label": "Conference Registrant ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "join_url",
+   "fieldtype": "Small Text",
+   "label": "Personal Join URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_online",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "attended_online",
+   "fieldtype": "Check",
+   "label": "Attended Online",
+   "read_only": 1
+  },
+  {
+   "fieldname": "online_minutes",
+   "fieldtype": "Float",
+   "label": "Online Minutes",
+   "precision": "1",
+   "read_only": 1
+  },
+  {
+   "fieldname": "onsite_section",
+   "fieldtype": "Section Break",
+   "label": "On-site"
+  },
+  {
+   "fieldname": "checked_in",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Checked In",
+   "read_only": 1
+  },
+  {
+   "fieldname": "checked_in_at",
+   "fieldtype": "Datetime",
+   "label": "Checked In At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "checked_in_by",
+   "fieldtype": "Link",
+   "label": "Checked In By",
+   "options": "User",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_onsite",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "access_token",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Access Token",
+   "read_only": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "reminder_sent",
+   "fieldtype": "Check",
+   "label": "Reminder Sent",
+   "read_only": 1
+  },
+  {
+   "fieldname": "feedback_requested",
+   "fieldtype": "Check",
+   "label": "Feedback Requested",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Seminar",
+ "name": "Seminar Registration",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Staff",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "search_fields": "attendee_name,email",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "attendee_name"
+}

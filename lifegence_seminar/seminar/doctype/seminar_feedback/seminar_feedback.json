@@ -1,0 +1,110 @@
+{
+ "actions": [],
+ "autoname": "format:SFB-{YYYY}-{######}",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "seminar",
+  "registration",
+  "rating",
+  "column_break_1",
+  "would_recommend",
+  "comments_section",
+  "comments"
+ ],
+ "fields": [
+  {
+   "fieldname": "seminar",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Seminar",
+   "options": "Seminar",
+   "read_only": 1,
+   "reqd": 1
+  },
+  {
+   "fieldname": "registration",
+   "fieldtype": "Link",
+   "label": "Registration",
+   "options": "Seminar Registration",
+   "read_only": 1,
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "rating",
+   "fieldtype": "Rating",
+   "in_list_view": 1,
+   "label": "Rating",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "would_recommend",
+   "fieldtype": "Check",
+   "label": "Would Recommend",
+   "read_only": 1
+  },
+  {
+   "fieldname": "comments_section",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "comments",
+   "fieldtype": "Small Text",
+   "label": "Comments",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Seminar",
+ "name": "Seminar Feedback",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Staff",
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

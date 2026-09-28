@@ -1,0 +1,282 @@
+{
+ "actions": [],
+ "allow_guest_to_view": 1,
+ "autoname": "SEM-.YYYY.-.####",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "overview_tab",
+  "title",
+  "status",
+  "format",
+  "organizer",
+  "column_break_overview",
+  "starts_at",
+  "ends_at",
+  "registration_closes_at",
+  "capacity",
+  "venue_section",
+  "venue",
+  "content_section",
+  "summary",
+  "description",
+  "banner_image",
+  "sessions",
+  "tickets_tab",
+  "ticket_types",
+  "online_tab",
+  "conference_kind",
+  "conference_session",
+  "column_break_online",
+  "join_url",
+  "planning_tab",
+  "tasks",
+  "internal_notes",
+  "website_tab",
+  "published",
+  "route",
+  "feedback_enabled"
+ ],
+ "fields": [
+  {
+   "fieldname": "overview_tab",
+   "fieldtype": "Tab Break",
+   "label": "Overview"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Draft",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Draft\nOpen\nClosed\nCompleted\nCancelled"
+  },
+  {
+   "default": "Offline",
+   "fieldname": "format",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Format",
+   "options": "Offline\nOnline\nHybrid",
+   "reqd": 1
+  },
+  {
+   "fieldname": "organizer",
+   "fieldtype": "Link",
+   "label": "Organizer",
+   "options": "User"
+  },
+  {
+   "fieldname": "column_break_overview",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "starts_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Starts At",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ends_at",
+   "fieldtype": "Datetime",
+   "label": "Ends At",
+   "reqd": 1
+  },
+  {
+   "description": "Defaults to the start time.",
+   "fieldname": "registration_closes_at",
+   "fieldtype": "Datetime",
+   "label": "Registration Closes At"
+  },
+  {
+   "description": "0 = unlimited (online capacity is still limited by the host license).",
+   "fieldname": "capacity",
+   "fieldtype": "Int",
+   "label": "Capacity"
+  },
+  {
+   "depends_on": "eval:doc.format!='Online'",
+   "fieldname": "venue_section",
+   "fieldtype": "Section Break",
+   "label": "Venue"
+  },
+  {
+   "fieldname": "venue",
+   "fieldtype": "Link",
+   "label": "Venue",
+   "mandatory_depends_on": "eval:doc.format!='Online'",
+   "options": "Seminar Venue"
+  },
+  {
+   "fieldname": "content_section",
+   "fieldtype": "Section Break",
+   "label": "Content"
+  },
+  {
+   "description": "Shown on the seminar list.",
+   "fieldname": "summary",
+   "fieldtype": "Small Text",
+   "label": "Summary"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "fieldname": "banner_image",
+   "fieldtype": "Attach Image",
+   "label": "Banner Image"
+  },
+  {
+   "fieldname": "sessions",
+   "fieldtype": "Table",
+   "label": "Program",
+   "options": "Seminar Session"
+  },
+  {
+   "fieldname": "tickets_tab",
+   "fieldtype": "Tab Break",
+   "label": "Tickets"
+  },
+  {
+   "fieldname": "ticket_types",
+   "fieldtype": "Table",
+   "label": "Ticket Types",
+   "options": "Seminar Ticket Type"
+  },
+  {
+   "depends_on": "eval:doc.format!='Offline'",
+   "fieldname": "online_tab",
+   "fieldtype": "Tab Break",
+   "label": "Online"
+  },
+  {
+   "default": "Meeting",
+   "description": "Meeting: registration-based Zoom meeting (up to the host's meeting capacity). Webinar: requires a host with a Webinar license.",
+   "fieldname": "conference_kind",
+   "fieldtype": "Select",
+   "label": "Conference Kind",
+   "options": "Meeting\nWebinar"
+  },
+  {
+   "fieldname": "conference_session",
+   "fieldtype": "Link",
+   "label": "Conference Session",
+   "options": "Conference Session",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_online",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Each registrant receives a personal join link.",
+   "fieldname": "join_url",
+   "fieldtype": "Small Text",
+   "label": "Join URL (Generic)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "planning_tab",
+   "fieldtype": "Tab Break",
+   "label": "Planning"
+  },
+  {
+   "fieldname": "tasks",
+   "fieldtype": "Table",
+   "label": "Tasks",
+   "options": "Seminar Task"
+  },
+  {
+   "fieldname": "internal_notes",
+   "fieldtype": "Text Editor",
+   "label": "Internal Notes"
+  },
+  {
+   "fieldname": "website_tab",
+   "fieldtype": "Tab Break",
+   "label": "Website"
+  },
+  {
+   "default": "0",
+   "fieldname": "published",
+   "fieldtype": "Check",
+   "label": "Published"
+  },
+  {
+   "fieldname": "route",
+   "fieldtype": "Data",
+   "label": "Route",
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "feedback_enabled",
+   "fieldtype": "Check",
+   "label": "Collect Feedback"
+  }
+ ],
+ "has_web_view": 1,
+ "image_field": "banner_image",
+ "index_web_pages_for_search": 0,
+ "is_published_field": "published",
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Seminar",
+ "name": "Seminar",
+ "naming_rule": "Expression (old style)",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Staff",
+   "share": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title"
+}

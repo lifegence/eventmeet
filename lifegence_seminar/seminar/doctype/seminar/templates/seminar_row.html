@@ -1,0 +1,6 @@
+<a class="ls-card" href="/{{ doc.route }}">
+	<div class="ls-card-body">
+		<div class="ls-meta">{{ frappe.utils.format_datetime(doc.starts_at, "yyyy-MM-dd HH:mm") }}</div>
+		<h2 class="ls-card-title">{{ doc.title | e }}</h2>
+	</div>
+</a>

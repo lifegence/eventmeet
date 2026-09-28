@@ -1,0 +1,119 @@
+{
+ "actions": [],
+ "autoname": "field:account_label",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "account_label",
+  "zoom_user",
+  "enabled",
+  "column_break_1",
+  "license_type",
+  "meeting_capacity",
+  "webinar_capacity",
+  "use_for_internal_meetings",
+  "use_for_seminars"
+ ],
+ "fields": [
+  {
+   "fieldname": "account_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Label",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "description": "Email address or user ID of a licensed user in the Zoom account.",
+   "fieldname": "zoom_user",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Zoom User",
+   "reqd": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "Pro",
+   "fieldname": "license_type",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "License",
+   "options": "Pro\nBusiness\nBusiness Plus\nEnterprise"
+  },
+  {
+   "default": "100",
+   "fieldname": "meeting_capacity",
+   "fieldtype": "Int",
+   "label": "Meeting Capacity"
+  },
+  {
+   "default": "0",
+   "description": "Attendee limit of the Webinar add-on assigned to this user. 0 = no webinar license.",
+   "fieldname": "webinar_capacity",
+   "fieldtype": "Int",
+   "in_list_view": 1,
+   "label": "Webinar Capacity"
+  },
+  {
+   "default": "1",
+   "fieldname": "use_for_internal_meetings",
+   "fieldtype": "Check",
+   "label": "Use for Internal Meetings"
+  },
+  {
+   "default": "1",
+   "fieldname": "use_for_seminars",
+   "fieldtype": "Check",
+   "label": "Use for Seminars"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Conferencing",
+ "name": "Zoom Host Account",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "account_label"
+}

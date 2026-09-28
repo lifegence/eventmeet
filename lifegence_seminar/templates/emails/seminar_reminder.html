@@ -1,0 +1,7 @@
+<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p>{{ _("This is a reminder that the seminar is coming up soon.") }}</p>
+{% include "templates/emails/_seminar_details.html" %}
+{% if is_online and registration.join_url %}
+<p><a href="{{ registration.join_url | e }}">{{ _("Join on Zoom") }}</a></p>
+{% endif %}
+<p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>

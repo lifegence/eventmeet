@@ -1,0 +1,255 @@
+{
+ "actions": [],
+ "autoname": "format:CONF-{YYYY}-{#####}",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "topic",
+  "provider",
+  "kind",
+  "status",
+  "column_break_1",
+  "reference_doctype",
+  "reference_name",
+  "host_account",
+  "schedule_section",
+  "starts_at",
+  "duration_minutes",
+  "column_break_2",
+  "ends_at",
+  "timezone",
+  "provider_section",
+  "external_id",
+  "join_url",
+  "registration_required",
+  "column_break_3",
+  "passcode",
+  "attendance_section",
+  "attendance_synced",
+  "attendance_sync_attempts",
+  "summary_imported",
+  "participants"
+ ],
+ "fields": [
+  {
+   "fieldname": "topic",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Topic",
+   "reqd": 1
+  },
+  {
+   "default": "Zoom",
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "in_standard_filter": 1,
+   "label": "Provider",
+   "options": "Zoom",
+   "reqd": 1
+  },
+  {
+   "default": "Meeting",
+   "fieldname": "kind",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Kind",
+   "options": "Meeting\nWebinar",
+   "reqd": 1
+  },
+  {
+   "default": "Scheduled",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Scheduled\nEnded\nCancelled"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Reference DocType",
+   "options": "DocType",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reference_name",
+   "fieldtype": "Dynamic Link",
+   "label": "Reference Name",
+   "options": "reference_doctype",
+   "read_only": 1
+  },
+  {
+   "fieldname": "host_account",
+   "fieldtype": "Link",
+   "label": "Host Account",
+   "options": "Zoom Host Account",
+   "read_only": 1
+  },
+  {
+   "fieldname": "schedule_section",
+   "fieldtype": "Section Break",
+   "label": "Schedule"
+  },
+  {
+   "fieldname": "starts_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Starts At",
+   "reqd": 1
+  },
+  {
+   "fieldname": "duration_minutes",
+   "fieldtype": "Int",
+   "label": "Duration (Minutes)",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "ends_at",
+   "fieldtype": "Datetime",
+   "label": "Ends At",
+   "read_only": 1
+  },
+  {
+   "fieldname": "timezone",
+   "fieldtype": "Data",
+   "label": "Time Zone",
+   "read_only": 1
+  },
+  {
+   "fieldname": "provider_section",
+   "fieldtype": "Section Break",
+   "label": "Provider Details"
+  },
+  {
+   "fieldname": "external_id",
+   "fieldtype": "Data",
+   "label": "External ID",
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "join_url",
+   "fieldtype": "Small Text",
+   "label": "Join URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "registration_required",
+   "fieldtype": "Check",
+   "label": "Registration Required",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_3",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "passcode",
+   "fieldtype": "Data",
+   "label": "Passcode",
+   "permlevel": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "attendance_section",
+   "fieldtype": "Section Break",
+   "label": "Attendance"
+  },
+  {
+   "fieldname": "attendance_synced",
+   "fieldtype": "Check",
+   "label": "Attendance Synced",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "attendance_sync_attempts",
+   "fieldtype": "Int",
+   "label": "Sync Attempts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "summary_imported",
+   "fieldtype": "Check",
+   "label": "AI Summary Imported",
+   "read_only": 1
+  },
+  {
+   "fieldname": "participants",
+   "fieldtype": "Table",
+   "label": "Participants",
+   "options": "Conference Participant",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Conferencing",
+ "name": "Conference Session",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "email": 1,
+   "export": 1,
+   "permlevel": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "topic"
+}

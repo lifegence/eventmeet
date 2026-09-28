@@ -1,0 +1,203 @@
+{
+ "actions": [],
+ "autoname": "format:MTG-{YYYY}-{#####}",
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "title",
+  "status",
+  "organizer",
+  "column_break_1",
+  "starts_at",
+  "ends_at",
+  "location",
+  "online",
+  "online_section",
+  "conference_session",
+  "column_break_online",
+  "join_url",
+  "agenda_tab",
+  "agenda",
+  "attendees",
+  "invitation_message",
+  "minutes_tab",
+  "minutes",
+  "ai_summary",
+  "actions"
+ ],
+ "fields": [
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "reqd": 1
+  },
+  {
+   "default": "Planned",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Status",
+   "options": "Planned\nInvited\nCompleted\nCancelled"
+  },
+  {
+   "default": "__user",
+   "fieldname": "organizer",
+   "fieldtype": "Link",
+   "in_standard_filter": 1,
+   "label": "Organizer",
+   "options": "User",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "starts_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Starts At",
+   "reqd": 1
+  },
+  {
+   "fieldname": "ends_at",
+   "fieldtype": "Datetime",
+   "label": "Ends At",
+   "reqd": 1
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location"
+  },
+  {
+   "default": "1",
+   "fieldname": "online",
+   "fieldtype": "Check",
+   "label": "Online (Zoom)"
+  },
+  {
+   "depends_on": "online",
+   "fieldname": "online_section",
+   "fieldtype": "Section Break",
+   "label": "Online"
+  },
+  {
+   "fieldname": "conference_session",
+   "fieldtype": "Link",
+   "label": "Conference Session",
+   "options": "Conference Session",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_online",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "join_url",
+   "fieldtype": "Small Text",
+   "label": "Join URL",
+   "read_only": 1
+  },
+  {
+   "fieldname": "agenda_tab",
+   "fieldtype": "Tab Break",
+   "label": "Agenda"
+  },
+  {
+   "fieldname": "agenda",
+   "fieldtype": "Table",
+   "label": "Agenda",
+   "options": "Internal Meeting Agenda"
+  },
+  {
+   "fieldname": "attendees",
+   "fieldtype": "Table",
+   "label": "Attendees",
+   "options": "Internal Meeting Attendee"
+  },
+  {
+   "fieldname": "invitation_message",
+   "fieldtype": "Text Editor",
+   "label": "Invitation Message"
+  },
+  {
+   "fieldname": "minutes_tab",
+   "fieldtype": "Tab Break",
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "minutes",
+   "fieldtype": "Text Editor",
+   "label": "Minutes"
+  },
+  {
+   "fieldname": "ai_summary",
+   "fieldtype": "Text Editor",
+   "label": "AI Summary (Zoom)",
+   "read_only": 1
+  },
+  {
+   "fieldname": "actions",
+   "fieldtype": "Table",
+   "label": "Action Items",
+   "options": "Internal Meeting Action"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Internal Meeting",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Desk User",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "show_title_field_in_link": 1,
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "title",
+ "track_changes": 1
+}

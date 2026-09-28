@@ -1,0 +1,6 @@
+<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p>{{ _("Your registration has been cancelled.") }}</p>
+{% include "templates/emails/_seminar_details.html" %}
+{% if registration.status == "Refunded" %}
+<p>{{ _("A refund of {0} has been issued to your original payment method.").format(frappe.utils.fmt_money(registration.refunded_amount, currency=registration.currency)) }}</p>
+{% endif %}

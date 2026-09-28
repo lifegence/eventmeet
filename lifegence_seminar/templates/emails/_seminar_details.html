@@ -1,0 +1,8 @@
+<table style="border-collapse: collapse; margin: 12px 0">
+	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Seminar") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ seminar.title | e }}</td></tr>
+	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Date") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ starts_at }} – {{ ends_at }}</td></tr>
+	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Ticket") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ registration.ticket_type | e }}</td></tr>
+	{% if venue and is_onsite %}
+	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Venue") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ venue.venue_name | e }}{% if venue.address %}<br>{{ venue.address | e }}{% endif %}{% if venue.map_url %}<br><a href="{{ venue.map_url | e }}">{{ _("Map") }}</a>{% endif %}</td></tr>
+	{% endif %}
+</table>
