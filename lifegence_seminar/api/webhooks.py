@@ -89,7 +89,7 @@ def zoom():
 		conference.mark_ended(external_id)
 	elif event == "meeting.summary_completed" and external_id:
 		for session in frappe.get_all(
-			"Conference Session", filters={"external_id": external_id}, pluck="name"
+			"Conference Session", filters={"external_id": external_id, "provider": "Zoom"}, pluck="name"
 		):
 			frappe.enqueue(
 				"lifegence_seminar.services.conference.import_summary",

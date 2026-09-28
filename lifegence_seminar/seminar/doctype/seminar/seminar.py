@@ -86,7 +86,7 @@ class Seminar(WebsiteGenerator):
 			return
 
 		if session_status == "Scheduled":
-			conference.reschedule_session(
+			conference.update_session(
 				self.conference_session,
 				topic=self.title,
 				starts_at=self.starts_at,

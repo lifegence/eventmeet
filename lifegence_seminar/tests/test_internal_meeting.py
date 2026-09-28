@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import frappe
 from frappe.utils import add_to_date, get_datetime, now_datetime
 
@@ -11,10 +9,10 @@ from lifegence_seminar.meeting.doctype.internal_meeting.internal_meeting import 
 from lifegence_seminar.services import conference, notifications
 from lifegence_seminar.services.host_pool import allocate_host
 from lifegence_seminar.tests.utils import (
-	FakeProvider,
 	SeminarTestCase,
 	capture_mail,
 	make_host,
+	patch_providers,
 	reset_conference_sessions,
 )
 
@@ -57,10 +55,8 @@ class TestHostPool(SeminarTestCase):
 		for name in frappe.get_all("Zoom Host Account", pluck="name"):
 			frappe.db.set_value("Zoom Host Account", name, "enabled", 0)
 		frappe.db.set_single_value("Conferencing Settings", "allocation_buffer_minutes", 15)
-		self.provider = FakeProvider()
-		patcher = patch("lifegence_seminar.services.conference.get_provider", return_value=self.provider)
-		patcher.start()
-		self.addCleanup(patcher.stop)
+		self.fakes = patch_providers(self)
+		self.provider = self.fakes["Zoom"]
 		self.organizer = make_user("organizer@example.com")
 
 	def test_prefers_smallest_sufficient_license(self):
@@ -110,10 +106,8 @@ class TestInternalMeeting(SeminarTestCase):
 		reset_conference_sessions()
 		self.mail = capture_mail(self)
 		make_host("Internal Host")
-		self.provider = FakeProvider()
-		patcher = patch("lifegence_seminar.services.conference.get_provider", return_value=self.provider)
-		patcher.start()
-		self.addCleanup(patcher.stop)
+		self.fakes = patch_providers(self)
+		self.provider = self.fakes["Zoom"]
 		self.organizer = make_user("organizer@example.com")
 		self.member = make_user("member@example.com")
 		self.outsider = make_user("outsider@example.com")

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, patch
 
 import frappe
 
-from lifegence_seminar.conferencing.providers import ConferenceProviderError, ConferenceSpec
+from lifegence_seminar.conferencing.providers import ConferenceProviderError, ConferenceSpec, SessionRef
 from lifegence_seminar.conferencing.providers.zoom import ZoomClient, ZoomProvider, render_summary_html
 from lifegence_seminar.tests.utils import SeminarTestCase
 
@@ -56,7 +56,7 @@ class TestZoomProvider(SeminarTestCase):
 	def test_refreshes_token_once_on_401(self, requests):
 		requests.post.return_value = response(payload={"access_token": "tok", "expires_in": 3600})
 		requests.request.side_effect = [response(401, {}), response(200, {"start_url": "https://s"})]
-		self.assertEqual(self.provider.get_host_url("Meeting", "1"), "https://s")
+		self.assertEqual(self.provider.get_host_url(SessionRef("Meeting", "1")), "https://s")
 		self.assertEqual(requests.post.call_count, 2)
 
 	@patch("lifegence_seminar.conferencing.providers.zoom.requests")
@@ -64,7 +64,7 @@ class TestZoomProvider(SeminarTestCase):
 		requests.post.return_value = response(payload={"access_token": "tok", "expires_in": 3600})
 		requests.request.return_value = response(400, {"message": "bad"})
 		with self.assertRaises(ConferenceProviderError):
-			self.provider.update("Meeting", "1", self.spec)
+			self.provider.update(SessionRef("Meeting", "1"), self.spec)
 
 	@patch("frappe.utils.data.get_system_timezone", return_value="Asia/Tokyo")
 	@patch("lifegence_seminar.conferencing.providers.zoom.requests")
@@ -91,7 +91,7 @@ class TestZoomProvider(SeminarTestCase):
 				{"participants": [{"name": "B", "user_email": "", "duration": 90}], "next_page_token": ""},
 			),
 		]
-		records = self.provider.list_participants("Webinar", "123")
+		records = self.provider.list_participants(SessionRef("Webinar", "123"))
 		self.assertEqual(len(records), 2)
 		self.assertEqual(records[0].email, "a@example.com")
 		self.assertEqual(records[0].join_time, datetime.datetime(2026, 10, 1, 14, 0))

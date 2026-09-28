@@ -13,6 +13,7 @@
   "reference_doctype",
   "reference_name",
   "host_account",
+  "host_user",
   "schedule_section",
   "starts_at",
   "duration_minutes",
@@ -21,6 +22,7 @@
   "timezone",
   "provider_section",
   "external_id",
+  "meeting_code",
   "join_url",
   "registration_required",
   "column_break_3",
@@ -45,7 +47,7 @@
    "fieldtype": "Select",
    "in_standard_filter": 1,
    "label": "Provider",
-   "options": "Zoom",
+   "options": "Zoom\nGoogle Meet",
    "reqd": 1
   },
   {
@@ -87,8 +89,15 @@
   {
    "fieldname": "host_account",
    "fieldtype": "Link",
-   "label": "Host Account",
+   "label": "Zoom Host Account",
    "options": "Zoom Host Account",
+   "read_only": 1
+  },
+  {
+   "description": "Zoom user of the host account, or the Google organizer.",
+   "fieldname": "host_user",
+   "fieldtype": "Data",
+   "label": "Host",
    "read_only": 1
   },
   {
@@ -136,6 +145,12 @@
    "label": "External ID",
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "meeting_code",
+   "fieldtype": "Data",
+   "label": "Meeting Code",
+   "read_only": 1
   },
   {
    "fieldname": "join_url",
@@ -194,7 +209,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-09-28 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Conferencing",
  "name": "Conference Session",

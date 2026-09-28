@@ -16,12 +16,32 @@ from frappe.utils import (
 	time_diff_in_seconds,
 )
 
-from lifegence_seminar.conferencing.providers import ConferenceProviderError, ConferenceSpec, get_provider
+from lifegence_seminar.conferencing.providers import (
+	ConferenceProviderError,
+	ConferenceSpec,
+	Invitee,
+	SessionRef,
+	get_provider,
+)
 from lifegence_seminar.services.host_pool import allocate_host, is_host_busy
 
 DEFAULT_PROVIDER = "Zoom"
 MAX_ATTENDANCE_SYNC_ATTEMPTS = 12
 SUMMARY_WINDOW_HOURS = 48
+NAME_KEY_PREFIX = "name:"
+
+
+def default_internal_provider() -> str:
+	return (
+		frappe.db.get_single_value("Conferencing Settings", "internal_meeting_provider") or DEFAULT_PROVIDER
+	)
+
+
+def attendance_key(email: str | None, name: str | None) -> str:
+	"""Attendance is matched by email; participants without a resolvable email fall back to their name."""
+	if email:
+		return email.strip().lower()
+	return NAME_KEY_PREFIX + (name or "").strip().lower()
 
 
 def _duration_minutes(starts_at: datetime.datetime, ends_at: datetime.datetime) -> int:
@@ -31,7 +51,9 @@ def _duration_minutes(starts_at: datetime.datetime, ends_at: datetime.datetime) 
 	return minutes
 
 
-def _spec(topic, kind, starts_at, ends_at, registration_required, agenda, purpose) -> ConferenceSpec:
+def _spec(
+	topic, kind, starts_at, ends_at, registration_required, agenda, purpose, attendees=None, notify=False
+) -> ConferenceSpec:
 	settings = frappe.get_single("Conferencing Settings")
 	return ConferenceSpec(
 		topic=topic,
@@ -43,6 +65,19 @@ def _spec(topic, kind, starts_at, ends_at, registration_required, agenda, purpos
 		agenda=agenda or "",
 		waiting_room=purpose == "internal" and bool(settings.zoom_waiting_room),
 		auto_recording=settings.zoom_auto_recording or "none",
+		attendees=list(attendees or []),
+		notify=notify,
+	)
+
+
+def session_ref(session) -> SessionRef:
+	return SessionRef(
+		kind=session.kind,
+		external_id=session.external_id,
+		host=session.host_user or "",
+		meeting_code=session.meeting_code or "",
+		starts_at=get_datetime(session.starts_at) if session.starts_at else None,
+		ends_at=get_datetime(session.ends_at) if session.ends_at else None,
 	)
 
 
@@ -51,6 +86,25 @@ def _raise(action: str, error: Exception):
 	frappe.throw(
 		_("Could not {0} the online session: {1}").format(_(action), error), title=_("Conferencing Error")
 	)
+
+
+def _validate_google_organizer(email: str | None) -> str:
+	if not email:
+		frappe.throw(_("The organizer needs an email address to host a Google Meet meeting."))
+	domains = {
+		d.strip().lower().lstrip("@")
+		for d in (
+			frappe.db.get_single_value("Conferencing Settings", "google_workspace_domains") or ""
+		).split(",")
+		if d.strip()
+	}
+	if domains and email.rsplit("@", 1)[-1].lower() not in domains:
+		frappe.throw(
+			_("Organizer {0} is not a Google Workspace user of {1}.").format(
+				email, ", ".join(sorted(domains))
+			)
+		)
+	return email
 
 
 def schedule_session(
@@ -64,12 +118,25 @@ def schedule_session(
 	expected_attendees: int,
 	purpose: str,
 	agenda: str = "",
+	provider_name: str = DEFAULT_PROVIDER,
+	organizer_email: str | None = None,
+	attendees: list[Invitee] | None = None,
+	notify: bool = False,
 ):
 	starts_at, ends_at = get_datetime(starts_at), get_datetime(ends_at)
-	spec = _spec(topic, kind, starts_at, ends_at, registration_required, agenda, purpose)
-	host_account = allocate_host(kind, starts_at, ends_at, expected_attendees, purpose)
-	host_user = frappe.db.get_value("Zoom Host Account", host_account, "zoom_user")
-	provider = get_provider(DEFAULT_PROVIDER)
+	spec = _spec(topic, kind, starts_at, ends_at, registration_required, agenda, purpose, attendees, notify)
+	provider = get_provider(provider_name)
+	if kind == "Webinar" and not provider.supports_webinar:
+		frappe.throw(_("{0} does not support webinars.").format(provider.name))
+	if registration_required and not provider.supports_registration:
+		frappe.throw(_("{0} does not support registration with personal join links.").format(provider.name))
+
+	host_account = None
+	if provider.uses_host_pool:
+		host_account = allocate_host(kind, starts_at, ends_at, expected_attendees, purpose)
+		host_user = frappe.db.get_value("Zoom Host Account", host_account, "zoom_user")
+	else:
+		host_user = _validate_google_organizer(organizer_email)
 
 	try:
 		created = provider.create(host_user, spec)
@@ -87,11 +154,13 @@ def schedule_session(
 				"reference_doctype": reference_doc.doctype,
 				"reference_name": reference_doc.name,
 				"host_account": host_account,
+				"host_user": host_user,
 				"starts_at": starts_at,
 				"ends_at": ends_at,
 				"duration_minutes": spec.duration_minutes,
 				"timezone": spec.timezone,
 				"external_id": created.external_id,
+				"meeting_code": created.meeting_code,
 				"join_url": created.join_url,
 				"passcode": created.passcode,
 				"registration_required": 1 if registration_required else 0,
@@ -101,55 +170,80 @@ def schedule_session(
 	except Exception:
 		# Do not leave an orphan meeting on the provider side.
 		try:
-			provider.delete(kind, created.external_id)
+			provider.delete(SessionRef(kind=kind, external_id=created.external_id, host=host_user))
 		except ConferenceProviderError:
 			frappe.log_error(title="Orphan conference cleanup failed", message=frappe.get_traceback())
 		raise
 	return session
 
 
-def reschedule_session(session_name: str, *, topic: str, starts_at, ends_at, agenda: str = "", purpose: str):
+def update_session(
+	session_name: str,
+	*,
+	topic: str,
+	starts_at,
+	ends_at,
+	agenda: str = "",
+	purpose: str,
+	attendees: list[Invitee] | None = None,
+	notify: bool = False,
+):
+	"""Push schedule/topic changes (and, for providers with native invitations, attendees)."""
 	session = frappe.get_doc("Conference Session", session_name)
+	provider = get_provider(session.provider)
 	starts_at, ends_at = get_datetime(starts_at), get_datetime(ends_at)
-	if (
+	schedule_changed = not (
 		session.topic == topic
 		and get_datetime(session.starts_at) == starts_at
 		and get_datetime(session.ends_at) == ends_at
-	):
+	)
+	if not schedule_changed and not provider.native_invitations:
 		return session
 
-	if is_host_busy(session.host_account, starts_at, ends_at, exclude_session=session.name):
-		frappe.throw(
-			_("Host account {0} is busy at the new time. Choose another time.").format(session.host_account),
-			title=_("No Zoom Host Available"),
-		)
+	if schedule_changed and session.host_account:
+		if is_host_busy(session.host_account, starts_at, ends_at, exclude_session=session.name):
+			frappe.throw(
+				_("Host account {0} is busy at the new time. Choose another time.").format(
+					session.host_account
+				),
+				title=_("No Zoom Host Available"),
+			)
 
 	spec = _spec(
-		topic, session.kind, starts_at, ends_at, bool(session.registration_required), agenda, purpose
+		topic,
+		session.kind,
+		starts_at,
+		ends_at,
+		bool(session.registration_required),
+		agenda,
+		purpose,
+		attendees,
+		notify,
 	)
 	try:
-		get_provider(session.provider).update(session.kind, session.external_id, spec)
+		provider.update(session_ref(session), spec)
 	except ConferenceProviderError as e:
 		_raise("update", e)
 
-	session.update(
-		{
-			"topic": topic,
-			"starts_at": starts_at,
-			"ends_at": ends_at,
-			"duration_minutes": spec.duration_minutes,
-		}
-	)
-	session.save(ignore_permissions=True)
+	if schedule_changed:
+		session.update(
+			{
+				"topic": topic,
+				"starts_at": starts_at,
+				"ends_at": ends_at,
+				"duration_minutes": spec.duration_minutes,
+			}
+		)
+		session.save(ignore_permissions=True)
 	return session
 
 
-def cancel_session(session_name: str):
+def cancel_session(session_name: str, notify: bool = False):
 	session = frappe.get_doc("Conference Session", session_name)
 	if session.status == "Cancelled":
 		return session
 	try:
-		get_provider(session.provider).delete(session.kind, session.external_id)
+		get_provider(session.provider).delete(session_ref(session), notify=notify)
 	except ConferenceProviderError as e:
 		_raise("cancel", e)
 	session.status = "Cancelled"
@@ -157,14 +251,19 @@ def cancel_session(session_name: str):
 	return session
 
 
+def provider_has_native_invitations(session_name: str | None) -> bool:
+	if not session_name:
+		return False
+	provider = frappe.db.get_value("Conference Session", session_name, "provider")
+	return provider == "Google Meet"
+
+
 def register_participant(session_name: str, email: str, full_name: str):
 	"""Return (registrant_id, personal join URL)."""
 	session = frappe.get_doc("Conference Session", session_name)
 	if not session.registration_required:
 		return "", session.join_url
-	registrant = get_provider(session.provider).add_registrant(
-		session.kind, session.external_id, email, full_name
-	)
+	registrant = get_provider(session.provider).add_registrant(session_ref(session), email, full_name)
 	return registrant.registrant_id, registrant.join_url or session.join_url
 
 
@@ -172,13 +271,13 @@ def cancel_participant(session_name: str, registrant_id: str, email: str) -> Non
 	session = frappe.get_doc("Conference Session", session_name)
 	if session.status == "Cancelled" or not registrant_id:
 		return
-	get_provider(session.provider).cancel_registrant(session.kind, session.external_id, registrant_id, email)
+	get_provider(session.provider).cancel_registrant(session_ref(session), registrant_id, email)
 
 
 def get_host_url(session_name: str) -> str:
 	session = frappe.get_doc("Conference Session", session_name)
 	try:
-		return get_provider(session.provider).get_host_url(session.kind, session.external_id)
+		return get_provider(session.provider).get_host_url(session_ref(session))
 	except ConferenceProviderError as e:
 		_raise("open", e)
 
@@ -191,11 +290,11 @@ def _reference_doc(session):
 
 
 def sync_attendance(session_name: str) -> dict[str, float]:
-	"""Fetch participant report and push per-email minutes to the reference document."""
+	"""Fetch participant report and push per-attendee minutes to the reference document."""
 	session = frappe.get_doc("Conference Session", session_name)
-	records = get_provider(session.provider).list_participants(session.kind, session.external_id)
+	records = get_provider(session.provider).list_participants(session_ref(session))
 
-	minutes_by_email: dict[str, float] = defaultdict(float)
+	minutes_by_key: dict[str, float] = defaultdict(float)
 	session.set("participants", [])
 	for record in records:
 		session.append(
@@ -208,8 +307,8 @@ def sync_attendance(session_name: str) -> dict[str, float]:
 				"duration_minutes": record.duration_minutes,
 			},
 		)
-		if record.email:
-			minutes_by_email[record.email] += record.duration_minutes
+		if record.email or record.name:
+			minutes_by_key[attendance_key(record.email, record.name)] += record.duration_minutes
 
 	session.attendance_synced = 1
 	session.attendance_sync_attempts = cint(session.attendance_sync_attempts) + 1
@@ -219,13 +318,13 @@ def sync_attendance(session_name: str) -> dict[str, float]:
 
 	reference = _reference_doc(session)
 	if reference and hasattr(reference, "apply_conference_attendance"):
-		reference.apply_conference_attendance(dict(minutes_by_email))
-	return dict(minutes_by_email)
+		reference.apply_conference_attendance(dict(minutes_by_key))
+	return dict(minutes_by_key)
 
 
 def import_summary(session_name: str) -> bool:
 	session = frappe.get_doc("Conference Session", session_name)
-	summary_html = get_provider(session.provider).get_summary_html(session.kind, session.external_id)
+	summary_html = get_provider(session.provider).get_summary_html(session_ref(session))
 	if not summary_html:
 		return False
 	reference = _reference_doc(session)
@@ -235,9 +334,11 @@ def import_summary(session_name: str) -> bool:
 	return True
 
 
-def mark_ended(external_id: str) -> None:
+def mark_ended(external_id: str, provider: str = "Zoom") -> None:
 	for name in frappe.get_all(
-		"Conference Session", filters={"external_id": external_id, "status": "Scheduled"}, pluck="name"
+		"Conference Session",
+		filters={"external_id": external_id, "provider": provider, "status": "Scheduled"},
+		pluck="name",
 	):
 		frappe.db.set_value("Conference Session", name, "status", "Ended")
 

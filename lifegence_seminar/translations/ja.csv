@@ -3,12 +3,14 @@
 A host account is considered busy this many minutes before and after each session.,各セッションの前後この分数は、ホストアカウントを使用中として扱います。
 A refund of {0} has been issued to your original payment method.,{0} をお支払いに使用された方法へ返金しました。
 AI Summary (Zoom),AI 要約（Zoom）
+AI Summary / Meeting Notes,AI 要約 / 会議メモ
 AI Summary Imported,AI 要約取込済
 Access Notes,アクセス案内
 Account ID,アカウント ID
 Action Items,アクションアイテム
 Add at least one attendee with an email address.,メールアドレスを持つ参加者を 1 名以上追加してください。
 Add at least one enabled ticket type before opening registration.,申込受付を開始する前に、有効なチケット種別を 1 つ以上追加してください。
+"After invitations are sent, changes and cancellation are notified to attendees.",招待送信後は、変更や中止が参加者に通知されます。
 Agenda,議題
 All Zoom host accounts are busy between {0} and {1}. Add a host account or change the time.,{0} 〜 {1} はすべての Zoom ホストアカウントが使用中です。ホストアカウントを追加するか、時間を変更してください。
 Already checked in,受付済み
@@ -41,23 +43,28 @@ Checked In By,受付担当
 Checked in,受付しました
 Checkout Expiry (Minutes),決済画面の有効時間（分）
 Collect Feedback,アンケートを実施
+"Comma-separated, e.g. example.com. Organizers must have an email address in one of these domains.",カンマ区切り（例: example.com）。主催者はいずれかのドメインのメールアドレスを持つ必要があります。
 Conference Kind,会議の種類
 Conference Participant,会議参加記録
 Conference Registrant ID,会議登録者 ID
 Conference Session,オンライン会議
 Conferencing Error,オンライン会議エラー
 Conferencing Settings,オンライン会議設定
+Conferencing Tool,会議ツール
 Confirm Without Online Payment,オンライン決済なしで確定
 Confirm this registration (e.g. invoice / bank transfer / invited guest)?,この申込を確定しますか？（請求書払い・銀行振込・招待者など）
 Could not {0} the online session: {1},オンライン会議を{0}できませんでした: {1}
 Create Stripe Invoice (Receipt),Stripe 請求書（領収書）を発行
 "Dear {0},",{0} 様
 Default Currency,既定の通貨
+Default conferencing tool for new internal meetings. Seminars always use Zoom (registrants / webinars).,新規の社内ミーティングで使う既定の会議ツール。セミナーは常に Zoom を使用します（申込者の個別リンク・ウェビナーのため）。
 Defaults to the start time.,未入力の場合は開始日時になります。
 Duration (Minutes),時間（分）
 Each registrant receives a personal join link.,申込者ごとに個別の参加リンクが発行されます。
 Email address or user ID of a licensed user in the Zoom account.,Zoom アカウント内のライセンス付与済みユーザーのメールアドレスまたはユーザー ID
 Email all attendees with a calendar invitation?,全参加者にカレンダー招待付きのメールを送信しますか？
+Enable Google Meet,Google Meet を有効化
+Enable Google Meet before making it the default for internal meetings.,社内ミーティングの既定にする前に Google Meet を有効化してください。
 Enable Stripe,Stripe を有効化
 Enable Zoom,Zoom を有効化
 End time must be after start time.,終了日時は開始日時より後にしてください。
@@ -69,22 +76,29 @@ Feedback Requested,アンケート依頼済
 Feedback has already been submitted. Thank you!,アンケートは回答済みです。ありがとうございました。
 Feedback is not collected for this seminar.,このセミナーではアンケートを実施していません。
 Feedback opens after the seminar starts.,アンケートはセミナー開始後に回答できます。
+Google Calendar notifies attendees automatically when the meeting is cancelled.,ミーティングを中止すると、Google カレンダーが参加者に自動で通知します。
+Google Calendar will email the invitation to all attendees. Continue?,Google カレンダーから全参加者に招待メールが送信されます。続行しますか？
 Host Account,ホストアカウント
 Host Allocation,ホスト割当
 Host account {0} is busy at the new time. Choose another time.,ホストアカウント {0} は変更後の時間に使用中です。別の時間を選んでください。
 Hybrid,ハイブリッド
 I would recommend this seminar to others,このセミナーを他の人に勧めたい
 Import AI Summary,AI 要約を取り込む
+Import Gemini Meeting Notes,Gemini の会議メモを取り込む
+"Imports ""Take notes for me"" documents into the minutes. Requires the drive.readonly scope.",「自動メモ作成」のドキュメントを議事録に取り込みます。drive.readonly スコープが必要です。
 Internal Meeting,社内ミーティング
 Internal Meeting Action,社内ミーティング アクション
 Internal Meeting Agenda,社内ミーティング 議題
 Internal Meeting Attendee,社内ミーティング 参加者
+Internal Meeting Provider,社内ミーティングの会議ツール
 Internal Notes,社内メモ
 Invalid check-in code.,受付コードが無効です。
 Invalid feedback link.,アンケートのリンクが無効です。
 Invitation Message,招待メッセージ
 Invitation queued,招待メールを送信しました
+Invitation sent,招待を送信しました
 Invitation: {0},招待: {0}
+Invitations Sent,招待送信済
 Invited,招待済
 Job Title,役職
 Join,参加
@@ -95,8 +109,10 @@ Join on Zoom,Zoom で参加する
 Join with this personal link (please do not share it):,以下の個別リンクから参加してください（他の方と共有しないでください）:
 Kind,種類
 Leave Time,退室日時
+Leave empty to use the default of Conferencing Settings. Google Meet uses the organizer's Google Calendar and sends Google invitations.,空欄の場合はオンライン会議設定の既定値を使用します。Google Meet は主催者の Google カレンダーに予定を作成し、Google から招待を送信します。
 Map URL,地図 URL
 Meeting Capacity,ミーティング上限人数
+Meeting Code,ミーティングコード
 Meeting: registration-based Zoom meeting (up to the host's meeting capacity). Webinar: requires a host with a Webinar license.,Meeting: 登録制の Zoom ミーティング（ホストのミーティング上限人数まで）。Webinar: Webinar ライセンスを持つホストが必要です。
 No AI summary is available yet. Make sure AI Companion meeting summary is enabled in Zoom.,AI 要約はまだありません。Zoom で AI Companion の会議要約が有効か確認してください。
 No Stripe payment is linked to this registration; refund it manually.,この申込には Stripe の決済が紐付いていません。手動で返金してください。
@@ -107,6 +123,7 @@ Notes,メモ
 On-site,会場
 On-site check-in,会場での受付
 Online (Zoom),オンライン（Zoom）
+Online Meeting,オンライン会議
 Online Minutes,オンライン視聴時間（分）
 Online participation,オンライン参加
 Online payment is not available. Enable Stripe in Seminar Settings.,オンライン決済は利用できません。セミナー設定で Stripe を有効にしてください。
@@ -118,6 +135,7 @@ Open in Frappe,Frappe で開く
 Optional,任意参加
 Organization,所属
 Organizer,主催者
+Organizer {0} is not a Google Workspace user of {1}.,主催者 {0} は {1} の Google Workspace ユーザーではありません。
 Overall satisfaction,総合満足度
 Paid At,支払日時
 Passcode,パスコード
@@ -156,6 +174,7 @@ Registrations,申込一覧
 Reminder Sent,リマインド送信済
 Reminder: {0},リマインド: {0}
 Resend Confirmation,確定メールを再送
+Resend Invitation,招待を再送
 Seat is held while the Stripe Checkout is open. Stripe requires 30 minutes or more.,Stripe の決済画面が開いている間は席を確保します。Stripe の仕様上 30 分以上が必要です。
 Secret Token of the Zoom app's Event Subscription. Webhook URL: /api/method/lifegence_seminar.api.webhooks.zoom,Zoom アプリの Event Subscription の Secret Token。Webhook URL: /api/method/lifegence_seminar.api.webhooks.zoom
 Seminar,セミナー
@@ -175,6 +194,8 @@ Send Cancellation,中止連絡を送信
 Send Feedback Request After Seminar,終了後にアンケート依頼を送信
 Send Invitation,招待を送信
 Send Reminder Hours Before,リマインド送信（開始の何時間前）
+Service Account Key (JSON),サービスアカウント鍵（JSON）
+"Service account with domain-wide delegation for scopes: calendar.events, meetings.space.readonly, directory.readonly (+ drive.readonly for notes).","ドメイン全体の委任を設定したサービスアカウント。スコープ: calendar.events, meetings.space.readonly, directory.readonly（メモ取込時は drive.readonly も）"
 Show this QR code at the reception.,受付でこの QR コードをご提示ください。
 Shown on the seminar list.,セミナー一覧に表示されます。
 Sold out,満席
@@ -192,12 +213,15 @@ Sync Attendance,参加ログを取得
 Thank you for attending {0},{0} へのご参加ありがとうございました
 Thank you for attending {0}. Please take a minute to answer our survey.,{0} にご参加いただきありがとうございました。アンケートへのご協力をお願いいたします。
 Thank you for registering. Your registration is confirmed.,お申し込みありがとうございます。お申し込みが確定しました。
+The JSON is not a service account key.,この JSON はサービスアカウント鍵ではありません。
 The Zoom session is created automatically when the status is set to Open.,ステータスを Open にすると Zoom が自動作成されます。
 The following meeting has been cancelled.,以下のミーティングは中止になりました。
 The link is invalid or has expired.,リンクが無効か、有効期限が切れています。
 The online join link will be sent in a separate email.,オンライン参加リンクは別途メールでお送りします。
 The online session is not ready yet. Please try again later.,オンライン会議の準備ができていません。しばらくしてから再度お試しください。
+The organizer needs an email address to host a Google Meet meeting.,Google Meet を開催するには主催者のメールアドレスが必要です。
 "The seminar is open but not published, so it is not visible on the website.",申込受付中ですが公開されていないため、Web サイトには表示されません。
+The service account key must be the JSON key file downloaded from Google Cloud.,Google Cloud からダウンロードした JSON 鍵ファイルの内容を貼り付けてください。
 The survey is not open yet.,アンケートはまだ開始されていません。
 This email address is already registered for this seminar.,このメールアドレスは既にこのセミナーに申し込まれています。
 This is a reminder that the seminar is coming up soon.,まもなくセミナーの開催日です。
@@ -231,6 +255,7 @@ Webhook Secret Token,Webhook Secret Token
 Webhook Signing Secret,Webhook 署名シークレット
 Webinar,ウェビナー
 Webinar Capacity,ウェビナー上限人数
+Workspace Domains,Workspace ドメイン
 Would Recommend,推奨意向
 You are invited to the following meeting.,以下のミーティングにご招待します。
 Your Registration,お申し込み内容
@@ -238,11 +263,16 @@ Your registration has been cancelled.,お申し込みはキャンセルされま
 Your registration is confirmed.,お申し込みは確定しています。
 Zoom (the join link is emailed after registration),Zoom（参加リンクはお申し込み後にメールでお送りします）
 Zoom Host Account,Zoom ホストアカウント
+Zoom Host Allocation,Zoom ホスト割当
 Zoom User,Zoom ユーザー
+Zoom is disabled; consider making Google Meet the default.,Zoom が無効です。既定を Google Meet にすることを検討してください。
+"Zoom user of the host account, or the Google organizer.",ホストアカウントの Zoom ユーザー、または Google の主催者
 cancel,取消
 create,作成
 min,分
 open,開始
 update,更新
+{0} does not support registration with personal join links.,{0} は個別参加リンク付きの登録に対応していません。
+{0} does not support webinars.,{0} はウェビナーに対応していません。
 {0} is too long.,{0} が長すぎます。
 {0} seats left,残り {0} 席

@@ -6,11 +6,11 @@ from frappe.utils import add_to_date, now_datetime
 from lifegence_seminar.services import registration as reg_service
 from lifegence_seminar.services import stripe_api
 from lifegence_seminar.tests.utils import (
-	FakeProvider,
 	SeminarTestCase,
 	capture_mail,
 	make_host,
 	make_seminar,
+	patch_providers,
 	reset_conference_sessions,
 )
 
@@ -222,10 +222,8 @@ class TestOnlineSeminar(SeminarTestCase):
 		reset_conference_sessions()
 		self.mail = capture_mail(self)
 		make_host("Seminar Host", meeting_capacity=100, webinar_capacity=500)
-		self.provider = FakeProvider()
-		patcher = patch("lifegence_seminar.services.conference.get_provider", return_value=self.provider)
-		patcher.start()
-		self.addCleanup(patcher.stop)
+		self.fakes = patch_providers(self)
+		self.provider = self.fakes["Zoom"]
 
 	def test_opening_online_seminar_creates_session_and_registers_attendee(self):
 		seminar = make_seminar(fmt="Online", status="Draft", conference_kind="Webinar", capacity=200)

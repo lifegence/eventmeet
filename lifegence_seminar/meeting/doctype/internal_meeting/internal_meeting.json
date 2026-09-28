@@ -8,11 +8,13 @@
   "title",
   "status",
   "organizer",
+  "invitations_sent",
   "column_break_1",
   "starts_at",
   "ends_at",
   "location",
   "online",
+  "conference_provider",
   "online_section",
   "conference_session",
   "column_break_online",
@@ -53,6 +55,14 @@
    "reqd": 1
   },
   {
+   "default": "0",
+   "description": "After invitations are sent, changes and cancellation are notified to attendees.",
+   "fieldname": "invitations_sent",
+   "fieldtype": "Check",
+   "label": "Invitations Sent",
+   "read_only": 1
+  },
+  {
    "fieldname": "column_break_1",
    "fieldtype": "Column Break"
   },
@@ -78,7 +88,15 @@
    "default": "1",
    "fieldname": "online",
    "fieldtype": "Check",
-   "label": "Online (Zoom)"
+   "label": "Online Meeting"
+  },
+  {
+   "depends_on": "online",
+   "description": "Leave empty to use the default of Conferencing Settings. Google Meet uses the organizer's Google Calendar and sends Google invitations.",
+   "fieldname": "conference_provider",
+   "fieldtype": "Select",
+   "label": "Conferencing Tool",
+   "options": "\nZoom\nGoogle Meet"
   },
   {
    "depends_on": "online",
@@ -138,7 +156,7 @@
   {
    "fieldname": "ai_summary",
    "fieldtype": "Text Editor",
-   "label": "AI Summary (Zoom)",
+   "label": "AI Summary / Meeting Notes",
    "read_only": 1
   },
   {
@@ -150,7 +168,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-09-28 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",

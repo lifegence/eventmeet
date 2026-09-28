@@ -13,11 +13,20 @@
 | オンライン | Zoom Meeting（登録制）/ Webinar の自動作成・変更・取消、申込者ごとの個別参加 URL、ホストとして開始 |
 | 当日 | QR チェックイン（`/seminar-checkin`、スタッフのみ）、リマインドメール |
 | 事後 | Zoom 参加ログ取込（出席・視聴分数）、アンケート（`/seminar-feedback`） |
-| 社内 MTG | 議題・参加者・招待メール（ICS 付き）・Zoom 自動発行・議事録・Zoom AI 要約取込・アクション（ToDo 双方向同期）・参加者のみ閲覧可 |
+| 社内 MTG | 議題・参加者・招待・議事録・アクション（ToDo 双方向同期）・参加者のみ閲覧可。会議ツールは **Zoom / Google Meet** を選択 |
+| Google Meet | 主催者の Google カレンダーに予定 + Meet を作成、Google から招待・変更・中止を通知、参加ログ取込、Gemini「自動メモ作成」の議事録取込 |
 | Zoom ライセンス | ホストアカウントのプールから空きを自動割当（必要ライセンス数 = 同時開催数のピーク） |
 
 会議基盤は `lifegence_seminar/conferencing/providers/` のインタフェースで抽象化しており、
-Google Meet や自前 WebRTC（`lifegence_meet` 等）への差し替え・追加が可能。
+自前 WebRTC（`lifegence_meet` 等）も同じ形で追加できる。
+
+| | Zoom | Google Meet |
+|---|---|---|
+| 用途 | セミナー（登録制 Meeting / Webinar）、社内 MTG | 社内 MTG |
+| ホスト | ライセンス付与済みホストのプールから自動割当 | 主催者本人（Workspace ユーザー） |
+| 招待 | アプリからメール + ICS | Google カレンダーの招待（アプリの「招待を送信」で送出） |
+| 参加ログ | Zoom レポート API | Meet REST API（参加者 → People API でメール解決、不可時は表示名で照合） |
+| AI 議事録 | AI Companion 会議要約 | Gemini「自動メモ作成」ドキュメント（任意） |
 
 ## 構成
 
@@ -46,6 +55,19 @@ bench --site <site> install-app lifegence_seminar
 4. **Zoom Host Account** にライセンス付与済みユーザーを登録（Webinar アドオンがあれば `Webinar Capacity` を設定）
 5. AI 要約を取り込む場合は Zoom 側で AI Companion の会議要約を有効化
 
+### Google Meet（社内 MTG）
+1. Google Cloud でサービスアカウントを作成し、JSON 鍵を発行。Calendar API / Google Meet REST API /
+   People API（メモ取込時は Drive API）を有効化
+2. Google 管理コンソール → セキュリティ → API の制御 → **ドメイン全体の委任** で、サービスアカウントの
+   クライアント ID に以下のスコープを付与
+   - `https://www.googleapis.com/auth/calendar.events`
+   - `https://www.googleapis.com/auth/meetings.space.readonly`
+   - `https://www.googleapis.com/auth/directory.readonly`
+   - `https://www.googleapis.com/auth/drive.readonly`（Gemini メモを取り込む場合のみ）
+3. **Conferencing Settings** で Google Meet を有効化し、JSON 鍵と Workspace ドメインを登録。
+   社内 MTG の既定を Google Meet にする場合は `Internal Meeting Provider` を変更
+4. 主催者（Frappe ユーザー）のメールアドレスは Workspace アカウントと一致している必要がある
+
 ### Stripe
 1. **Seminar Settings** に Secret Key と Webhook Signing Secret を登録
 2. Webhook: `https://<site>/api/method/lifegence_seminar.api.webhooks.stripe`、
@@ -65,7 +87,7 @@ bench --site <site> set-config allow_tests true
 bench --site <site> run-tests --app lifegence_seminar
 ```
 
-外部 API（Zoom / Stripe）はテストでモックする。
+外部 API（Zoom / Google / Stripe）はテストでモックする。
 
 ## セキュリティ
 ゲスト到達エンドポイントの認可・入力検証・レート制限は

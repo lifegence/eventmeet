@@ -20,7 +20,9 @@ except ImportError:  # Frappe v15
 	from frappe.tests.utils import FrappeTestCase as SeminarTestCase
 
 __all__ = [
+	"FakeGoogleProvider",
 	"FakeProvider",
+	"patch_providers",
 	"SeminarTestCase",
 	"capture_mail",
 	"make_host",
@@ -34,6 +36,9 @@ class FakeProvider(ConferenceProvider):
 	"""In-memory stand-in for Zoom that records every call."""
 
 	name = "Zoom"
+	uses_host_pool = True
+	supports_registration = True
+	supports_webinar = True
 	_ids = itertools.count(90000)
 
 	def __init__(self):
@@ -45,35 +50,66 @@ class FakeProvider(ConferenceProvider):
 		external_id = str(next(self._ids))
 		self.calls.append(("create", host, spec))
 		return CreatedConference(
-			external_id=external_id, join_url=f"https://zoom.test/j/{external_id}", passcode="pw"
+			external_id=external_id,
+			join_url=f"https://zoom.test/j/{external_id}",
+			passcode="pw",
+			meeting_code=f"code-{external_id}",
 		)
 
-	def update(self, kind, external_id, spec):
-		self.calls.append(("update", external_id, spec))
+	def update(self, ref, spec):
+		self.calls.append(("update", ref, spec))
 
-	def delete(self, kind, external_id):
-		self.calls.append(("delete", external_id))
+	def delete(self, ref, notify=False):
+		self.calls.append(("delete", ref, notify))
 
-	def add_registrant(self, kind, external_id, email, first_name, last_name=""):
-		self.calls.append(("add_registrant", external_id, email))
+	def add_registrant(self, ref, email, first_name, last_name=""):
+		self.calls.append(("add_registrant", ref.external_id, email))
 		return Registrant(
-			registrant_id=f"r-{email}", join_url=f"https://zoom.test/w/{external_id}?tk={email}"
+			registrant_id=f"r-{email}", join_url=f"https://zoom.test/w/{ref.external_id}?tk={email}"
 		)
 
-	def cancel_registrant(self, kind, external_id, registrant_id, email):
-		self.calls.append(("cancel_registrant", external_id, registrant_id))
+	def cancel_registrant(self, ref, registrant_id, email):
+		self.calls.append(("cancel_registrant", ref.external_id, registrant_id))
 
-	def get_host_url(self, kind, external_id):
-		return f"https://zoom.test/s/{external_id}"
+	def get_host_url(self, ref):
+		return f"https://zoom.test/s/{ref.external_id}"
 
-	def list_participants(self, kind, external_id):
+	def list_participants(self, ref):
 		return self.participants
 
-	def get_summary_html(self, kind, external_id):
+	def get_summary_html(self, ref):
 		return self.summary
 
 	def called(self, action: str) -> list[tuple]:
 		return [call for call in self.calls if call[0] == action]
+
+
+class FakeGoogleProvider(FakeProvider):
+	"""Google Meet-like fake: organizer-owned sessions and native calendar invitations."""
+
+	name = "Google Meet"
+	uses_host_pool = False
+	supports_registration = False
+	supports_webinar = False
+	native_invitations = True
+
+	def create(self, host, spec):
+		created = super().create(host, spec)
+		created.join_url = f"https://meet.test/{created.meeting_code}"
+		return created
+
+
+def patch_providers(testcase) -> dict[str, FakeProvider]:
+	"""Route get_provider() to fakes for the duration of the test."""
+	from unittest.mock import patch
+
+	fakes = {"Zoom": FakeProvider(), "Google Meet": FakeGoogleProvider()}
+	patcher = patch(
+		"lifegence_seminar.services.conference.get_provider", side_effect=lambda name: fakes[name]
+	)
+	patcher.start()
+	testcase.addCleanup(patcher.stop)
+	return fakes
 
 
 def ensure_currency(code: str = "JPY"):

@@ -26,6 +26,7 @@ from lifegence_seminar.conferencing.providers.base import (
 	CreatedConference,
 	ParticipantRecord,
 	Registrant,
+	SessionRef,
 )
 
 API_BASE = "https://api.zoom.us/v2"
@@ -110,6 +111,9 @@ def _parse_zoom_time(value: str | None) -> datetime.datetime | None:
 
 class ZoomProvider(ConferenceProvider):
 	name = "Zoom"
+	uses_host_pool = True
+	supports_registration = True
+	supports_webinar = True
 
 	def __init__(self, client: ZoomClient):
 		self.client = client
@@ -159,39 +163,37 @@ class ZoomProvider(ConferenceProvider):
 			external_id=str(data["id"]), join_url=data.get("join_url", ""), passcode=data.get("password", "")
 		)
 
-	def update(self, kind: str, external_id: str, spec: ConferenceSpec) -> None:
+	def update(self, ref: SessionRef, spec: ConferenceSpec) -> None:
 		payload = self._payload(spec)
 		payload.pop("type")
-		self.client.request("PATCH", f"/{_collection(kind)}/{external_id}", json=payload)
+		self.client.request("PATCH", f"/{_collection(ref.kind)}/{ref.external_id}", json=payload)
 
-	def delete(self, kind: str, external_id: str) -> None:
-		self.client.request("DELETE", f"/{_collection(kind)}/{external_id}", allow_404=True)
+	def delete(self, ref: SessionRef, notify: bool = False) -> None:
+		self.client.request("DELETE", f"/{_collection(ref.kind)}/{ref.external_id}", allow_404=True)
 
-	def add_registrant(
-		self, kind: str, external_id: str, email: str, first_name: str, last_name: str = ""
-	) -> Registrant:
+	def add_registrant(self, ref: SessionRef, email: str, first_name: str, last_name: str = "") -> Registrant:
 		data = self.client.request(
 			"POST",
-			f"/{_collection(kind)}/{external_id}/registrants",
+			f"/{_collection(ref.kind)}/{ref.external_id}/registrants",
 			json={"email": email, "first_name": first_name[:64], "last_name": (last_name or "")[:64]},
 		)
 		return Registrant(
 			registrant_id=str(data.get("registrant_id") or data.get("id")), join_url=data.get("join_url", "")
 		)
 
-	def cancel_registrant(self, kind: str, external_id: str, registrant_id: str, email: str) -> None:
+	def cancel_registrant(self, ref: SessionRef, registrant_id: str, email: str) -> None:
 		self.client.request(
 			"PUT",
-			f"/{_collection(kind)}/{external_id}/registrants/status",
+			f"/{_collection(ref.kind)}/{ref.external_id}/registrants/status",
 			json={"action": "cancel", "registrants": [{"id": registrant_id, "email": email}]},
 			allow_404=True,
 		)
 
-	def get_host_url(self, kind: str, external_id: str) -> str:
-		data = self.client.request("GET", f"/{_collection(kind)}/{external_id}")
+	def get_host_url(self, ref: SessionRef) -> str:
+		data = self.client.request("GET", f"/{_collection(ref.kind)}/{ref.external_id}")
 		return data.get("start_url", "")
 
-	def list_participants(self, kind: str, external_id: str) -> list[ParticipantRecord]:
+	def list_participants(self, ref: SessionRef) -> list[ParticipantRecord]:
 		records: list[ParticipantRecord] = []
 		next_page_token = ""
 		while True:
@@ -199,7 +201,7 @@ class ZoomProvider(ConferenceProvider):
 			if next_page_token:
 				params["next_page_token"] = next_page_token
 			data = self.client.request(
-				"GET", f"/report/{_collection(kind)}/{external_id}/participants", params=params
+				"GET", f"/report/{_collection(ref.kind)}/{ref.external_id}/participants", params=params
 			)
 			for row in data.get("participants", []):
 				records.append(
@@ -215,10 +217,10 @@ class ZoomProvider(ConferenceProvider):
 			if not next_page_token:
 				return records
 
-	def get_summary_html(self, kind: str, external_id: str) -> str | None:
-		if kind != "Meeting":
+	def get_summary_html(self, ref: SessionRef) -> str | None:
+		if ref.kind != "Meeting":
 			return None
-		data = self.client.request("GET", f"/meetings/{external_id}/meeting_summary", allow_404=True)
+		data = self.client.request("GET", f"/meetings/{ref.external_id}/meeting_summary", allow_404=True)
 		if not data:
 			return None
 		return render_summary_html(data)

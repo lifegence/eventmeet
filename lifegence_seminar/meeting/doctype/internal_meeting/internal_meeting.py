@@ -6,6 +6,7 @@ from frappe import _
 from frappe.model.document import Document
 from frappe.utils import get_datetime, get_fullname
 
+from lifegence_seminar.conferencing.providers import Invitee
 from lifegence_seminar.services import conference, notifications, todo_sync
 
 MANAGER_ROLES = {"System Manager", "Seminar Manager"}
@@ -15,6 +16,14 @@ class InternalMeeting(Document):
 	def validate(self):
 		if get_datetime(self.ends_at) <= get_datetime(self.starts_at):
 			frappe.throw(_("End time must be after start time."))
+		if self.online and not self.conference_provider:
+			# Keep the tool of an existing session; only new meetings follow the current default.
+			existing = (
+				frappe.db.get_value("Conference Session", self.conference_session, "provider")
+				if self.conference_session
+				else None
+			)
+			self.conference_provider = existing or conference.default_internal_provider()
 		self.set_attendee_details()
 
 	def set_attendee_details(self):
@@ -34,49 +43,83 @@ class InternalMeeting(Document):
 
 	def on_trash(self):
 		if self.conference_session:
-			conference.cancel_session(self.conference_session)
+			conference.cancel_session(self.conference_session, notify=bool(self.invitations_sent))
+
+	# ------------------------------------------------------------------ online
+	def invitees(self) -> list[Invitee]:
+		return [
+			Invitee(email=row.email, optional=bool(row.optional))
+			for row in self.attendees
+			if row.email and row.user != self.organizer
+		]
+
+	def organizer_email(self) -> str | None:
+		return frappe.db.get_value("User", self.organizer, "email") if self.organizer else None
+
+	def _session(self):
+		if not self.conference_session:
+			return None
+		return frappe.db.get_value(
+			"Conference Session", self.conference_session, ["status", "provider"], as_dict=True
+		)
+
+	def _cancel_session(self):
+		conference.cancel_session(self.conference_session, notify=bool(self.invitations_sent))
+		self.db_set("join_url", "")
 
 	def sync_conference_session(self):
-		session_status = (
-			frappe.db.get_value("Conference Session", self.conference_session, "status")
-			if self.conference_session
-			else None
-		)
-		if session_status == "Scheduled" and (self.status == "Cancelled" or not self.online):
-			conference.cancel_session(self.conference_session)
-			self.db_set("join_url", "")
+		session = self._session()
+		scheduled = bool(session and session.status == "Scheduled")
+
+		if scheduled and (self.status == "Cancelled" or not self.online):
+			self._cancel_session()
 			return
 		if not self.online or self.status in ("Cancelled", "Completed"):
 			return
-		if session_status == "Scheduled":
-			conference.reschedule_session(
+
+		if scheduled and session.provider != self.conference_provider:
+			# Switching tools (e.g. Zoom -> Google Meet): replace the session.
+			self._cancel_session()
+			scheduled = False
+
+		if scheduled:
+			conference.update_session(
 				self.conference_session,
 				topic=self.title,
 				starts_at=self.starts_at,
 				ends_at=self.ends_at,
 				agenda=self.agenda_text(),
 				purpose="internal",
+				attendees=self.invitees(),
+				notify=bool(self.invitations_sent),
 			)
-		elif session_status in (None, "Cancelled"):
-			session = conference.schedule_session(
-				self,
-				topic=self.title,
-				starts_at=self.starts_at,
-				ends_at=self.ends_at,
-				kind="Meeting",
-				registration_required=False,
-				expected_attendees=len(self.attendees),
-				purpose="internal",
-				agenda=self.agenda_text(),
-			)
-			self.db_set({"conference_session": session.name, "join_url": session.join_url})
+			return
+
+		created = conference.schedule_session(
+			self,
+			topic=self.title,
+			starts_at=self.starts_at,
+			ends_at=self.ends_at,
+			kind="Meeting",
+			registration_required=False,
+			expected_attendees=len(self.attendees),
+			purpose="internal",
+			agenda=self.agenda_text(),
+			provider_name=self.conference_provider,
+			organizer_email=self.organizer_email(),
+			attendees=self.invitees(),
+			notify=bool(self.invitations_sent),
+		)
+		self.db_set({"conference_session": created.name, "join_url": created.join_url})
 
 	def agenda_text(self) -> str:
 		return "\n".join(f"- {row.topic}" for row in self.agenda)
 
-	def apply_conference_attendance(self, minutes_by_email: dict):
+	def apply_conference_attendance(self, minutes_by_key: dict):
 		for row in self.attendees:
-			minutes = minutes_by_email.get((row.email or "").lower(), 0)
+			minutes = minutes_by_key.get(conference.attendance_key(row.email, None), 0) or minutes_by_key.get(
+				conference.attendance_key(None, row.full_name), 0
+			)
 			frappe.db.set_value(
 				"Internal Meeting Attendee",
 				row.name,
@@ -93,10 +136,30 @@ class InternalMeeting(Document):
 	@frappe.whitelist()
 	def send_invitations(self):
 		self.check_permission("write")
-		notifications.send_meeting_invitation(self, cancelled=self.status == "Cancelled")
+		native = self.online and conference.provider_has_native_invitations(self.conference_session)
+		if native:
+			if self.status == "Cancelled":
+				frappe.throw(
+					_("Google Calendar notifies attendees automatically when the meeting is cancelled.")
+				)
+			# Google Calendar sends (or re-sends) the invitations to every attendee.
+			conference.update_session(
+				self.conference_session,
+				topic=self.title,
+				starts_at=self.starts_at,
+				ends_at=self.ends_at,
+				agenda=self.agenda_text(),
+				purpose="internal",
+				attendees=self.invitees(),
+				notify=True,
+			)
+		else:
+			notifications.send_meeting_invitation(self, cancelled=self.status == "Cancelled")
+		values = {"invitations_sent": 1}
 		if self.status == "Planned":
-			self.db_set("status", "Invited")
-		return True
+			values["status"] = "Invited"
+		self.db_set(values)
+		return "google" if native else "email"
 
 
 def _is_manager(user: str) -> bool:
