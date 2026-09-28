@@ -38,12 +38,12 @@
 			frappe.call({
 				method: "lifegence_seminar.api.staff.check_in",
 				type: "POST",
-				args: { token: {{ frappe.as_json(token) }} },
+				args: { token: {{ (token) | tojson }} },
 				callback: function (r) {
 					const box = document.getElementById("ls-checkin-result");
 					box.textContent = r.message.already_checked_in
-						? {{ frappe.as_json(_("Already checked in")) }}
-						: {{ frappe.as_json(_("Checked in")) }};
+						? {{ (_("Already checked in")) | tojson }}
+						: {{ (_("Checked in")) | tojson }};
 				},
 				error: function () { button.disabled = false; },
 			});

@@ -5,7 +5,14 @@ from frappe.utils import add_to_date, now_datetime
 
 from lifegence_seminar.services import registration as reg_service
 from lifegence_seminar.services import stripe_api
-from lifegence_seminar.tests.utils import FakeProvider, SeminarTestCase, make_host, make_seminar
+from lifegence_seminar.tests.utils import (
+	FakeProvider,
+	SeminarTestCase,
+	capture_mail,
+	make_host,
+	make_seminar,
+	reset_conference_sessions,
+)
 
 PAID_TICKETS = [
 	{"ticket_name": "Standard", "price": 5500, "currency": "JPY", "enabled": 1},
@@ -22,6 +29,9 @@ def registration_for(seminar, email="alice@example.com"):
 
 
 class TestFreeRegistration(SeminarTestCase):
+	def setUp(self):
+		self.mail = capture_mail(self)
+
 	def test_free_registration_is_confirmed_immediately(self):
 		seminar = make_seminar()
 		result = register(seminar)
@@ -29,7 +39,10 @@ class TestFreeRegistration(SeminarTestCase):
 		doc = registration_for(seminar)
 		self.assertEqual(doc.status, "Confirmed")
 		self.assertIn(doc.access_token, result["redirect_url"])
-		self.assertTrue(frappe.db.exists("Email Queue", {"reference_name": doc.name}))
+		self.assertEqual(len(self.mail), 1)
+		self.assertEqual(self.mail[0]["recipients"], ["alice@example.com"])
+		self.assertEqual(self.mail[0]["attachments"][0]["fname"], "checkin-qr.png")
+		self.assertIn(doc.access_token, self.mail[0]["rendered"])
 
 	def test_email_is_normalized_and_duplicates_rejected(self):
 		seminar = make_seminar()
@@ -73,6 +86,7 @@ class TestFreeRegistration(SeminarTestCase):
 
 class TestPaidRegistration(SeminarTestCase):
 	def setUp(self):
+		self.mail = capture_mail(self)
 		self.seminar = make_seminar(tickets=PAID_TICKETS)
 		self.stripe_calls = []
 
@@ -119,7 +133,7 @@ class TestPaidRegistration(SeminarTestCase):
 		doc = registration_for(self.seminar)
 		self.assertEqual((doc.status, doc.stripe_payment_intent), ("Confirmed", "pi_1"))
 		self.assertTrue(doc.paid_at)
-		self.assertEqual(frappe.db.count("Email Queue", {"reference_name": doc.name}), 1)
+		self.assertEqual(len(self.mail), 1, "confirmation email is sent exactly once")
 
 	def test_amount_mismatch_does_not_confirm(self):
 		register(self.seminar, ticket="Standard")
@@ -168,6 +182,9 @@ class TestPaidRegistration(SeminarTestCase):
 
 
 class TestCheckInAndFeedback(SeminarTestCase):
+	def setUp(self):
+		self.mail = capture_mail(self)
+
 	def test_check_in_is_idempotent(self):
 		seminar = make_seminar()
 		register(seminar)
@@ -192,8 +209,9 @@ class TestCheckInAndFeedback(SeminarTestCase):
 			reg_service.submit_feedback(token, 5)
 
 	def test_feedback_rating_range(self):
-		seminar = make_seminar(starts_at=add_to_date(now_datetime(), hours=-1))
+		seminar = make_seminar()
 		register(seminar)
+		frappe.db.set_value("Seminar", seminar.name, "starts_at", add_to_date(now_datetime(), hours=-1))
 		with self.assertRaises(frappe.ValidationError):
 			reg_service.submit_feedback(registration_for(seminar).access_token, 9)
 
@@ -201,6 +219,8 @@ class TestCheckInAndFeedback(SeminarTestCase):
 class TestOnlineSeminar(SeminarTestCase):
 	def setUp(self):
 		frappe.db.set_single_value("Conferencing Settings", "allocation_buffer_minutes", 15)
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
 		make_host("Seminar Host", meeting_capacity=100, webinar_capacity=500)
 		self.provider = FakeProvider()
 		patcher = patch("lifegence_seminar.services.conference.get_provider", return_value=self.provider)
@@ -224,6 +244,8 @@ class TestOnlineSeminar(SeminarTestCase):
 		register(seminar)
 		doc = registration_for(seminar)
 		self.assertTrue(doc.join_url.startswith("https://zoom.test/w/"))
+		self.assertIn(doc.join_url, self.mail[-1]["rendered"])
+		self.assertFalse(self.mail[-1]["attachments"], "online-only seminars have no check-in QR")
 		self.assertEqual(doc.conference_registrant_id, "r-alice@example.com")
 
 	def test_reschedule_and_cancel(self):
@@ -248,6 +270,7 @@ class TestOnlineSeminar(SeminarTestCase):
 		reg_service.cancel_registration(registration_for(seminar).name)
 		self.assertEqual(len(self.provider.called("cancel_registrant")), 1)
 		self.assertFalse(registration_for(seminar).join_url)
+		self.assertIn("Registration cancelled", self.mail[-1]["subject"])
 
 	def test_attendance_is_applied_to_registrations(self):
 		from lifegence_seminar.conferencing.providers import ParticipantRecord

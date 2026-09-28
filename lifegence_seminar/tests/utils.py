@@ -19,7 +19,15 @@ try:  # Frappe v16
 except ImportError:  # Frappe v15
 	from frappe.tests.utils import FrappeTestCase as SeminarTestCase
 
-__all__ = ["FakeProvider", "SeminarTestCase", "make_host", "make_seminar", "make_venue"]
+__all__ = [
+	"FakeProvider",
+	"SeminarTestCase",
+	"capture_mail",
+	"make_host",
+	"make_seminar",
+	"make_venue",
+	"reset_conference_sessions",
+]
 
 
 class FakeProvider(ConferenceProvider):
@@ -118,3 +126,26 @@ def make_seminar(fmt: str = "Offline", status: str = "Open", tickets=None, capac
 		}
 	)
 	return doc.insert(ignore_permissions=True)
+
+
+def capture_mail(testcase) -> list[dict]:
+	"""Replace frappe.sendmail for the test: render the template (to catch template errors) and record it."""
+	from unittest.mock import patch
+
+	sent: list[dict] = []
+
+	def fake_sendmail(**kwargs):
+		kwargs["rendered"] = frappe.get_template(f"templates/emails/{kwargs['template']}.html").render(
+			kwargs.get("args") or {}
+		)
+		sent.append(kwargs)
+
+	patcher = patch("frappe.sendmail", side_effect=fake_sendmail)
+	patcher.start()
+	testcase.addCleanup(patcher.stop)
+	return sent
+
+
+def reset_conference_sessions():
+	"""Free every host within the test transaction so allocations do not collide across tests."""
+	frappe.db.sql("update `tabConference Session` set status = 'Cancelled' where status = 'Scheduled'")

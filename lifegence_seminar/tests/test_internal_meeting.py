@@ -10,7 +10,13 @@ from lifegence_seminar.meeting.doctype.internal_meeting.internal_meeting import 
 )
 from lifegence_seminar.services import conference, notifications
 from lifegence_seminar.services.host_pool import allocate_host
-from lifegence_seminar.tests.utils import FakeProvider, SeminarTestCase, make_host
+from lifegence_seminar.tests.utils import (
+	FakeProvider,
+	SeminarTestCase,
+	capture_mail,
+	make_host,
+	reset_conference_sessions,
+)
 
 
 def make_user(email: str, roles=("Desk User",)):
@@ -47,6 +53,7 @@ def make_meeting(organizer: str, attendees=(), online=1, **kwargs):
 
 class TestHostPool(SeminarTestCase):
 	def setUp(self):
+		reset_conference_sessions()
 		for name in frappe.get_all("Zoom Host Account", pluck="name"):
 			frappe.db.set_value("Zoom Host Account", name, "enabled", 0)
 		frappe.db.set_single_value("Conferencing Settings", "allocation_buffer_minutes", 15)
@@ -100,6 +107,8 @@ class TestHostPool(SeminarTestCase):
 
 class TestInternalMeeting(SeminarTestCase):
 	def setUp(self):
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
 		make_host("Internal Host")
 		self.provider = FakeProvider()
 		patcher = patch("lifegence_seminar.services.conference.get_provider", return_value=self.provider)
@@ -197,3 +206,6 @@ class TestInternalMeeting(SeminarTestCase):
 		self.assertIn("METHOD:REQUEST", ics)
 		meeting.send_invitations()
 		self.assertEqual(frappe.db.get_value("Internal Meeting", meeting.name, "status"), "Invited")
+		self.assertEqual(self.mail[0]["attachments"][0]["fname"], "invite.ics")
+		self.assertIn(meeting.join_url, self.mail[0]["rendered"])
+		self.assertIn("Plan; Q4, budget", self.mail[0]["rendered"])

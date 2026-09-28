@@ -45,7 +45,8 @@ class ZoomClient:
 
 	def _get_token(self, force_refresh: bool = False) -> str:
 		if not force_refresh:
-			token = frappe.cache.get_value(self._token_cache_key)
+			# expires=True: never pin a cache miss in frappe.local (v15 would, forcing re-auth per call).
+			token = frappe.cache.get_value(self._token_cache_key, expires=True)
 			if token:
 				return token
 

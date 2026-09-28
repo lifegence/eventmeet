@@ -4,7 +4,15 @@ from __future__ import annotations
 
 import frappe
 from frappe import _
-from frappe.utils import cint, flt, get_datetime, get_url, now_datetime, validate_email_address
+from frappe.utils import (
+	cint,
+	flt,
+	get_datetime,
+	get_url,
+	now_datetime,
+	strip_html,
+	validate_email_address,
+)
 
 from lifegence_seminar.services import notifications, stripe_api
 from lifegence_seminar.services.conference import cancel_participant, register_participant
@@ -41,7 +49,8 @@ def count_active(seminar: str, ticket_type: str | None = None) -> int:
 
 
 def _clean_text(value: str | None, label: str, max_length: int, required: bool = False) -> str:
-	value = (value or "").strip()
+	# Plain-text fields: drop markup so the stored value is never HTML-sanitized/entity-encoded.
+	value = strip_html(value or "").strip()
 	if required and not value:
 		frappe.throw(_("{0} is required.").format(_(label)))
 	if len(value) > max_length:
@@ -144,8 +153,8 @@ def confirm_registration(name: str, payment_intent: str | None = None):
 
 	registration.status = "Confirmed"
 	if payment_intent:
+		# Manual confirmations (invoice / bank transfer) record no payment time here.
 		registration.stripe_payment_intent = payment_intent
-	if flt(registration.amount) > 0:
 		registration.paid_at = now_datetime()
 	registration.save(ignore_permissions=True)
 

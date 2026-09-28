@@ -96,8 +96,8 @@ def send_seminar_reminders():
 
 		def remind(name):
 			doc = frappe.get_doc("Seminar Registration", name)
-			notifications.send_seminar_reminder(doc)
-			doc.db_set("reminder_sent", 1, update_modified=False)
+			if notifications.send_seminar_reminder(doc):
+				doc.db_set("reminder_sent", 1, update_modified=False)
 
 		_each(names, remind, "Seminar reminder")
 
@@ -132,7 +132,7 @@ def send_feedback_requests():
 
 		def request_feedback(name):
 			doc = frappe.get_doc("Seminar Registration", name)
-			notifications.send_feedback_request(doc)
-			doc.db_set("feedback_requested", 1, update_modified=False)
+			if notifications.send_feedback_request(doc):
+				doc.db_set("feedback_requested", 1, update_modified=False)
 
 		_each(names, request_feedback, "Feedback request")

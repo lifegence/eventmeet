@@ -112,9 +112,9 @@
 			const button = form.querySelector("button[type=submit]");
 			const message = document.getElementById("ls-register-message");
 			const data = Object.fromEntries(new FormData(form).entries());
-			data.seminar = {{ frappe.as_json(doc.name) }};
+			data.seminar = {{ (doc.name) | tojson }};
 			button.disabled = true;
-			message.textContent = {{ frappe.as_json(_("Processing...")) }};
+			message.textContent = {{ (_("Processing...")) | tojson }};
 			frappe.call({
 				method: "lifegence_seminar.api.public.register",
 				type: "POST",

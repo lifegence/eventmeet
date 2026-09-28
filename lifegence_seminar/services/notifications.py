@@ -37,25 +37,47 @@ def _seminar_context(registration) -> dict:
 	}
 
 
-def _send(recipients, subject: str, template: str, args: dict, reference, attachments=None, now=False):
-	frappe.sendmail(
-		recipients=recipients,
-		subject=subject,
-		template=template,
-		args=args,
-		reference_doctype=reference.doctype,
-		reference_name=reference.name,
-		attachments=attachments or [],
-		now=now,
-	)
+def _send(
+	recipients,
+	subject: str,
+	template: str,
+	args: dict,
+	reference,
+	attachments=None,
+	raise_on_error: bool = False,
+) -> bool:
+	"""Queue an email. Attendee notifications must never roll back payments or
+	registrations (e.g. inside the Stripe webhook), so failures are logged unless
+	the caller is an interactive action that should surface the error."""
+	message_count = len(frappe.local.message_log or [])
+	try:
+		frappe.sendmail(
+			recipients=recipients,
+			subject=subject,
+			template=template,
+			args=args,
+			reference_doctype=reference.doctype,
+			reference_name=reference.name,
+			attachments=attachments or [],
+		)
+		return True
+	except Exception:
+		if raise_on_error:
+			raise
+		# Do not leak mail-server setup messages to guests (e.g. on the public registration form).
+		del frappe.local.message_log[message_count:]
+		frappe.log_error(
+			title=f"Email '{template}' failed for {reference.name}", message=frappe.get_traceback()
+		)
+		return False
 
 
-def send_registration_confirmed(registration) -> None:
+def send_registration_confirmed(registration) -> bool:
 	context = _seminar_context(registration)
 	attachments = []
 	if context["is_onsite"]:
 		attachments.append({"fname": "checkin-qr.png", "fcontent": qr_png(context["checkin_url"])})
-	_send(
+	return _send(
 		[registration.email],
 		_("Registration confirmed: {0}").format(context["seminar"].title),
 		"seminar_registration_confirmed",
@@ -65,9 +87,9 @@ def send_registration_confirmed(registration) -> None:
 	)
 
 
-def send_seminar_reminder(registration) -> None:
+def send_seminar_reminder(registration) -> bool:
 	context = _seminar_context(registration)
-	_send(
+	return _send(
 		[registration.email],
 		_("Reminder: {0}").format(context["seminar"].title),
 		"seminar_reminder",
@@ -76,9 +98,9 @@ def send_seminar_reminder(registration) -> None:
 	)
 
 
-def send_feedback_request(registration) -> None:
+def send_feedback_request(registration) -> bool:
 	context = _seminar_context(registration)
-	_send(
+	return _send(
 		[registration.email],
 		_("Thank you for attending {0}").format(context["seminar"].title),
 		"seminar_feedback_request",
@@ -87,9 +109,9 @@ def send_feedback_request(registration) -> None:
 	)
 
 
-def send_registration_cancelled(registration) -> None:
+def send_registration_cancelled(registration) -> bool:
 	context = _seminar_context(registration)
-	_send(
+	return _send(
 		[registration.email],
 		_("Registration cancelled: {0}").format(context["seminar"].title),
 		"seminar_registration_cancelled",
@@ -157,4 +179,5 @@ def send_meeting_invitation(meeting, cancelled: bool = False) -> None:
 		},
 		meeting,
 		[{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}],
+		raise_on_error=True,
 	)

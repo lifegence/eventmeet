@@ -150,7 +150,8 @@ class Seminar(WebsiteGenerator):
 
 		context.no_cache = 1
 		context.show_sidebar = False
-		context.parents = [{"route": "seminars", "title": _("Seminars")}]
+		# Frappe's breadcrumb include renders the page title unescaped; the page has its own heading.
+		context.no_breadcrumbs = True
 		context.venue = frappe.get_doc("Seminar Venue", self.venue) if self.venue else None
 
 		speaker_names = {row.speaker for row in self.sessions if row.speaker}
