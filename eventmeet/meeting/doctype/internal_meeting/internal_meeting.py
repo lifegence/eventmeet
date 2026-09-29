@@ -4,7 +4,7 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import get_datetime, get_fullname
+from frappe.utils import get_datetime, get_fullname, strip_html, validate_email_address
 
 from eventmeet.conferencing.providers import Invitee
 from eventmeet.services import conference, notifications, todo_sync
@@ -25,6 +25,7 @@ class InternalMeeting(Document):
 			)
 			self.conference_provider = existing or conference.default_internal_provider()
 		self.set_attendee_details()
+		self.validate_external_attendees()
 
 	def set_attendee_details(self):
 		seen = set()
@@ -37,6 +38,23 @@ class InternalMeeting(Document):
 			row.full_name = get_fullname(row.user)
 			row.email = frappe.db.get_value("User", row.user, "email")
 
+	def validate_external_attendees(self):
+		internal_emails = {(row.email or "").lower() for row in self.attendees if row.email}
+		seen = set()
+		for row in self.external_attendees:
+			row.guest_name = strip_html(row.guest_name or "").strip()
+			row.organization = strip_html(row.organization or "").strip()
+			row.email = validate_email_address((row.email or "").strip(), throw=True).lower()
+			if row.email in seen:
+				frappe.throw(_("External attendee {0} is listed more than once.").format(row.email))
+			if row.email in internal_emails:
+				frappe.throw(
+					_("{0} is already an internal attendee; remove it from External Attendees.").format(
+						row.email
+					)
+				)
+			seen.add(row.email)
+
 	def on_update(self):
 		todo_sync.sync_todos(self)
 		self.sync_conference_session()
@@ -47,11 +65,17 @@ class InternalMeeting(Document):
 
 	# ------------------------------------------------------------------ online
 	def invitees(self) -> list[Invitee]:
-		return [
+		internal = [
 			Invitee(email=row.email, optional=bool(row.optional))
 			for row in self.attendees
 			if row.email and row.user != self.organizer
 		]
+		external = [
+			Invitee(email=row.email, optional=bool(row.optional))
+			for row in self.external_attendees
+			if row.email
+		]
+		return internal + external
 
 	def organizer_email(self) -> str | None:
 		return frappe.db.get_value("User", self.organizer, "email") if self.organizer else None
@@ -116,12 +140,14 @@ class InternalMeeting(Document):
 		return "\n".join(f"- {row.topic}" for row in self.agenda)
 
 	def apply_conference_attendance(self, minutes_by_key: dict):
-		for row in self.attendees:
+		rows = [("Internal Meeting Attendee", row, row.full_name) for row in self.attendees]
+		rows += [("Internal Meeting Guest", row, row.guest_name) for row in self.external_attendees]
+		for child_doctype, row, display_name in rows:
 			minutes = minutes_by_key.get(conference.attendance_key(row.email, None), 0) or minutes_by_key.get(
-				conference.attendance_key(None, row.full_name), 0
+				conference.attendance_key(None, display_name), 0
 			)
 			frappe.db.set_value(
-				"Internal Meeting Attendee",
+				child_doctype,
 				row.name,
 				{"attended": 1 if minutes > 0 else 0, "attended_minutes": minutes},
 				update_modified=False,

@@ -14,4 +14,4 @@
 <ol>{% for row in meeting.agenda %}<li>{{ row.topic | e }}{% if row.duration_minutes %} ({{ row.duration_minutes }} {{ _("min") }}){% endif %}</li>{% endfor %}</ol>
 {% endif %}
 {% if meeting.invitation_message and not cancelled %}<div>{{ meeting.invitation_message }}</div>{% endif %}
-<p><a href="{{ meeting_url }}">{{ _("Open in Frappe") }}</a></p>
+{% if meeting_url %}<p><a href="{{ meeting_url }}">{{ _("Open in Frappe") }}</a></p>{% endif %}

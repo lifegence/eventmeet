@@ -74,13 +74,16 @@ Ended,終了
 "Endpoint: /api/method/eventmeet.api.webhooks.stripe — events: checkout.session.completed, checkout.session.expired, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed","エンドポイント: /api/method/eventmeet.api.webhooks.stripe — イベント: checkout.session.completed, checkout.session.expired, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed"
 Ends At,終了日時
 EventMeet,セミナー・会議
+External Attendees,社外参加者
 External ID,外部 ID
+External attendee {0} is listed more than once.,社外参加者 {0} が重複しています。
 Feedback Requested,アンケート依頼済
 Feedback has already been submitted. Thank you!,アンケートは回答済みです。ありがとうございました。
 Feedback is not collected for this seminar.,このセミナーではアンケートを実施していません。
 Feedback opens after the seminar starts.,アンケートはセミナー開始後に回答できます。
 Google Calendar notifies attendees automatically when the meeting is cancelled.,ミーティングを中止すると、Google カレンダーが参加者に自動で通知します。
 Google Calendar will email the invitation to all attendees. Continue?,Google カレンダーから全参加者に招待メールが送信されます。続行しますか？
+Guest Name,氏名
 Host Account,ホストアカウント
 Host Allocation,ホスト割当
 Host account {0} is busy at the new time. Choose another time.,ホストアカウント {0} は変更後の時間に使用中です。別の時間を選んでください。
@@ -93,6 +96,7 @@ Internal Meeting,社内ミーティング
 Internal Meeting Action,社内ミーティング アクション
 Internal Meeting Agenda,社内ミーティング 議題
 Internal Meeting Attendee,社内ミーティング 参加者
+Internal Meeting Guest,社内ミーティング 社外参加者
 Internal Meeting Provider,社内ミーティングの会議ツール
 Internal Meetings,社内ミーティング
 Internal Notes,社内メモ
@@ -149,6 +153,7 @@ Payment,支払い
 Payment could not be started. Please try again later.,決済を開始できませんでした。しばらくしてから再度お試しください。
 Payment was cancelled. You can register again from the seminar page.,決済がキャンセルされました。セミナーページから再度お申し込みいただけます。
 Pending Payment,支払い待ち
+People outside the organization. They receive the invitation by email (or Google Calendar) but get no access to this system.,社外の方。招待はメール（または Google カレンダー）で届きますが、このシステムにはアクセスできません。
 Personal Join URL,個別参加 URL
 Photo,写真
 Planned,予定
@@ -281,5 +286,6 @@ open,開始
 update,更新
 {0} does not support registration with personal join links.,{0} は個別参加リンク付きの登録に対応していません。
 {0} does not support webinars.,{0} はウェビナーに対応していません。
+{0} is already an internal attendee; remove it from External Attendees.,{0} は社内の参加者に登録済みです。社外参加者から削除してください。
 {0} is too long.,{0} が長すぎます。
 {0} seats left,残り {0} 席

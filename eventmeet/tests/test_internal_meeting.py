@@ -203,3 +203,67 @@ class TestInternalMeeting(SeminarTestCase):
 		self.assertEqual(self.mail[0]["attachments"][0]["fname"], "invite.ics")
 		self.assertIn(meeting.join_url, self.mail[0]["rendered"])
 		self.assertIn("Plan; Q4, budget", self.mail[0]["rendered"])
+
+
+class TestExternalAttendees(SeminarTestCase):
+	def setUp(self):
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
+		make_host("Internal Host")
+		self.fakes = patch_providers(self)
+		self.organizer = make_user("organizer@example.com")
+		self.member = make_user("member@example.com")
+
+	def meeting_with_guest(self, **kwargs):
+		return make_meeting(
+			self.organizer,
+			[self.member],
+			external_attendees=[
+				{"guest_name": "Nomura (Guest)", "email": " Guest@Partner.test ", "organization": "Partner"}
+			],
+			**kwargs,
+		)
+
+	def test_guest_is_normalized_and_invited_without_desk_link(self):
+		meeting = self.meeting_with_guest()
+		self.assertEqual(meeting.external_attendees[0].email, "guest@partner.test")
+		self.assertIn("guest@partner.test", [i.email for i in meeting.invitees()])
+
+		meeting.send_invitations()
+		by_recipient = {tuple(m["recipients"]): m for m in self.mail}
+		external = by_recipient[("guest@partner.test",)]
+		internal = next(m for key, m in by_recipient.items() if self.member in key)
+		self.assertNotIn("guest@partner.test", internal["recipients"], "guests get a separate email")
+		self.assertNotIn("Open in Frappe", external["rendered"], "no desk link for guests")
+		self.assertIn("Open in Frappe", internal["rendered"])
+		self.assertIn(meeting.join_url, external["rendered"])
+		ics = external["attachments"][0]["fcontent"].decode()
+		self.assertIn("CN=Nomura (Guest):mailto:guest@partner.test", ics)
+
+	def test_guest_validation(self):
+		with self.assertRaises(frappe.ValidationError):
+			make_meeting(
+				self.organizer, [], external_attendees=[{"guest_name": "X", "email": "not-an-email"}]
+			)
+		with self.assertRaises(frappe.ValidationError):
+			make_meeting(
+				self.organizer,
+				[],
+				external_attendees=[
+					{"guest_name": "A", "email": "a@partner.test"},
+					{"guest_name": "A2", "email": "A@partner.test"},
+				],
+			)
+		with self.assertRaises(frappe.ValidationError):
+			make_meeting(
+				self.organizer, [self.member], external_attendees=[{"guest_name": "M", "email": self.member}]
+			)
+
+	def test_guest_attendance_is_recorded(self):
+		meeting = self.meeting_with_guest()
+		self.fakes["Zoom"].participants = [ParticipantRecord("Nomura", "guest@partner.test", None, None, 33)]
+		conference.sync_attendance(meeting.conference_session)
+		meeting.reload()
+		self.assertEqual(
+			(meeting.external_attendees[0].attended, meeting.external_attendees[0].attended_minutes), (1, 33)
+		)

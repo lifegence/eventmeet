@@ -1,0 +1,71 @@
+{
+ "actions": [],
+ "creation": "2026-09-29 11:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "guest_name",
+  "email",
+  "organization",
+  "optional",
+  "attended",
+  "attended_minutes"
+ ],
+ "fields": [
+  {
+   "fieldname": "guest_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Guest Name",
+   "reqd": 1
+  },
+  {
+   "fieldname": "email",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Email",
+   "options": "Email",
+   "reqd": 1
+  },
+  {
+   "fieldname": "organization",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Organization"
+  },
+  {
+   "fieldname": "optional",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Optional"
+  },
+  {
+   "fieldname": "attended",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Attended",
+   "read_only": 1
+  },
+  {
+   "fieldname": "attended_minutes",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Attended Minutes",
+   "precision": "1",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-09-29 11:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Meeting",
+ "name": "Internal Meeting Guest",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

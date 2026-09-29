@@ -150,34 +150,50 @@ def meeting_ics(meeting, method: str = "REQUEST") -> str:
 		f"ORGANIZER:mailto:{organizer}",
 		f"STATUS:{'CANCELLED' if method == 'CANCEL' else 'CONFIRMED'}",
 	]
-	for attendee in meeting.attendees:
-		if attendee.email:
-			role = "OPT-PARTICIPANT" if attendee.optional else "REQ-PARTICIPANT"
-			lines.append(
-				f"ATTENDEE;ROLE={role};CN={_ics_escape(attendee.full_name or attendee.email)}:mailto:{attendee.email}"
-			)
+	participants = [(row.full_name, row.email, row.optional) for row in meeting.attendees]
+	participants += [
+		(row.guest_name, row.email, row.optional) for row in meeting.get("external_attendees") or []
+	]
+	for full_name, email, optional in participants:
+		if email:
+			role = "OPT-PARTICIPANT" if optional else "REQ-PARTICIPANT"
+			lines.append(f"ATTENDEE;ROLE={role};CN={_ics_escape(full_name or email)}:mailto:{email}")
 	lines += ["END:VEVENT", "END:VCALENDAR"]
 	return "\r\n".join(lines) + "\r\n"
 
 
 def send_meeting_invitation(meeting, cancelled: bool = False) -> None:
-	recipients = [row.email for row in meeting.attendees if row.email]
-	if not recipients:
+	internal = [row.email for row in meeting.attendees if row.email]
+	external = [row.email for row in meeting.get("external_attendees") or [] if row.email]
+	if not internal and not external:
 		frappe.throw(_("Add at least one attendee with an email address."))
 	method = "CANCEL" if cancelled else "REQUEST"
 	subject = (_("Cancelled: {0}") if cancelled else _("Invitation: {0}")).format(meeting.title)
-	_send(
-		recipients,
-		subject,
-		"internal_meeting_invitation",
-		{
-			"meeting": meeting,
-			"cancelled": cancelled,
-			"starts_at": format_datetime(meeting.starts_at, "yyyy-MM-dd HH:mm"),
-			"ends_at": format_datetime(meeting.ends_at, "HH:mm"),
-			"meeting_url": get_url(meeting.get_url()),
-		},
-		meeting,
-		[{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}],
-		raise_on_error=True,
-	)
+	args = {
+		"meeting": meeting,
+		"cancelled": cancelled,
+		"starts_at": format_datetime(meeting.starts_at, "yyyy-MM-dd HH:mm"),
+		"ends_at": format_datetime(meeting.ends_at, "HH:mm"),
+	}
+	attachments = [{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}]
+	if internal:
+		_send(
+			internal,
+			subject,
+			"internal_meeting_invitation",
+			{**args, "meeting_url": get_url(meeting.get_url())},
+			meeting,
+			attachments,
+			raise_on_error=True,
+		)
+	if external:
+		# External guests have no access to this system: no link back to the desk.
+		_send(
+			external,
+			subject,
+			"internal_meeting_invitation",
+			{**args, "meeting_url": None},
+			meeting,
+			attachments,
+			raise_on_error=True,
+		)

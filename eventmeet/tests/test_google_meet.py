@@ -354,3 +354,16 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 		self.assertEqual(meeting.conference_provider, "Zoom")
 		self.assertEqual(meeting.conference_session, zoom_session)
 		self.assertEqual(frappe.db.get_value("Conference Session", zoom_session, "status"), "Scheduled")
+
+	def test_external_attendees_are_google_calendar_guests(self):
+		meeting = make_meeting(
+			self.organizer,
+			[self.member],
+			external_attendees=[{"guest_name": "Guest", "email": "guest@partner.test"}],
+		)
+		created_spec = self.google.called("create")[0][2]
+		self.assertEqual(
+			sorted(i.email for i in created_spec.attendees), sorted([self.member, "guest@partner.test"])
+		)
+		self.assertEqual(meeting.send_invitations(), "google")
+		self.assertEqual(self.mail, [], "Google Calendar sends the invitations, including to guests")

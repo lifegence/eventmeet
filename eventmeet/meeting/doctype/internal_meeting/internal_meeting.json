@@ -22,6 +22,7 @@
   "agenda_tab",
   "agenda",
   "attendees",
+  "external_attendees",
   "invitation_message",
   "minutes_tab",
   "minutes",
@@ -139,6 +140,13 @@
    "options": "Internal Meeting Attendee"
   },
   {
+   "description": "People outside the organization. They receive the invitation by email (or Google Calendar) but get no access to this system.",
+   "fieldname": "external_attendees",
+   "fieldtype": "Table",
+   "label": "External Attendees",
+   "options": "Internal Meeting Guest"
+  },
+  {
    "fieldname": "invitation_message",
    "fieldtype": "Text Editor",
    "label": "Invitation Message"
@@ -168,7 +176,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 10:30:00.000000",
+ "modified": "2026-09-29 11:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",
