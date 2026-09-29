@@ -2,7 +2,7 @@ import frappe
 from frappe import _
 from frappe.utils import get_datetime, now_datetime
 
-from lifegence_seminar.services.registration import get_registration_by_token
+from eventmeet.services.registration import get_registration_by_token
 
 no_cache = 1
 
@@ -10,6 +10,7 @@ no_cache = 1
 def get_context(context):
 	context.title = _("Seminar Survey")
 	context.metatags = {"robots": "noindex, nofollow"}
+	context.token = ""  # the page script references it even when the link is invalid
 	registration = get_registration_by_token(frappe.form_dict.get("token"))
 	context.registration = registration if registration and registration.status == "Confirmed" else None
 	if not context.registration:
