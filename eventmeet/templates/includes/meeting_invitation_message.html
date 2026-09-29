@@ -1,0 +1,17 @@
+<p>{{ _("We will hold the following meeting. Please join us.") }}</p>
+<p><strong>{{ _("Overview") }}</strong></p>
+<ul>
+	<li>{{ _("Title") }}: {{ meeting.title | e }}</li>
+	<li>{{ _("Date") }}: {{ starts_at }} – {{ ends_at }}</li>
+	{% if meeting.location %}<li>{{ _("Meeting Place") }}: {{ meeting.location | e }}</li>{% endif %}
+	{% if meeting.online %}<li>{{ _("Online Meeting") }}: {{ _(meeting.conference_provider or "Zoom") }}{% if not meeting.join_url %} ({{ _("the join link will be sent with the invitation") }}){% endif %}</li>{% endif %}
+	<li>{{ _("Organizer") }}: {{ organizer_name | e }}</li>
+</ul>
+{% if agenda %}
+<p><strong>{{ _("Agenda") }}</strong>{% if total_minutes %} ({{ _("{0} min in total").format(total_minutes) }}){% endif %}</p>
+<ol>
+	{% for row in agenda %}
+	<li>{{ row.topic | e }}{% if row.duration_minutes %} ({{ row.duration_minutes }} {{ _("min") }}){% endif %}{% if row.presenter_name %} — {{ row.presenter_name | e }}{% endif %}</li>
+	{% endfor %}
+</ol>
+{% endif %}

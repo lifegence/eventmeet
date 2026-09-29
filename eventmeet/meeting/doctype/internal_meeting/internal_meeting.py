@@ -4,7 +4,14 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import get_datetime, get_fullname, strip_html, validate_email_address
+from frappe.utils import (
+	cint,
+	format_datetime,
+	get_datetime,
+	get_fullname,
+	strip_html,
+	validate_email_address,
+)
 
 from eventmeet.conferencing.providers import Invitee
 from eventmeet.services import conference, notifications, todo_sync
@@ -158,6 +165,30 @@ class InternalMeeting(Document):
 		if not (self.minutes or "").strip():
 			values["minutes"] = summary_html
 		self.db_set(values, update_modified=False)
+
+	@frappe.whitelist()
+	def build_invitation_message(self) -> str:
+		"""Invitation text with the meeting overview and agenda (works on unsaved form values)."""
+		agenda = [
+			frappe._dict(
+				topic=row.topic,
+				duration_minutes=row.duration_minutes,
+				presenter_name=get_fullname(row.presenter) if row.presenter else "",
+			)
+			for row in self.agenda
+			if row.topic
+		]
+		return frappe.render_template(
+			"eventmeet/templates/includes/meeting_invitation_message.html",
+			{
+				"meeting": self,
+				"starts_at": format_datetime(self.starts_at, "yyyy-MM-dd HH:mm") if self.starts_at else "",
+				"ends_at": format_datetime(self.ends_at, "HH:mm") if self.ends_at else "",
+				"organizer_name": get_fullname(self.organizer) if self.organizer else "",
+				"agenda": agenda,
+				"total_minutes": sum(cint(row.duration_minutes) for row in agenda),
+			},
+		).strip()
 
 	@frappe.whitelist()
 	def send_invitations(self):

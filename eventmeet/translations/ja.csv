@@ -92,6 +92,7 @@ I would recommend this seminar to others,このセミナーを他の人に勧め
 Import AI Summary,AI 要約を取り込む
 Import Gemini Meeting Notes,Gemini の会議メモを取り込む
 "Imports ""Take notes for me"" documents into the minutes. Requires the drive.readonly scope.",「自動メモ作成」のドキュメントを議事録に取り込みます。drive.readonly スコープが必要です。
+Insert Overview and Agenda,実施概要と議題を挿入
 Internal Attendees,社内参加者
 Internal Meeting,社内ミーティング
 Internal Meeting Action,社内ミーティング アクション
@@ -144,10 +145,13 @@ Only seminar staff can check in attendees.,受付はセミナースタッフの�
 Only the organizer can start this meeting as host.,このミーティングをホストとして開始できるのは主催者のみです。
 Open in Frappe,Frappe で開く
 Optional,任意参加
+"Optional. When filled in, this text is used as the invitation email body (the join URL is always added).",任意。入力すると、この文面が招待メールの本文になります（参加 URL は自動で追記されます）。
 Organization,所属
 Organizer,主催者
 Organizer {0} is not a Google Workspace user of {1}.,主催者 {0} は {1} の Google Workspace ユーザーではありません。
 Overall satisfaction,総合満足度
+Overview,実施概要
+Overview and agenda inserted,実施概要と議題を挿入しました
 Paid At,支払日時
 Passcode,パスコード
 Payment,支払い
@@ -185,6 +189,7 @@ Registration not found.,申込が見つかりません。
 Registrations,申込一覧
 Reminder Sent,リマインド送信済
 Reminder: {0},リマインド: {0}
+Replace the current invitation message?,現在の招待メッセージを置き換えますか？
 Resend Confirmation,確定メールを再送
 Resend Invitation,招待を再送
 Seat is held while the Stripe Checkout is open. Stripe requires 30 minutes or more.,Stripe の決済画面が開いている間は席を確保します。Stripe の仕様上 30 分以上が必要です。
@@ -264,6 +269,7 @@ View your registration,お申し込み内容を確認
 Waiting Room for Internal Meetings,社内ミーティングで待機室を使用
 Waiting for payment.,お支払いをお待ちしています。
 We are confirming your payment. This page will update shortly; the confirmation email follows.,お支払いを確認しています。まもなくこのページが更新され、確定メールが届きます。
+We will hold the following meeting. Please join us.,下記のとおりミーティングを開催します。ご参加をお願いいたします。
 Webhook Secret Token,Webhook Secret Token
 Webhook Signing Secret,Webhook 署名シークレット
 Webinar,ウェビナー
@@ -284,9 +290,11 @@ cancel,取消
 create,作成
 min,分
 open,開始
+the join link will be sent with the invitation,参加リンクは招待メールでお送りします
 update,更新
 {0} does not support registration with personal join links.,{0} は個別参加リンク付きの登録に対応していません。
 {0} does not support webinars.,{0} はウェビナーに対応していません。
 {0} is already an internal attendee; remove it from External Attendees.,{0} は社内の参加者に登録済みです。社外参加者から削除してください。
 {0} is too long.,{0} が長すぎます。
+{0} min in total,計 {0} 分
 {0} seats left,残り {0} 席

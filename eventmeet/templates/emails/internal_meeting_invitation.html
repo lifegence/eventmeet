@@ -1,17 +1,22 @@
 {% if cancelled %}
 <p>{{ _("The following meeting has been cancelled.") }}</p>
-{% else %}
+{% elif not meeting.invitation_message %}
 <p>{{ _("You are invited to the following meeting.") }}</p>
 {% endif %}
+{% if meeting.invitation_message and not cancelled %}
+<div>{{ meeting.invitation_message }}</div>
+{% else %}
 <table style="border-collapse: collapse; margin: 12px 0">
 	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Title") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ meeting.title | e }}</td></tr>
 	<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Date") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ starts_at }} – {{ ends_at }}</td></tr>
-	{% if meeting.location %}<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Location") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ meeting.location | e }}</td></tr>{% endif %}
-	{% if meeting.join_url and not cancelled %}<tr><td style="border: 1px solid #ddd; padding: 6px 10px">Zoom</td><td style="border: 1px solid #ddd; padding: 6px 10px"><a href="{{ meeting.join_url | e }}">{{ meeting.join_url | e }}</a></td></tr>{% endif %}
+	{% if meeting.location %}<tr><td style="border: 1px solid #ddd; padding: 6px 10px">{{ _("Meeting Place") }}</td><td style="border: 1px solid #ddd; padding: 6px 10px">{{ meeting.location | e }}</td></tr>{% endif %}
 </table>
 {% if meeting.agenda and not cancelled %}
 <p><strong>{{ _("Agenda") }}</strong></p>
 <ol>{% for row in meeting.agenda %}<li>{{ row.topic | e }}{% if row.duration_minutes %} ({{ row.duration_minutes }} {{ _("min") }}){% endif %}</li>{% endfor %}</ol>
 {% endif %}
-{% if meeting.invitation_message and not cancelled %}<div>{{ meeting.invitation_message }}</div>{% endif %}
+{% endif %}
+{% if meeting.join_url and not cancelled %}
+<p><strong>{{ _("Join URL") }}</strong>: <a href="{{ meeting.join_url | e }}">{{ meeting.join_url | e }}</a></p>
+{% endif %}
 {% if meeting_url %}<p><a href="{{ meeting_url }}">{{ _("Open in Frappe") }}</a></p>{% endif %}

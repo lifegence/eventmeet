@@ -2,6 +2,20 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on("Internal Meeting", {
+	insert_invitation_template(frm) {
+		const insert = () =>
+			frm.call({ doc: frm.doc, method: "build_invitation_message" }).then((r) => {
+				frm.set_value("invitation_message", r.message);
+				frappe.show_alert({ message: __("Overview and agenda inserted"), indicator: "green" });
+			});
+		const current = (frm.doc.invitation_message || "").replace(/<[^>]*>/g, "").trim();
+		if (current) {
+			frappe.confirm(__("Replace the current invitation message?"), insert);
+		} else {
+			insert();
+		}
+	},
+
 	refresh(frm) {
 		if (frm.is_new()) return;
 

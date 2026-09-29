@@ -267,3 +267,49 @@ class TestExternalAttendees(SeminarTestCase):
 		self.assertEqual(
 			(meeting.external_attendees[0].attended, meeting.external_attendees[0].attended_minutes), (1, 33)
 		)
+
+
+class TestInvitationMessage(SeminarTestCase):
+	def setUp(self):
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
+		make_host("Internal Host")
+		self.fakes = patch_providers(self)
+		self.organizer = make_user("organizer@example.com")
+		self.member = make_user("member@example.com")
+
+	def test_build_message_contains_overview_and_agenda(self):
+		meeting = make_meeting(
+			self.organizer,
+			[self.member],
+			title="Q4 planning",
+			location="Room B & C",
+			agenda=[
+				{"topic": "Budget & headcount", "duration_minutes": 20, "presenter": self.member},
+				{"topic": "Risks", "duration_minutes": 10},
+			],
+		)
+		html = meeting.build_invitation_message()
+		self.assertIn("Q4 planning", html)
+		self.assertIn("Room B &amp; C", html)
+		self.assertIn("Budget &amp; headcount (20 min) — Member", html)
+		self.assertIn("30 min in total", html)
+		self.assertIn(frappe.utils.format_datetime(meeting.starts_at, "yyyy-MM-dd HH:mm"), html)
+
+	def test_invitation_email_uses_message_without_duplicates(self):
+		meeting = make_meeting(self.organizer, [self.member], agenda=[{"topic": "Unique topic 42"}])
+		meeting.invitation_message = meeting.build_invitation_message()
+		meeting.save(ignore_permissions=True)
+		meeting.send_invitations()
+		rendered = self.mail[0]["rendered"]
+		self.assertEqual(rendered.count("Unique topic 42"), 1, "agenda must not be duplicated")
+		self.assertIn(meeting.join_url, rendered, "join URL is always included")
+		self.assertNotIn("You are invited to the following meeting.", rendered)
+
+	def test_default_email_without_message(self):
+		meeting = make_meeting(self.organizer, [self.member], agenda=[{"topic": "Default agenda"}])
+		meeting.send_invitations()
+		rendered = self.mail[0]["rendered"]
+		self.assertIn("You are invited to the following meeting.", rendered)
+		self.assertEqual(rendered.count("Default agenda"), 1)
+		self.assertEqual(rendered.count(meeting.join_url), 2, "href + text of the single join URL line")

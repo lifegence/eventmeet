@@ -22,6 +22,7 @@
   "attendees_section",
   "attendees",
   "external_attendees",
+  "insert_invitation_template",
   "invitation_message",
   "agenda_tab",
   "agenda",
@@ -142,6 +143,12 @@
    "options": "Internal Meeting Guest"
   },
   {
+   "fieldname": "insert_invitation_template",
+   "fieldtype": "Button",
+   "label": "Insert Overview and Agenda"
+  },
+  {
+   "description": "Optional. When filled in, this text is used as the invitation email body (the join URL is always added).",
    "fieldname": "invitation_message",
    "fieldtype": "Text Editor",
    "label": "Invitation Message"
@@ -182,7 +189,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 11:35:00.000000",
+ "modified": "2026-09-29 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",
