@@ -36,6 +36,8 @@ class ConferenceSpec:
 	# Used by providers with native invitations (e.g. Google Calendar).
 	attendees: list[Invitee] = field(default_factory=list)
 	notify: bool = False
+	# Rich invitation text (HTML); providers that show a description use it instead of `agenda`.
+	description_html: str = ""
 
 	@property
 	def ends_at(self) -> datetime.datetime:

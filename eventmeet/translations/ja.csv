@@ -145,7 +145,7 @@ Only seminar staff can check in attendees.,受付はセミナースタッフの�
 Only the organizer can start this meeting as host.,このミーティングをホストとして開始できるのは主催者のみです。
 Open in Frappe,Frappe で開く
 Optional,任意参加
-"Optional. When filled in, this text is used as the invitation email body (the join URL is always added).",任意。入力すると、この文面が招待メールの本文になります（参加 URL は自動で追記されます）。
+"Optional. When filled in, this text is used as the invitation email body, or as the event description for Google Meet (the join URL is always included).",任意。入力すると、この文面が招待メールの本文になります。Google Meet の場合は Google カレンダーの予定の説明になります（参加 URL は常に含まれます）。
 Organization,所属
 Organizer,主催者
 Organizer {0} is not a Google Workspace user of {1}.,主催者 {0} は {1} の Google Workspace ユーザーではありません。

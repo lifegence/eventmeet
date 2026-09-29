@@ -9,6 +9,7 @@ from eventmeet.conferencing.providers import ConferenceSpec, Invitee, Participan
 from eventmeet.conferencing.providers.google_meet import (
 	GoogleMeetProvider,
 	parse_rfc3339,
+	to_calendar_description,
 	to_rfc3339_utc,
 )
 from eventmeet.services import conference
@@ -216,6 +217,42 @@ class TestGoogleMeetProvider(SeminarTestCase):
 		self.assertEqual(to_rfc3339_utc(datetime.datetime(2026, 10, 1, 14, 0)), "2026-10-01T05:00:00Z")
 
 
+class TestCalendarDescription(SeminarTestCase):
+	def test_editor_html_is_reduced_to_calendar_tags(self):
+		editor_html = (
+			'<div class="ql-editor read-mode"><p>Please join.</p><p><strong>Overview</strong></p>'
+			'<ul><li data-list="bullet"><span class="ql-ui"></span>Title: A &amp; B</li></ul>'
+			"<ol><li>Topic (15 min)</li></ol><p><script>alert(1)</script><em>note</em></p>"
+			'<p><a href="https://example.com/x">link</a> <a href="javascript:alert(1)">bad</a></p></div>'
+		)
+		text = to_calendar_description(editor_html)
+		self.assertTrue(
+			text.startswith("Please join.<br><b>Overview</b><br><ul><li>Title: A &amp; B</li></ul>")
+		)
+		self.assertIn("<ol><li>Topic (15 min)</li></ol>", text)
+		self.assertIn("<i>note</i>", text)
+		self.assertIn('<a href="https://example.com/x">link</a>', text)
+		self.assertIn("<a>bad</a>", text, "unsafe links lose their href")
+		self.assertNotIn("alert", text)
+		self.assertNotIn("<div", text)
+		self.assertNotIn("<p>", text)
+
+	def test_event_uses_description_html_when_present(self):
+		client = FakeGoogleClient(
+			{
+				("POST", "/calendars/primary/events"): {
+					"id": "evt9",
+					"hangoutLink": "https://meet.google.com/x",
+					"conferenceData": {"conferenceId": "x"},
+				}
+			}
+		)
+		GoogleMeetProvider(client).create(
+			"o@example.com", spec(description_html="<p>Hello <strong>X</strong></p>")
+		)
+		self.assertEqual(client.requests[0]["json"]["description"], "Hello <b>X</b>")
+
+
 class TestConferencingSettings(SeminarTestCase):
 	def test_rejects_non_service_account_key(self):
 		settings = frappe.get_single("Conferencing Settings")
@@ -367,3 +404,17 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 		)
 		self.assertEqual(meeting.send_invitations(), "google")
 		self.assertEqual(self.mail, [], "Google Calendar sends the invitations, including to guests")
+
+	def test_invitation_message_is_the_google_description(self):
+		meeting = make_meeting(self.organizer, [self.member], agenda=[{"topic": "Only topic"}])
+		self.assertEqual(self.google.called("create")[0][2].description_html, "")
+		meeting.invitation_message = meeting.build_invitation_message()
+		meeting.save(ignore_permissions=True)
+		update_spec = self.google.called("update")[-1][2]
+		self.assertIn("Only topic", update_spec.description_html)
+		self.assertFalse(update_spec.notify)
+
+		meeting.send_invitations()
+		invite_spec = self.google.called("update")[-1][2]
+		self.assertTrue(invite_spec.notify)
+		self.assertEqual(invite_spec.description_html, meeting.invitation_message)

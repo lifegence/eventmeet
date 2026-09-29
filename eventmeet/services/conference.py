@@ -52,7 +52,16 @@ def _duration_minutes(starts_at: datetime.datetime, ends_at: datetime.datetime) 
 
 
 def _spec(
-	topic, kind, starts_at, ends_at, registration_required, agenda, purpose, attendees=None, notify=False
+	topic,
+	kind,
+	starts_at,
+	ends_at,
+	registration_required,
+	agenda,
+	purpose,
+	attendees=None,
+	notify=False,
+	description_html="",
 ) -> ConferenceSpec:
 	settings = frappe.get_single("Conferencing Settings")
 	return ConferenceSpec(
@@ -67,6 +76,7 @@ def _spec(
 		auto_recording=settings.zoom_auto_recording or "none",
 		attendees=list(attendees or []),
 		notify=notify,
+		description_html=description_html or "",
 	)
 
 
@@ -122,9 +132,21 @@ def schedule_session(
 	organizer_email: str | None = None,
 	attendees: list[Invitee] | None = None,
 	notify: bool = False,
+	description_html: str = "",
 ):
 	starts_at, ends_at = get_datetime(starts_at), get_datetime(ends_at)
-	spec = _spec(topic, kind, starts_at, ends_at, registration_required, agenda, purpose, attendees, notify)
+	spec = _spec(
+		topic,
+		kind,
+		starts_at,
+		ends_at,
+		registration_required,
+		agenda,
+		purpose,
+		attendees,
+		notify,
+		description_html,
+	)
 	provider = get_provider(provider_name)
 	if kind == "Webinar" and not provider.supports_webinar:
 		frappe.throw(_("{0} does not support webinars.").format(provider.name))
@@ -187,6 +209,7 @@ def update_session(
 	purpose: str,
 	attendees: list[Invitee] | None = None,
 	notify: bool = False,
+	description_html: str = "",
 ):
 	"""Push schedule/topic changes (and, for providers with native invitations, attendees)."""
 	session = frappe.get_doc("Conference Session", session_name)
@@ -219,6 +242,7 @@ def update_session(
 		purpose,
 		attendees,
 		notify,
+		description_html,
 	)
 	try:
 		provider.update(session_ref(session), spec)

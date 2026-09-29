@@ -148,7 +148,7 @@
    "label": "Insert Overview and Agenda"
   },
   {
-   "description": "Optional. When filled in, this text is used as the invitation email body (the join URL is always added).",
+   "description": "Optional. When filled in, this text is used as the invitation email body, or as the event description for Google Meet (the join URL is always included).",
    "fieldname": "invitation_message",
    "fieldtype": "Text Editor",
    "label": "Invitation Message"
@@ -189,7 +189,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 12:00:00.000000",
+ "modified": "2026-09-29 12:30:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",

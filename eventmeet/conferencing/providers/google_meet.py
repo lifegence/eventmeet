@@ -17,9 +17,11 @@ Grant these scopes to the service account's client ID in the Google Admin consol
 from __future__ import annotations
 
 import datetime
+import html
 import json
 import re
 import time
+from html.parser import HTMLParser
 from urllib.parse import quote
 
 import frappe
@@ -76,6 +78,67 @@ def to_rfc3339_utc(value: datetime.datetime) -> str:
 
 	local = value.replace(tzinfo=ZoneInfo(get_system_timezone()))
 	return local.astimezone(ZoneInfo("UTC")).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+class _CalendarHTML(HTMLParser):
+	"""Reduce editor HTML to the tags Google Calendar renders in descriptions."""
+
+	INLINE = {"b": "b", "strong": "b", "i": "i", "em": "i", "u": "u"}
+	LISTS = {"ul", "ol"}
+	BLOCKS = {"p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "tr"}
+
+	SKIP = {"script", "style"}
+
+	def __init__(self):
+		super().__init__(convert_charrefs=True)
+		self.out: list[str] = []
+		self.skip_depth = 0
+
+	def _newline(self):
+		if self.out and not self.out[-1].endswith(("<br>", "</ul>", "</ol>", "</li>")):
+			self.out.append("<br>")
+
+	def handle_starttag(self, tag, attrs):
+		if tag in self.SKIP:
+			self.skip_depth += 1
+		elif tag in self.INLINE:
+			self.out.append(f"<{self.INLINE[tag]}>")
+		elif tag in self.LISTS:
+			self._newline()
+			self.out.append(f"<{tag}>")
+		elif tag == "li":
+			self.out.append("<li>")
+		elif tag == "a":
+			href = dict(attrs).get("href") or ""
+			if href.startswith(("http://", "https://", "mailto:")):
+				self.out.append(f'<a href="{html.escape(href, quote=True)}">')
+			else:
+				self.out.append("<a>")
+		elif tag == "br":
+			self.out.append("<br>")
+
+	def handle_endtag(self, tag):
+		if tag in self.SKIP:
+			self.skip_depth = max(self.skip_depth - 1, 0)
+		elif tag in self.INLINE:
+			self.out.append(f"</{self.INLINE[tag]}>")
+		elif tag in self.LISTS or tag == "li" or tag == "a":
+			self.out.append(f"</{tag}>")
+		elif tag in self.BLOCKS:
+			self._newline()
+
+	def handle_data(self, data):
+		if data.strip() and not self.skip_depth:
+			self.out.append(html.escape(data, quote=False))
+
+
+def to_calendar_description(value: str) -> str:
+	parser = _CalendarHTML()
+	parser.feed(value or "")
+	parser.close()
+	text = "".join(parser.out).replace("<a></a>", "")
+	text = re.sub(r"(<br>)+$", "", text)
+	return re.sub(r"(<br>){3,}", "<br><br>", text)[:8000]
 
 
 class GoogleWorkspaceClient:
@@ -160,7 +223,9 @@ class GoogleMeetProvider(ConferenceProvider):
 
 		return {
 			"summary": spec.topic[:1024],
-			"description": spec.agenda or "",
+			"description": to_calendar_description(spec.description_html)
+			if spec.description_html
+			else spec.agenda or "",
 			"start": when(spec.starts_at),
 			"end": when(spec.ends_at),
 			"attendees": [
