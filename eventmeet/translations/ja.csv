@@ -71,6 +71,7 @@ End time must be after start time.,終了日時は開始日時より後にして
 Ended,終了
 "Endpoint: /api/method/eventmeet.api.webhooks.stripe — events: checkout.session.completed, checkout.session.expired, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed","エンドポイント: /api/method/eventmeet.api.webhooks.stripe — イベント: checkout.session.completed, checkout.session.expired, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed"
 Ends At,終了日時
+EventMeet,セミナー・会議
 External ID,外部 ID
 Feedback Requested,アンケート依頼済
 Feedback has already been submitted. Thank you!,アンケートは回答済みです。ありがとうございました。
@@ -91,6 +92,7 @@ Internal Meeting Action,社内ミーティング アクション
 Internal Meeting Agenda,社内ミーティング 議題
 Internal Meeting Attendee,社内ミーティング 参加者
 Internal Meeting Provider,社内ミーティングの会議ツール
+Internal Meetings,社内ミーティング
 Internal Notes,社内メモ
 Invalid check-in code.,受付コードが無効です。
 Invalid feedback link.,アンケートのリンクが無効です。
@@ -180,6 +182,7 @@ Secret Token of the Zoom app's Event Subscription. Webhook URL: /api/method/even
 Seminar,セミナー
 Seminar Check-in,セミナー受付
 Seminar Feedback,セミナーアンケート
+Seminar Management,セミナー管理
 Seminar Registration,セミナー申込
 Seminar Session,セミナープログラム
 Seminar Settings,セミナー設定

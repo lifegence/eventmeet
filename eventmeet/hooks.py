@@ -10,7 +10,7 @@ add_to_apps_screen = [
 		"name": app_name,
 		"logo": "/assets/eventmeet/images/seminar-icon.svg",
 		"title": "EventMeet",
-		"route": "/app/seminar",
+		"route": "/app/eventmeet",
 	},
 ]
 
