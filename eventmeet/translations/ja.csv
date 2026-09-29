@@ -92,6 +92,7 @@ I would recommend this seminar to others,このセミナーを他の人に勧め
 Import AI Summary,AI 要約を取り込む
 Import Gemini Meeting Notes,Gemini の会議メモを取り込む
 "Imports ""Take notes for me"" documents into the minutes. Requires the drive.readonly scope.",「自動メモ作成」のドキュメントを議事録に取り込みます。drive.readonly スコープが必要です。
+Internal Attendees,社内参加者
 Internal Meeting,社内ミーティング
 Internal Meeting Action,社内ミーティング アクション
 Internal Meeting Agenda,社内ミーティング 議題

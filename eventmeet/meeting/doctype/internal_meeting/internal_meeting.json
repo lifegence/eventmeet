@@ -19,11 +19,12 @@
   "conference_session",
   "column_break_online",
   "join_url",
-  "agenda_tab",
-  "agenda",
+  "attendees_section",
   "attendees",
   "external_attendees",
   "invitation_message",
+  "agenda_tab",
+  "agenda",
   "minutes_tab",
   "minutes",
   "ai_summary",
@@ -123,20 +124,14 @@
    "read_only": 1
   },
   {
-   "fieldname": "agenda_tab",
-   "fieldtype": "Tab Break",
-   "label": "Agenda"
-  },
-  {
-   "fieldname": "agenda",
-   "fieldtype": "Table",
-   "label": "Agenda",
-   "options": "Internal Meeting Agenda"
+   "fieldname": "attendees_section",
+   "fieldtype": "Section Break",
+   "label": "Attendees"
   },
   {
    "fieldname": "attendees",
    "fieldtype": "Table",
-   "label": "Attendees",
+   "label": "Internal Attendees",
    "options": "Internal Meeting Attendee"
   },
   {
@@ -150,6 +145,17 @@
    "fieldname": "invitation_message",
    "fieldtype": "Text Editor",
    "label": "Invitation Message"
+  },
+  {
+   "fieldname": "agenda_tab",
+   "fieldtype": "Tab Break",
+   "label": "Agenda"
+  },
+  {
+   "fieldname": "agenda",
+   "fieldtype": "Table",
+   "label": "Agenda",
+   "options": "Internal Meeting Agenda"
   },
   {
    "fieldname": "minutes_tab",
@@ -176,7 +182,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 11:00:00.000000",
+ "modified": "2026-09-29 11:35:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",
