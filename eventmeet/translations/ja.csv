@@ -80,6 +80,7 @@ Feedback Requested,アンケート依頼済
 Feedback has already been submitted. Thank you!,アンケートは回答済みです。ありがとうございました。
 Feedback is not collected for this seminar.,このセミナーではアンケートを実施していません。
 Feedback opens after the seminar starts.,アンケートはセミナー開始後に回答できます。
+"Google Calendar cannot notify only some guests, so they receive an email from this system (without a calendar attachment).",Google カレンダーは一部の人だけに通知できないため、選択した人にはこのシステムからメールを送ります（カレンダー添付なし）。
 Google Calendar notifies attendees automatically when the meeting is cancelled.,ミーティングを中止すると、Google カレンダーが参加者に自動で通知します。
 Google Calendar will email the invitation to all attendees. Continue?,Google カレンダーから全参加者に招待メールが送信されます。続行しますか？
 "Google Meet: after invitations are sent, Google Calendar notifies attendees of changes and cancellation. Zoom / on-site: use 'Resend Invitation' after changes.",Google Meet：招待送信後の変更・中止は Google カレンダーが参加者に通知します。Zoom・対面：変更後は「招待を再送」で送り直してください。
@@ -107,9 +108,11 @@ Invalid feedback link.,アンケートのリンクが無効です。
 Invitation Message,招待メッセージ
 Invitation queued,招待メールを送信しました
 Invitation sent,招待を送信しました
+Invitation sent to: {0},招待を送信しました: {0}
 Invitation: {0},招待: {0}
 Invitations Sent,招待送信済
 Invited,招待済
+Invited At,招待送信日時
 Job Title,役職
 Join,参加
 Join Time,入室日時
@@ -131,6 +134,7 @@ No Stripe payment is linked to this registration; refund it manually.,この申�
 No Zoom Host Available,利用可能な Zoom ホストがありません
 No enabled Zoom host account can host a {0} for {1} attendees.,{1} 名の {0} を開催できる有効な Zoom ホストアカウントがありません。
 No upcoming seminars.,開催予定のセミナーはありません。
+Not an attendee of this meeting: {0},このミーティングの参加者ではありません: {0}
 Notes,メモ
 On-site,会場
 On-site check-in,会場での受付
@@ -192,6 +196,7 @@ Reminder: {0},リマインド: {0}
 Replace the current invitation message?,現在の招待メッセージを置き換えますか？
 Resend Confirmation,確定メールを再送
 Resend Invitation,招待を再送
+Save the meeting before sending the invitation.,招待を送信する前にミーティングを保存してください。
 Seat is held while the Stripe Checkout is open. Stripe requires 30 minutes or more.,Stripe の決済画面が開いている間は席を確保します。Stripe の仕様上 30 分以上が必要です。
 Secret Token of the Zoom app's Event Subscription. Webhook URL: /api/method/eventmeet.api.webhooks.zoom,Zoom アプリの Event Subscription の Secret Token。Webhook URL: /api/method/eventmeet.api.webhooks.zoom
 Seminar,セミナー
@@ -209,9 +214,12 @@ Seminar Venue,セミナー会場
 Seminar not found.,セミナーが見つかりません。
 Seminars,セミナー一覧
 Send Cancellation,中止連絡を送信
+Send Cancellation to Selected,選択した参加者に中止連絡を送信
 Send Feedback Request After Seminar,終了後にアンケート依頼を送信
 Send Invitation,招待を送信
 Send Reminder Hours Before,リマインド送信（開始の何時間前）
+Send to Selected Attendees,選択した参加者に送信
+Send to the following {0} people?,次の {0} 名に送信しますか？
 Service Account Key (JSON),サービスアカウント鍵（JSON）
 "Service account with domain-wide delegation for scopes: calendar.events, meetings.space.readonly, directory.readonly (+ drive.readonly for notes).","ドメイン全体の委任を設定したサービスアカウント。スコープ: calendar.events, meetings.space.readonly, directory.readonly（メモ取込時は drive.readonly も）"
 Show this QR code at the reception.,受付でこの QR コードをご提示ください。
@@ -247,6 +255,7 @@ This link is personal. Please do not share it.,このリンクはあなた専用
 This registration cannot be checked in.,この申込は受付できません。
 This registration is {0}.,この申込は「{0}」です。
 This seminar is fully booked.,このセミナーは満席です。
+Tick the attendees to send to in the attendee tables first.,先に参加者の表で送信先にチェックを付けてください。
 Ticket,チケット
 Ticket Name,チケット名
 Ticket Type,チケット種別

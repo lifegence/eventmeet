@@ -162,9 +162,17 @@ def meeting_ics(meeting, method: str = "REQUEST") -> str:
 	return "\r\n".join(lines) + "\r\n"
 
 
-def send_meeting_invitation(meeting, cancelled: bool = False) -> None:
+def send_meeting_invitation(
+	meeting, cancelled: bool = False, only: set[str] | None = None, attach_ics: bool = True
+) -> list[str]:
+	"""Email the invitation (or cancellation). `only` limits recipients to these emails.
+
+	Returns the recipients that were emailed."""
 	internal = [row.email for row in meeting.attendees if row.email]
 	external = [row.email for row in meeting.get("external_attendees") or [] if row.email]
+	if only is not None:
+		internal = [email for email in internal if email.lower() in only]
+		external = [email for email in external if email.lower() in only]
 	if not internal and not external:
 		frappe.throw(_("Add at least one attendee with an email address."))
 	method = "CANCEL" if cancelled else "REQUEST"
@@ -175,7 +183,9 @@ def send_meeting_invitation(meeting, cancelled: bool = False) -> None:
 		"starts_at": format_datetime(meeting.starts_at, "yyyy-MM-dd HH:mm"),
 		"ends_at": format_datetime(meeting.ends_at, "HH:mm"),
 	}
-	attachments = [{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}]
+	attachments = (
+		[{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}] if attach_ics else []
+	)
 	if internal:
 		_send(
 			internal,
@@ -197,3 +207,4 @@ def send_meeting_invitation(meeting, cancelled: bool = False) -> None:
 			attachments,
 			raise_on_error=True,
 		)
+	return internal + external

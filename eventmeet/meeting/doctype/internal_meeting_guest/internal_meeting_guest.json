@@ -10,7 +10,8 @@
   "organization",
   "optional",
   "attended",
-  "attended_minutes"
+  "attended_minutes",
+  "invited_at"
  ],
  "fields": [
   {
@@ -54,12 +55,19 @@
    "label": "Attended Minutes",
    "precision": "1",
    "read_only": 1
+  },
+  {
+   "fieldname": "invited_at",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Invited At",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-09-29 11:00:00.000000",
+ "modified": "2026-09-29 13:30:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting Guest",

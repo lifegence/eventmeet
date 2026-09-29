@@ -313,3 +313,74 @@ class TestInvitationMessage(SeminarTestCase):
 		self.assertIn("You are invited to the following meeting.", rendered)
 		self.assertEqual(rendered.count("Default agenda"), 1)
 		self.assertEqual(rendered.count(meeting.join_url), 2, "href + text of the single join URL line")
+
+
+class TestSelectiveInvitation(SeminarTestCase):
+	def setUp(self):
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
+		make_host("Internal Host")
+		self.fakes = patch_providers(self)
+		self.organizer = make_user("organizer@example.com")
+		self.member = make_user("member@example.com")
+		self.other = make_user("other@example.com")
+
+	def meeting(self, **kwargs):
+		return make_meeting(
+			self.organizer,
+			[self.member, self.other],
+			external_attendees=[{"guest_name": "Guest", "email": "guest@partner.test"}],
+			**kwargs,
+		)
+
+	def invited_at(self, meeting):
+		meeting.reload()
+		rows = list(meeting.attendees) + list(meeting.external_attendees)
+		return {row.email: row.invited_at for row in rows}
+
+	def test_send_only_to_selected_people(self):
+		meeting = self.meeting()
+		self.assertEqual(
+			meeting.send_invitations(recipients='["GUEST@partner.test", "other@example.com"]'), "selected"
+		)
+		recipients = sorted(email for m in self.mail for email in m["recipients"])
+		self.assertEqual(recipients, ["guest@partner.test", "other@example.com"])
+		self.assertTrue(all(m["attachments"] for m in self.mail), "Zoom/on-site keep the .ics")
+		invited = self.invited_at(meeting)
+		self.assertTrue(invited["guest@partner.test"] and invited["other@example.com"])
+		self.assertFalse(invited[self.member])
+		self.assertEqual((meeting.status, meeting.invitations_sent), ("Planned", 0))
+		self.assertTrue(
+			frappe.db.exists(
+				"Comment",
+				{
+					"reference_name": meeting.name,
+					"comment_type": "Info",
+					"content": ["like", "%guest@partner.test%"],
+				},
+			)
+		)
+
+	def test_selecting_everyone_is_a_full_send(self):
+		meeting = self.meeting()
+		everyone = [self.organizer, self.member, self.other, "guest@partner.test"]
+		self.assertEqual(meeting.send_invitations(recipients=everyone), "email")
+		meeting.reload()
+		self.assertEqual((meeting.status, meeting.invitations_sent), ("Invited", 1))
+		self.assertTrue(all(self.invited_at(meeting).values()))
+
+	def test_unknown_recipient_is_rejected(self):
+		meeting = self.meeting()
+		with self.assertRaises(frappe.ValidationError):
+			meeting.send_invitations(recipients=["stranger@example.com"])
+		self.assertEqual(self.mail, [])
+
+	def test_google_meet_selected_send_uses_email_without_ics(self):
+		frappe.db.set_single_value("Conferencing Settings", "google_workspace_domains", "example.com")
+		meeting = self.meeting(conference_provider="Google Meet")
+		updates = len(self.fakes["Google Meet"].called("update"))
+		self.assertEqual(meeting.send_invitations(recipients=["guest@partner.test"]), "selected")
+		self.assertEqual([m["recipients"] for m in self.mail], [["guest@partner.test"]])
+		self.assertEqual(self.mail[0]["attachments"], [], "no .ics: guests already have the Google event")
+		self.assertIn(meeting.join_url, self.mail[0]["rendered"])
+		self.assertEqual(len(self.fakes["Google Meet"].called("update")), updates, "Google does not notify")

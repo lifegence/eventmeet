@@ -9,6 +9,7 @@ from frappe.utils import (
 	format_datetime,
 	get_datetime,
 	get_fullname,
+	now_datetime,
 	strip_html,
 	validate_email_address,
 )
@@ -212,14 +213,26 @@ class InternalMeeting(Document):
 		).strip()
 
 	@frappe.whitelist()
-	def send_invitations(self):
+	def send_invitations(self, recipients=None):
+		"""Send the invitation to everyone, or only to `recipients` (emails selected in the attendee tables)."""
 		self.check_permission("write")
+		selected = self._selected_recipients(recipients)
 		native = self.online and conference.provider_has_native_invitations(self.conference_session)
+		cancelled = self.status == "Cancelled"
+		if native and cancelled:
+			frappe.throw(_("Google Calendar notifies attendees automatically when the meeting is cancelled."))
+
+		if selected is not None:
+			# Google Calendar can only notify everyone, so selected people get an email from this
+			# system instead (without .ics: they already have the Google Calendar event).
+			sent = notifications.send_meeting_invitation(
+				self, cancelled=cancelled, only=selected, attach_ics=not native
+			)
+			self._mark_invited(sent)
+			self.add_comment("Info", _("Invitation sent to: {0}").format(", ".join(sent)))
+			return "selected"
+
 		if native:
-			if self.status == "Cancelled":
-				frappe.throw(
-					_("Google Calendar notifies attendees automatically when the meeting is cancelled.")
-				)
 			# Google Calendar sends (or re-sends) the invitations to every attendee.
 			conference.update_session(
 				self.conference_session,
@@ -232,13 +245,43 @@ class InternalMeeting(Document):
 				attendees=self.invitees(),
 				notify=True,
 			)
+			self._mark_invited([i.email for i in self.invitees()])
 		else:
-			notifications.send_meeting_invitation(self, cancelled=self.status == "Cancelled")
+			sent = notifications.send_meeting_invitation(self, cancelled=cancelled)
+			self._mark_invited(sent)
 		values = {"invitations_sent": 1}
 		if self.status == "Planned":
 			values["status"] = "Invited"
 		self.db_set(values)
 		return "google" if native else "email"
+
+	def participant_emails(self) -> set[str]:
+		rows = list(self.attendees) + list(self.external_attendees)
+		return {row.email.lower() for row in rows if row.email}
+
+	def _selected_recipients(self, recipients) -> set[str] | None:
+		"""None means everyone."""
+		if isinstance(recipients, str):
+			recipients = frappe.parse_json(recipients)
+		if not recipients:
+			return None
+		selected = {str(email).strip().lower() for email in recipients if email}
+		everyone = self.participant_emails()
+		unknown = selected - everyone
+		if unknown:
+			frappe.throw(_("Not an attendee of this meeting: {0}").format(", ".join(sorted(unknown))))
+		return None if selected == everyone else selected
+
+	def _mark_invited(self, emails) -> None:
+		emails = {email.lower() for email in emails}
+		now = now_datetime()
+		for child_doctype, rows in (
+			("Internal Meeting Attendee", self.attendees),
+			("Internal Meeting Guest", self.external_attendees),
+		):
+			for row in rows:
+				if row.email and row.email.lower() in emails:
+					frappe.db.set_value(child_doctype, row.name, "invited_at", now, update_modified=False)
 
 
 def _is_manager(user: str) -> bool:

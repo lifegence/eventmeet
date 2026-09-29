@@ -31,22 +31,68 @@ frappe.ui.form.on("Internal Meeting", {
 
 		// Google Calendar notifies cancellations itself once invitations were sent.
 		if (frm.doc.status === "Cancelled" && (is_google || !frm.doc.invitations_sent)) return;
-		const label =
-			frm.doc.status === "Cancelled"
-				? __("Send Cancellation")
-				: frm.doc.invitations_sent
-				? __("Resend Invitation")
-				: __("Send Invitation");
+		const cancelled = frm.doc.status === "Cancelled";
+		const label = cancelled
+			? __("Send Cancellation")
+			: frm.doc.invitations_sent
+			? __("Resend Invitation")
+			: __("Send Invitation");
 		const confirm_message = is_google
 			? __("Google Calendar will email the invitation to all attendees. Continue?")
 			: __("Email all attendees with a calendar invitation?");
-		frm.add_custom_button(label, () =>
-			frappe.confirm(confirm_message, () =>
-				frm.call({ doc: frm.doc, method: "send_invitations", freeze: true }).then(() => {
-					frappe.show_alert({ message: __("Invitation sent"), indicator: "green" });
-					frm.reload_doc();
-				})
-			)
+		frm.add_custom_button(label, () => {
+			if (!ensure_saved(frm)) return;
+			frappe.confirm(confirm_message, () => send(frm));
+		});
+
+		frm.add_custom_button(
+			cancelled ? __("Send Cancellation to Selected") : __("Send to Selected Attendees"),
+			() => {
+				if (!ensure_saved(frm)) return;
+				const rows = ["attendees", "external_attendees"].flatMap((field) =>
+					frm.fields_dict[field].grid.get_selected_children()
+				);
+				const emails = [...new Set(rows.map((row) => row.email).filter(Boolean))];
+				if (!emails.length) {
+					frappe.msgprint(__("Tick the attendees to send to in the attendee tables first."));
+					return;
+				}
+				const note = is_google
+					? "<br><br>" +
+					  __(
+							"Google Calendar cannot notify only some guests, so they receive an email from this system (without a calendar attachment)."
+					  )
+					: "";
+				frappe.confirm(
+					__("Send to the following {0} people?", [emails.length]) +
+						"<br>" +
+						emails.map((email) => frappe.utils.escape_html(email)).join("<br>") +
+						note,
+					() => send(frm, emails)
+				);
+			}
 		);
 	},
 });
+
+function ensure_saved(frm) {
+	if (frm.is_dirty()) {
+		frappe.msgprint(__("Save the meeting before sending the invitation."));
+		return false;
+	}
+	return true;
+}
+
+function send(frm, recipients) {
+	return frm
+		.call({
+			doc: frm.doc,
+			method: "send_invitations",
+			args: recipients ? { recipients } : {},
+			freeze: true,
+		})
+		.then(() => {
+			frappe.show_alert({ message: __("Invitation sent"), indicator: "green" });
+			frm.reload_doc();
+		});
+}
