@@ -82,7 +82,7 @@
   {
    "fieldname": "location",
    "fieldtype": "Data",
-   "label": "Location"
+   "label": "Meeting Place"
   },
   {
    "default": "1",
@@ -146,12 +146,12 @@
   {
    "fieldname": "minutes_tab",
    "fieldtype": "Tab Break",
-   "label": "Minutes"
+   "label": "Meeting Minutes"
   },
   {
    "fieldname": "minutes",
    "fieldtype": "Text Editor",
-   "label": "Minutes"
+   "label": "Meeting Minutes"
   },
   {
    "fieldname": "ai_summary",
@@ -168,7 +168,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-28 16:00:00.000000",
+ "modified": "2026-09-29 10:30:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",

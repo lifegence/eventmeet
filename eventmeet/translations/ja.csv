@@ -115,6 +115,8 @@ Leave empty to use the default of Conferencing Settings. Google Meet uses the or
 Map URL,地図 URL
 Meeting Capacity,ミーティング上限人数
 Meeting Code,ミーティングコード
+Meeting Minutes,議事録
+Meeting Place,開催場所
 Meeting: registration-based Zoom meeting (up to the host's meeting capacity). Webinar: requires a host with a Webinar license.,Meeting: 登録制の Zoom ミーティング（ホストのミーティング上限人数まで）。Webinar: Webinar ライセンスを持つホストが必要です。
 No AI summary is available yet. Make sure AI Companion meeting summary is enabled in Zoom.,AI 要約はまだありません。Zoom で AI Companion の会議要約が有効か確認してください。
 No Stripe payment is linked to this registration; refund it manually.,この申込には Stripe の決済が紐付いていません。手動で返金してください。
