@@ -56,6 +56,9 @@ bench --site <site> install-app lifegence_seminar
 5. AI 要約を取り込む場合は Zoom 側で AI Companion の会議要約を有効化
 
 ### Google Meet（社内 MTG）
+詳細な手順（管理コンソールの画面操作、動作確認、トラブルシューティング）は
+[docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.0_Draft.docx](docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.0_Draft.docx) を参照。
+
 1. Google Cloud でサービスアカウントを作成し、JSON 鍵を発行。Calendar API / Google Meet REST API /
    People API（メモ取込時は Drive API）を有効化
 2. Google 管理コンソール → セキュリティ → API の制御 → **ドメイン全体の委任** で、サービスアカウントの
