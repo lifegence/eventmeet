@@ -16,7 +16,7 @@
    "fieldname": "description",
    "fieldtype": "Small Text",
    "in_list_view": 1,
-   "label": "Action",
+   "label": "Action Detail",
    "reqd": 1
   },
   {
@@ -51,7 +51,7 @@
  "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-09-29 10:40:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting Action",

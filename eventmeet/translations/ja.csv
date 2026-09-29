@@ -7,6 +7,7 @@ AI Summary / Meeting Notes,AI 要約 / 会議メモ
 AI Summary Imported,AI 要約取込済
 Access Notes,アクセス案内
 Account ID,アカウント ID
+Action Detail,対応内容
 Action Items,アクションアイテム
 Add at least one attendee with an email address.,メールアドレスを持つ参加者を 1 名以上追加してください。
 Add at least one enabled ticket type before opening registration.,申込受付を開始する前に、有効なチケット種別を 1 つ以上追加してください。
@@ -21,6 +22,7 @@ Attendance Sync Delay (Minutes),参加ログ取得までの待ち時間（分）
 Attendance Synced,参加ログ取得済
 Attendance updated,出席情報を更新しました
 Attended,出席
+Attended Minutes,参加時間（分）
 Attended Online,オンライン出席
 Attendee Name,参加者名
 Attendee limit of the Webinar add-on assigned to this user. 0 = no webinar license.,このユーザーに割り当てた Webinar アドオンの参加者上限。0 = Webinar ライセンスなし
