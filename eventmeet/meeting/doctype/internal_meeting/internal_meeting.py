@@ -114,6 +114,10 @@ class InternalMeeting(Document):
 			scheduled = False
 
 		if scheduled:
+			if not self.conference_details_changed():
+				# e.g. only minutes / action items were edited: nothing to push, and no
+				# notification to attendees (Google Calendar would email everyone).
+				return
 			conference.update_session(
 				self.conference_session,
 				topic=self.title,
@@ -144,6 +148,21 @@ class InternalMeeting(Document):
 			notify=bool(self.invitations_sent),
 		)
 		self.db_set({"conference_session": created.name, "join_url": created.join_url})
+
+	def conference_signature(self) -> tuple:
+		"""Everything that is sent to the conferencing provider / calendar invitation."""
+		return (
+			self.title,
+			str(get_datetime(self.starts_at)),
+			str(get_datetime(self.ends_at)),
+			self.invitation_message or "",
+			self.agenda_text(),
+			tuple(sorted((i.email, bool(i.optional)) for i in self.invitees())),
+		)
+
+	def conference_details_changed(self) -> bool:
+		previous = self.get_doc_before_save()
+		return previous is None or previous.conference_signature() != self.conference_signature()
 
 	def agenda_text(self) -> str:
 		return "\n".join(f"- {row.topic}" for row in self.agenda)

@@ -59,7 +59,7 @@
   },
   {
    "default": "0",
-   "description": "After invitations are sent, changes and cancellation are notified to attendees.",
+   "description": "Google Meet: after invitations are sent, Google Calendar notifies attendees of changes and cancellation. Zoom / on-site: use 'Resend Invitation' after changes.",
    "fieldname": "invitations_sent",
    "fieldtype": "Check",
    "label": "Invitations Sent",
@@ -189,7 +189,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-29 12:30:00.000000",
+ "modified": "2026-09-29 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Meeting",
  "name": "Internal Meeting",

@@ -11,7 +11,6 @@ Action Detail,対応内容
 Action Items,アクションアイテム
 Add at least one attendee with an email address.,メールアドレスを持つ参加者を 1 名以上追加してください。
 Add at least one enabled ticket type before opening registration.,申込受付を開始する前に、有効なチケット種別を 1 つ以上追加してください。
-"After invitations are sent, changes and cancellation are notified to attendees.",招待送信後は、変更や中止が参加者に通知されます。
 Agenda,議題
 All Zoom host accounts are busy between {0} and {1}. Add a host account or change the time.,{0} 〜 {1} はすべての Zoom ホストアカウントが使用中です。ホストアカウントを追加するか、時間を変更してください。
 Already checked in,受付済み
@@ -83,6 +82,7 @@ Feedback is not collected for this seminar.,このセミナーではアンケー
 Feedback opens after the seminar starts.,アンケートはセミナー開始後に回答できます。
 Google Calendar notifies attendees automatically when the meeting is cancelled.,ミーティングを中止すると、Google カレンダーが参加者に自動で通知します。
 Google Calendar will email the invitation to all attendees. Continue?,Google カレンダーから全参加者に招待メールが送信されます。続行しますか？
+"Google Meet: after invitations are sent, Google Calendar notifies attendees of changes and cancellation. Zoom / on-site: use 'Resend Invitation' after changes.",Google Meet：招待送信後の変更・中止は Google カレンダーが参加者に通知します。Zoom・対面：変更後は「招待を再送」で送り直してください。
 Guest Name,氏名
 Host Account,ホストアカウント
 Host Allocation,ホスト割当

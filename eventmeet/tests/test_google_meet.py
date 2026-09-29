@@ -307,10 +307,9 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 
 	def test_invitations_are_sent_by_google_and_changes_notified_afterwards(self):
 		meeting = make_meeting(self.organizer, [self.member])
+		meeting.title = "Weekly sync (updated)"
 		meeting.save(ignore_permissions=True)
-		self.assertFalse(
-			self.google.called("update")[-1][2].notify, "attendee sync before invitation is silent"
-		)
+		self.assertFalse(self.google.called("update")[-1][2].notify, "changes before invitation are silent")
 
 		self.assertEqual(meeting.send_invitations(), "google")
 		self.assertTrue(self.google.called("update")[-1][2].notify)
@@ -418,3 +417,20 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 		invite_spec = self.google.called("update")[-1][2]
 		self.assertTrue(invite_spec.notify)
 		self.assertEqual(invite_spec.description_html, meeting.invitation_message)
+
+	def test_minutes_and_actions_do_not_notify_google_guests(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		meeting.send_invitations()
+		meeting.reload()
+		updates_before = len(self.google.called("update"))
+
+		meeting.minutes = "<p>Decided X</p>"
+		meeting.append("actions", {"description": "Follow up", "assigned_to": self.member})
+		meeting.save(ignore_permissions=True)
+		self.assertEqual(len(self.google.called("update")), updates_before, "no calendar update for minutes")
+
+		meeting.append("external_attendees", {"guest_name": "Late guest", "email": "late@partner.test"})
+		meeting.save(ignore_permissions=True)
+		last = self.google.called("update")[-1][2]
+		self.assertTrue(last.notify)
+		self.assertIn("late@partner.test", [i.email for i in last.attendees])
