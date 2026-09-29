@@ -1,0 +1,59 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+{% include "eventmeet/templates/includes/seminar_styles.html" %}
+<div class="ls-container">
+	{% if not registration %}
+	<h1 class="ls-title">{{ _("Registration not found") }}</h1>
+	<p class="ls-muted">{{ _("The link is invalid or has expired.") }}</p>
+	{% else %}
+	<h1 class="ls-title">{{ seminar.title | e }}</h1>
+
+	{% if registration.status == "Pending Payment" %}
+		{% if checkout == "success" %}
+		<div class="ls-box">{{ _("We are confirming your payment. This page will update shortly; the confirmation email follows.") }}</div>
+		<script>setTimeout(function () { window.location.reload(); }, 5000);</script>
+		{% elif checkout == "cancelled" %}
+		<div class="ls-box">{{ _("Payment was cancelled. You can register again from the seminar page.") }}
+			<a href="/{{ seminar.route | e }}#register">{{ _("Back to seminar") }}</a></div>
+		{% else %}
+		<div class="ls-box">{{ _("Waiting for payment.") }}</div>
+		{% endif %}
+	{% elif registration.status == "Confirmed" %}
+	<div class="ls-box"><strong>{{ _("Your registration is confirmed.") }}</strong></div>
+	{% else %}
+	<div class="ls-box">{{ _("Status") }}: {{ _(registration.status) }}</div>
+	{% endif %}
+
+	<table class="ls-table" style="margin-top: 16px">
+		<tr><th style="width: 30%">{{ _("Name") }}</th><td>{{ registration.attendee_name | e }}</td></tr>
+		<tr><th>{{ _("Ticket") }}</th><td>{{ registration.ticket_type | e }}</td></tr>
+		<tr><th>{{ _("Date") }}</th>
+			<td>{{ frappe.utils.format_datetime(seminar.starts_at, "yyyy-MM-dd HH:mm") }} – {{ frappe.utils.format_datetime(seminar.ends_at, "HH:mm") }}</td></tr>
+		{% if venue %}<tr><th>{{ _("Venue") }}</th><td>{{ venue.venue_name | e }}{% if venue.address %}<br>{{ venue.address | e }}{% endif %}</td></tr>{% endif %}
+	</table>
+
+	{% if show_join %}
+	<div class="ls-box">
+		<strong>{{ _("Online participation") }}</strong>
+		<p>{{ _("This link is personal. Please do not share it.") }}</p>
+		<a class="btn btn-primary" href="{{ registration.join_url | e }}" target="_blank" rel="noopener">{{ _("Join on Zoom") }}</a>
+	</div>
+	{% endif %}
+
+	{% if qr_data_uri %}
+	<div class="ls-box">
+		<strong>{{ _("On-site check-in") }}</strong>
+		<p>{{ _("Show this QR code at the reception.") }}</p>
+		<img src="{{ qr_data_uri }}" alt="{{ _('Check-in QR code') }}" width="220" height="220">
+	</div>
+	{% endif %}
+
+	{% if feedback_link %}
+	<div class="ls-box">
+		<a class="btn btn-default" href="{{ feedback_link | e }}">{{ _("Answer the survey") }}</a>
+	</div>
+	{% endif %}
+	{% endif %}
+</div>
+{% endblock %}

@@ -1,11 +1,12 @@
 [project]
-name = "lifegence_seminar"
+name = "eventmeet"
 authors = [
     { name = "Lifegence", email = "info@lifegence.com"}
 ]
-description = "Seminar planning & operation (online/offline) and internal meetings with Zoom and Stripe for Frappe v15/v16"
+description = "EventMeet: seminar & internal meeting management for Frappe (v15/v16) with Stripe, Zoom and Google Meet"
 requires-python = ">=3.10"
 readme = "README.md"
+license = { file = "license.txt" }
 dynamic = ["version"]
 dependencies = [
     # "frappe>=15.0.0,<17.0.0" # Installed and managed by bench.

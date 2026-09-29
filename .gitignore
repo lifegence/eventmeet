@@ -3,4 +3,4 @@ __pycache__/
 *.egg-info/
 .DS_Store
 node_modules/
-lifegence_seminar/public/dist/
+eventmeet/public/dist/

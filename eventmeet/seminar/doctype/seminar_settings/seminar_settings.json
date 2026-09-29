@@ -1,0 +1,130 @@
+{
+ "actions": [],
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "general_section",
+  "default_currency",
+  "reminder_hours_before",
+  "column_break_general",
+  "send_feedback_request",
+  "stripe_section",
+  "stripe_enabled",
+  "stripe_secret_key",
+  "stripe_webhook_secret",
+  "column_break_stripe",
+  "checkout_expiry_minutes",
+  "stripe_create_invoice"
+ ],
+ "fields": [
+  {
+   "fieldname": "general_section",
+   "fieldtype": "Section Break",
+   "label": "General"
+  },
+  {
+   "default": "JPY",
+   "fieldname": "default_currency",
+   "fieldtype": "Link",
+   "label": "Default Currency",
+   "options": "Currency"
+  },
+  {
+   "default": "24",
+   "fieldname": "reminder_hours_before",
+   "fieldtype": "Int",
+   "label": "Send Reminder Hours Before"
+  },
+  {
+   "fieldname": "column_break_general",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "send_feedback_request",
+   "fieldtype": "Check",
+   "label": "Send Feedback Request After Seminar"
+  },
+  {
+   "fieldname": "stripe_section",
+   "fieldtype": "Section Break",
+   "label": "Stripe"
+  },
+  {
+   "default": "0",
+   "fieldname": "stripe_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Stripe"
+  },
+  {
+   "depends_on": "stripe_enabled",
+   "fieldname": "stripe_secret_key",
+   "fieldtype": "Password",
+   "label": "Secret Key",
+   "mandatory_depends_on": "stripe_enabled"
+  },
+  {
+   "depends_on": "stripe_enabled",
+   "description": "Endpoint: /api/method/eventmeet.api.webhooks.stripe — events: checkout.session.completed, checkout.session.expired, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed",
+   "fieldname": "stripe_webhook_secret",
+   "fieldtype": "Password",
+   "label": "Webhook Signing Secret"
+  },
+  {
+   "fieldname": "column_break_stripe",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "30",
+   "description": "Seat is held while the Stripe Checkout is open. Stripe requires 30 minutes or more.",
+   "fieldname": "checkout_expiry_minutes",
+   "fieldtype": "Int",
+   "label": "Checkout Expiry (Minutes)"
+  },
+  {
+   "default": "1",
+   "description": "Stripe issues an invoice PDF after payment. Configure your qualified invoice registration number in Stripe.",
+   "fieldname": "stripe_create_invoice",
+   "fieldtype": "Check",
+   "label": "Create Stripe Invoice (Receipt)"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-28 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Seminar",
+ "name": "Seminar Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

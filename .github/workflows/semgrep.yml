@@ -17,5 +17,5 @@ jobs:
       - run: pip install semgrep
       - name: semgrep (gate on ERROR severity)
         run: |
-          semgrep --config .semgrep/lifegence.yml --severity ERROR --error \
+          semgrep --config .semgrep/eventmeet.yml --severity ERROR --error \
             --exclude '*/node_modules/*' --exclude '*/e2e/*' --exclude '*test*' .

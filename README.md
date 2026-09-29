@@ -1,7 +1,11 @@
-# Lifegence Seminar
+# EventMeet
 
-オンライン/オフライン/ハイブリッドのセミナーを企画から実施・事後フォローまで支援し、
-社内ミーティング（議事録・アクション管理）も扱う Frappe アプリ。Frappe **v15 / v16** 両対応。
+**Seminar & internal meeting management for Frappe** — セミナー（オンライン / オフライン / ハイブリッド）の
+企画・集客・決済・当日運営・事後フォローと、社内ミーティング（議題・議事録・アクション管理）を
+ひとつのアプリで扱う Frappe アプリ。Frappe **v15 / v16** 両対応。MIT ライセンス。
+
+> EventMeet は独立したオープンソースプロジェクトであり、Frappe Technologies の公式製品ではありません。
+> Zoom、Google Meet、Stripe は各社の商標です。
 
 ## 提供機能
 
@@ -17,8 +21,8 @@
 | Google Meet | 主催者の Google カレンダーに予定 + Meet を作成、Google から招待・変更・中止を通知、参加ログ取込、Gemini「自動メモ作成」の議事録取込 |
 | Zoom ライセンス | ホストアカウントのプールから空きを自動割当（必要ライセンス数 = 同時開催数のピーク） |
 
-会議基盤は `lifegence_seminar/conferencing/providers/` のインタフェースで抽象化しており、
-自前 WebRTC（`lifegence_meet` 等）も同じ形で追加できる。
+会議基盤は `eventmeet/conferencing/providers/` のインタフェースで抽象化しており、
+自前の WebRTC 基盤（LiveKit / Jitsi 等）も同じ形で追加できる。
 
 | | Zoom | Google Meet |
 |---|---|---|
@@ -31,7 +35,7 @@
 ## 構成
 
 ```
-lifegence_seminar/
+eventmeet/
 ├── seminar/        Seminar, Registration, Ticket Type, Session, Task, Speaker, Venue, Feedback, Settings
 ├── meeting/        Internal Meeting (+ Agenda / Attendee / Action)
 ├── conferencing/   Conference Session, Zoom Host Account, Conferencing Settings, providers/
@@ -44,12 +48,12 @@ lifegence_seminar/
 
 ```bash
 bench get-app <repo-url>
-bench --site <site> install-app lifegence_seminar
+bench --site <site> install-app eventmeet
 ```
 
 ### Zoom
 1. Zoom App Marketplace で **Server-to-Server OAuth** アプリを作成し、`zoom.py` 冒頭のスコープを付与
-2. Event Subscription を有効化: URL `https://<site>/api/method/lifegence_seminar.api.webhooks.zoom`、
+2. Event Subscription を有効化: URL `https://<site>/api/method/eventmeet.api.webhooks.zoom`、
    イベント `meeting.ended` / `webinar.ended` / `meeting.summary_completed`
 3. **Conferencing Settings** に Account ID / Client ID / Client Secret / Secret Token を登録
 4. **Zoom Host Account** にライセンス付与済みユーザーを登録（Webinar アドオンがあれば `Webinar Capacity` を設定）
@@ -57,7 +61,7 @@ bench --site <site> install-app lifegence_seminar
 
 ### Google Meet（社内 MTG）
 詳細な手順（管理コンソールの画面操作、動作確認、トラブルシューティング）は
-[docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.0_Draft.docx](docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.0_Draft.docx) を参照。
+[docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.1_Draft.docx](docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.1_Draft.docx) を参照。
 
 1. Google Cloud でサービスアカウントを作成し、JSON 鍵を発行。Calendar API / Google Meet REST API /
    People API（メモ取込時は Drive API）を有効化
@@ -73,7 +77,7 @@ bench --site <site> install-app lifegence_seminar
 
 ### Stripe
 1. **Seminar Settings** に Secret Key と Webhook Signing Secret を登録
-2. Webhook: `https://<site>/api/method/lifegence_seminar.api.webhooks.stripe`、
+2. Webhook: `https://<site>/api/method/eventmeet.api.webhooks.stripe`、
    イベント `checkout.session.completed` / `checkout.session.expired` /
    `checkout.session.async_payment_succeeded` / `checkout.session.async_payment_failed`
 3. 領収書（適格請求書）を発行する場合は Stripe 側で登録番号・請求書設定を行う
@@ -87,7 +91,7 @@ bench --site <site> install-app lifegence_seminar
 
 ```bash
 bench --site <site> set-config allow_tests true
-bench --site <site> run-tests --app lifegence_seminar
+bench --site <site> run-tests --app eventmeet
 ```
 
 外部 API（Zoom / Google / Stripe）はテストでモックする。
@@ -95,3 +99,7 @@ bench --site <site> run-tests --app lifegence_seminar
 ## セキュリティ
 ゲスト到達エンドポイントの認可・入力検証・レート制限は
 [docs/security/guest-endpoint-audit.md](docs/security/guest-endpoint-audit.md) を参照。
+
+## ライセンス
+
+[MIT License](license.txt) © 2026 Lifegence Corporation

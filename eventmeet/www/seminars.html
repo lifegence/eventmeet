@@ -1,0 +1,29 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+{% include "eventmeet/templates/includes/seminar_styles.html" %}
+<div class="ls-container">
+	<h1 class="ls-title">{{ _("Seminars") }}</h1>
+	{% if seminars %}
+	<div class="ls-list">
+		{% for s in seminars %}
+		<a class="ls-card" href="/{{ s.route | e }}">
+			{% if s.banner_image %}<img class="ls-card-image" src="{{ s.banner_image | e }}" alt="">{% endif %}
+			<div class="ls-card-body">
+				<div class="ls-meta">
+					<span class="ls-badge">{{ _(s.format) }}</span>
+					{{ frappe.utils.format_datetime(s.starts_at, "yyyy-MM-dd HH:mm") }}
+					{% if s.venue %} · {{ s.venue | e }}{% endif %}
+				</div>
+				<h2 class="ls-card-title">{{ s.title | e }}</h2>
+				{% if s.summary %}<p class="ls-muted">{{ s.summary | e }}</p>{% endif %}
+				{% if s.status == "Closed" %}<span class="ls-badge">{{ _("Registration closed") }}</span>{% endif %}
+			</div>
+		</a>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p class="ls-muted">{{ _("No upcoming seminars.") }}</p>
+	{% endif %}
+</div>
+{% endblock %}

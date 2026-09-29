@@ -1,0 +1,198 @@
+{
+ "actions": [],
+ "creation": "2026-09-28 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "defaults_section",
+  "internal_meeting_provider",
+  "zoom_section",
+  "zoom_enabled",
+  "zoom_account_id",
+  "zoom_client_id",
+  "zoom_client_secret",
+  "column_break_zoom",
+  "zoom_webhook_secret",
+  "zoom_auto_recording",
+  "zoom_waiting_room",
+  "google_section",
+  "google_meet_enabled",
+  "google_workspace_domains",
+  "google_import_meeting_notes",
+  "column_break_google",
+  "google_service_account_key",
+  "allocation_section",
+  "allocation_buffer_minutes",
+  "column_break_alloc",
+  "attendance_sync_delay_minutes"
+ ],
+ "fields": [
+  {
+   "fieldname": "defaults_section",
+   "fieldtype": "Section Break",
+   "label": "Defaults"
+  },
+  {
+   "default": "Zoom",
+   "description": "Default conferencing tool for new internal meetings. Seminars always use Zoom (registrants / webinars).",
+   "fieldname": "internal_meeting_provider",
+   "fieldtype": "Select",
+   "label": "Internal Meeting Provider",
+   "options": "Zoom\nGoogle Meet"
+  },
+  {
+   "fieldname": "zoom_section",
+   "fieldtype": "Section Break",
+   "label": "Zoom"
+  },
+  {
+   "default": "0",
+   "fieldname": "zoom_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Zoom"
+  },
+  {
+   "depends_on": "zoom_enabled",
+   "fieldname": "zoom_account_id",
+   "fieldtype": "Data",
+   "label": "Account ID",
+   "mandatory_depends_on": "zoom_enabled"
+  },
+  {
+   "depends_on": "zoom_enabled",
+   "fieldname": "zoom_client_id",
+   "fieldtype": "Data",
+   "label": "Client ID",
+   "mandatory_depends_on": "zoom_enabled"
+  },
+  {
+   "depends_on": "zoom_enabled",
+   "fieldname": "zoom_client_secret",
+   "fieldtype": "Password",
+   "label": "Client Secret",
+   "mandatory_depends_on": "zoom_enabled"
+  },
+  {
+   "fieldname": "column_break_zoom",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "zoom_enabled",
+   "description": "Secret Token of the Zoom app's Event Subscription. Webhook URL: /api/method/eventmeet.api.webhooks.zoom",
+   "fieldname": "zoom_webhook_secret",
+   "fieldtype": "Password",
+   "label": "Webhook Secret Token"
+  },
+  {
+   "default": "none",
+   "fieldname": "zoom_auto_recording",
+   "fieldtype": "Select",
+   "label": "Auto Recording",
+   "options": "none\nlocal\ncloud"
+  },
+  {
+   "default": "1",
+   "fieldname": "zoom_waiting_room",
+   "fieldtype": "Check",
+   "label": "Waiting Room for Internal Meetings"
+  },
+  {
+   "fieldname": "google_section",
+   "fieldtype": "Section Break",
+   "label": "Google Meet"
+  },
+  {
+   "default": "0",
+   "fieldname": "google_meet_enabled",
+   "fieldtype": "Check",
+   "label": "Enable Google Meet"
+  },
+  {
+   "depends_on": "google_meet_enabled",
+   "description": "Comma-separated, e.g. example.com. Organizers must have an email address in one of these domains.",
+   "fieldname": "google_workspace_domains",
+   "fieldtype": "Data",
+   "label": "Workspace Domains",
+   "mandatory_depends_on": "google_meet_enabled"
+  },
+  {
+   "default": "0",
+   "depends_on": "google_meet_enabled",
+   "description": "Imports \"Take notes for me\" documents into the minutes. Requires the drive.readonly scope.",
+   "fieldname": "google_import_meeting_notes",
+   "fieldtype": "Check",
+   "label": "Import Gemini Meeting Notes"
+  },
+  {
+   "fieldname": "column_break_google",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "google_meet_enabled",
+   "description": "Service account with domain-wide delegation for scopes: calendar.events, meetings.space.readonly, directory.readonly (+ drive.readonly for notes).",
+   "fieldname": "google_service_account_key",
+   "fieldtype": "Password",
+   "label": "Service Account Key (JSON)",
+   "mandatory_depends_on": "google_meet_enabled"
+  },
+  {
+   "fieldname": "allocation_section",
+   "fieldtype": "Section Break",
+   "label": "Zoom Host Allocation"
+  },
+  {
+   "default": "15",
+   "description": "A host account is considered busy this many minutes before and after each session.",
+   "fieldname": "allocation_buffer_minutes",
+   "fieldtype": "Int",
+   "label": "Buffer Between Sessions (Minutes)"
+  },
+  {
+   "fieldname": "column_break_alloc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "15",
+   "fieldname": "attendance_sync_delay_minutes",
+   "fieldtype": "Int",
+   "label": "Attendance Sync Delay (Minutes)"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-09-28 16:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Conferencing",
+ "name": "Conferencing Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "delete": 0,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Seminar Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
