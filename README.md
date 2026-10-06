@@ -1,111 +1,150 @@
 # EventMeet
 
-**Seminar & internal meeting management for Frappe** — セミナー（オンライン / オフライン / ハイブリッド）の
-企画・集客・決済・当日運営・事後フォローと、社内ミーティング（議題・議事録・アクション管理）を
-ひとつのアプリで扱う Frappe アプリ。Frappe **v15 / v16** 両対応。MIT ライセンス。
+**Seminar and internal meeting management for [Frappe](https://frappeframework.com/)** (v15 / v16).
 
-> EventMeet は独立したオープンソースプロジェクトであり、Frappe Technologies の公式製品ではありません。
-> Zoom、Google Meet、Stripe は各社の商標です。
+- **Seminars** (online, on-site or hybrid): planning, a public registration page, paid tickets with
+  Stripe, Zoom meetings or webinars with a personal join link for each registrant, QR check-in,
+  reminders, attendance import and a feedback survey.
+- **Internal meetings**: agenda, internal and external attendees, invitations, minutes and action
+  items synced with ToDo. Run them on Zoom or Google Meet; with Google Meet, the event lives in the
+  organizer's Google Calendar and Gemini "Take notes for me" summaries are imported into the minutes.
 
-## 提供機能
+[日本語の README](README_ja.md)
 
-| 領域 | 機能 |
+> EventMeet is an independent open-source project and is not affiliated with Frappe Technologies.
+> Zoom, Google Meet and Stripe are trademarks of their respective owners.
+
+## Status
+
+EventMeet 0.1.0 is the first public release. Every integration is covered by automated tests with
+mocked APIs; verification against the live services is still in progress:
+
+| Integration | Verified against the live service |
 |---|---|
-| 企画 | セミナー（形式・日時・定員・会場）、プログラム、登壇者、準備タスク（担当者割当 → ToDo 連動） |
-| 集客・申込 | 公開ページ `/seminars`、申込フォーム（チケット種別・枠数・ボット対策・レート制限） |
-| 決済 | Stripe Checkout（カード / コンビニ等の非同期決済、Stripe 請求書 = 領収書）、返金、Webhook 未達時の自動照合、請求書払い等の手動確定 |
-| オンライン | Zoom Meeting（登録制）/ Webinar の自動作成・変更・取消、申込者ごとの個別参加 URL、ホストとして開始 |
-| 当日 | QR チェックイン（`/seminar-checkin`、スタッフのみ）、リマインドメール |
-| 事後 | Zoom 参加ログ取込（出席・視聴分数）、アンケート（`/seminar-feedback`） |
-| 社内 MTG | 議題・参加者・**社外参加者**（アカウント不要、メール / Google カレンダーで招待）・招待・議事録・アクション（ToDo 双方向同期）・参加者のみ閲覧可。会議ツールは **Zoom / Google Meet** を選択 |
-| Google Meet | 主催者の Google カレンダーに予定 + Meet を作成、Google から招待・変更・中止を通知、参加ログ取込、Gemini「自動メモ作成」の議事録取込 |
-| Zoom ライセンス | ホストアカウントのプールから空きを自動割当（必要ライセンス数 = 同時開催数のピーク） |
+| Google Meet (internal meetings) | Yes: event and Meet link creation, Google Calendar invitations, attendance and Gemini notes import (Frappe 16.33) |
+| Zoom (seminars, internal meetings) | Not yet. Follow the first-run checklist in the [Zoom guide](docs/en/zoom-seminar-guide.md#6-first-run-verification) |
+| Stripe (paid tickets) | Not yet |
 
-会議基盤は `eventmeet/conferencing/providers/` のインタフェースで抽象化しており、
-自前の WebRTC 基盤（LiveKit / Jitsi 等）も同じ形で追加できる。
+Reports from your own setup are welcome in the issues.
+
+## Features
+
+| Area | What it does |
+|---|---|
+| Planning | Seminars (format, schedule, capacity, venue), program, speakers, preparation tasks assigned as ToDo |
+| Registration | Public pages at `/seminars`, registration form with ticket types and per-ticket capacity, bot trap and rate limit |
+| Payment | Stripe Checkout (cards and asynchronous methods such as konbini), Stripe invoices as receipts, refunds, reconciliation when a webhook is missed, manual confirmation (for example payment by invoice) |
+| Online | Registration-based Zoom meetings or webinars created, updated and cancelled automatically; personal join link per registrant; "Start as Host" |
+| On the day | QR check-in at `/seminar-checkin` (staff only), reminder emails |
+| Afterwards | Zoom attendance import (attended, minutes watched), feedback survey at `/seminar-feedback` |
+| Internal meetings | Agenda, attendees, **external guests** (no account needed, invited by email or Google Calendar), invitations, minutes, action items (two-way sync with ToDo); visible to the organizer and attendees only |
+| Google Meet | Event with a Meet link in the organizer's Google Calendar, invitations / updates / cancellations sent by Google, attendance import, Gemini "Take notes for me" import |
+| Zoom licenses | Hosts are allocated from a pool of licensed accounts, so you need as many licenses as concurrent sessions, not one per employee |
+
+Conferencing tools sit behind the provider interface in `eventmeet/conferencing/providers/`, so another
+tool (for example a self-hosted LiveKit or Jitsi) can be added the same way.
 
 | | Zoom | Google Meet |
 |---|---|---|
-| 用途 | セミナー（登録制 Meeting / Webinar）、社内 MTG | 社内 MTG |
-| ホスト | ライセンス付与済みホストのプールから自動割当 | 主催者本人（Workspace ユーザー） |
-| 招待 | アプリからメール + ICS | Google カレンダーの招待（アプリの「招待を送信」で送出） |
-| 参加ログ | Zoom レポート API | Meet REST API（参加者 → People API でメール解決、不可時は表示名で照合） |
-| AI 議事録 | AI Companion 会議要約 | Gemini「自動メモ作成」ドキュメント（任意） |
+| Used for | Seminars (registration-based meetings / webinars), internal meetings | Internal meetings |
+| Host | Allocated from the pool of licensed host accounts | The organizer (a Google Workspace user) |
+| Invitations | Email with an .ics file, sent by EventMeet | Google Calendar invitation (sent when you press "Send Invitation") |
+| Attendance | Zoom report API | Meet REST API (emails resolved with the People API, display names as a fallback) |
+| AI summary | Zoom AI Companion meeting summary | Gemini "Take notes for me" document (optional) |
 
-## 構成
+The user interface ships with a Japanese translation.
 
-```
-eventmeet/
-├── seminar/        Seminar, Registration, Ticket Type, Session, Task, Speaker, Venue, Feedback, Settings
-├── meeting/        Internal Meeting (+ Agenda / Attendee / Action)
-├── conferencing/   Conference Session, Zoom Host Account, Conferencing Settings, providers/
-├── services/       registration, conference, host_pool, stripe_api, notifications, todo_sync
-├── api/            public (guest), staff, conference, webhooks
-└── www/            seminars, seminar-registration, seminar-checkin, seminar-feedback
-```
+## Requirements
 
-## セットアップ
+| | |
+|---|---|
+| Frappe | v15 or v16 (ERPNext is not required) |
+| Python | 3.10 or later |
+| Zoom | A paid account with a Server-to-Server OAuth app and licensed host users (for seminars or Zoom meetings) |
+| Google Workspace | A service account with domain-wide delegation (for Google Meet) |
+| Stripe | An account, only if you sell paid tickets |
+
+## Installation
 
 ```bash
-bench get-app <repo-url>
+bench get-app https://github.com/lifegence/eventmeet
 bench --site <site> install-app eventmeet
+bench --site <site> migrate
 ```
 
+Then open **Conferencing Settings** and **Seminar Settings** as a System Manager.
+
+## Setup
+
 ### Zoom
-Zoom の設定とセミナーの運用手順（初回の検証手順を含む。未検証のドラフト）は
-[docs/setup/20261006_ZoomSeminarGuide_JA_v1.0_Draft.docx](docs/setup/20261006_ZoomSeminarGuide_JA_v1.0_Draft.docx) を参照。
 
-1. Zoom App Marketplace で **Server-to-Server OAuth** アプリを作成し、`zoom.py` 冒頭のスコープを付与
-2. Event Subscription を有効化: URL `https://<site>/api/method/eventmeet.api.webhooks.zoom`、
-   イベント `meeting.ended` / `webinar.ended` / `meeting.summary_completed`
-3. **Conferencing Settings** に Account ID / Client ID / Client Secret / Secret Token を登録
-4. **Zoom Host Account** にライセンス付与済みユーザーを登録（Webinar アドオンがあれば `Webinar Capacity` を設定）
-5. AI 要約を取り込む場合は Zoom 側で AI Companion の会議要約を有効化
+The step-by-step guide, including a first-run checklist, is in
+[docs/en/zoom-seminar-guide.md](docs/en/zoom-seminar-guide.md). In short:
 
-### Google Meet（社内 MTG）
-詳細な手順（管理コンソールの画面操作、動作確認、トラブルシューティング）は
-[docs/setup/20261006_GoogleWorkspaceSetupGuide_JA_v1.2_Draft.docx](docs/setup/20261006_GoogleWorkspaceSetupGuide_JA_v1.2_Draft.docx) を参照。
+1. In the Zoom App Marketplace, create a **Server-to-Server OAuth** app and add the scopes listed in the
+   guide (also at the top of `eventmeet/conferencing/providers/zoom.py`).
+2. Enable Event Subscriptions with the endpoint `https://<site>/api/method/eventmeet.api.webhooks.zoom`
+   and the events `meeting.ended`, `webinar.ended` and (optional) `meeting.summary_completed`.
+   Save the Secret Token in Frappe before you press "Validate".
+3. In **Conferencing Settings**, enter the Account ID, Client ID, Client Secret and Webhook Secret Token.
+4. Add each licensed host user as a **Zoom Host Account** (set **Webinar Capacity** if the user has a
+   webinar add-on).
+5. To import AI summaries of internal meetings, turn on the AI Companion meeting summary in Zoom.
 
-1. Google Cloud でサービスアカウントを作成し、JSON 鍵を発行。Calendar API / Google Meet REST API /
-   People API（メモ取込時は Drive API）を有効化
-2. Google 管理コンソール → セキュリティ → API の制御 → **ドメイン全体の委任** で、サービスアカウントの
-   クライアント ID に以下のスコープを付与
+### Google Meet (internal meetings)
+
+The step-by-step guide (which console to use, verification, troubleshooting) is in
+[docs/en/google-meet-setup.md](docs/en/google-meet-setup.md). In short:
+
+1. In the Google Cloud console, create a service account and a JSON key, and enable the Google Calendar
+   API, the Google Meet REST API and the People API (and the Google Drive API to import Gemini notes).
+2. In the Google Admin console, under **Security > Access and data control > API controls > Manage Domain
+   Wide Delegation**, authorize the service account's client ID for:
    - `https://www.googleapis.com/auth/calendar.events`
    - `https://www.googleapis.com/auth/meetings.space.readonly`
    - `https://www.googleapis.com/auth/directory.readonly`
-   - `https://www.googleapis.com/auth/drive.readonly`（Gemini メモを取り込む場合のみ）
-3. **Conferencing Settings** で Google Meet を有効化し、JSON 鍵と Workspace ドメインを登録。
-   社内 MTG の既定を Google Meet にする場合は `Internal Meeting Provider` を変更
-4. 主催者（Frappe ユーザー）のメールアドレスは Workspace アカウントと一致している必要がある
+   - `https://www.googleapis.com/auth/drive.readonly` (only to import Gemini notes)
+3. In **Conferencing Settings**, enable Google Meet and enter the JSON key and your Workspace domains.
+   Set **Internal Meeting Provider** to Google Meet to make it the default.
+4. Organizers' Frappe email addresses must match their Workspace accounts.
 
 ### Stripe
-1. **Seminar Settings** に Secret Key と Webhook Signing Secret を登録
-2. Webhook: `https://<site>/api/method/eventmeet.api.webhooks.stripe`、
-   イベント `checkout.session.completed` / `checkout.session.expired` /
-   `checkout.session.async_payment_succeeded` / `checkout.session.async_payment_failed`
-3. 領収書（適格請求書）を発行する場合は Stripe 側で登録番号・請求書設定を行う
 
-### ロール
-- **Seminar Manager**: セミナー・申込・設定の管理
-- **Seminar Staff**: 閲覧と当日チェックイン
-- 社内 MTG は全デスクユーザーが作成可（主催者は自分のみ。主催者の変更は Manager のみ）。
-  閲覧は主催者・参加者（と Manager）のみ。主催者以外の参加者が編集できるのは議事録とアクションアイテムだけで、
-  招待の送信は主催者と Manager のみ
-- Conferencing Settings / Seminar Settings / Zoom Host Account は System Manager・Seminar Manager のみ
+1. In **Seminar Settings**, enter the Secret Key and the Webhook Signing Secret.
+2. Add a webhook endpoint `https://<site>/api/method/eventmeet.api.webhooks.stripe` with the events
+   `checkout.session.completed`, `checkout.session.expired`,
+   `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`.
+3. To issue invoices as receipts (for example Japanese qualified invoices), configure your registration
+   number and invoice settings in Stripe.
 
-## テスト
+### Roles
+
+| Role | Can |
+|---|---|
+| System Manager / Seminar Manager | Change Conferencing Settings, Seminar Settings and Zoom Host Accounts; manage seminars and registrations; start a seminar as host |
+| Seminar Staff | View seminars, view and update registrations, check people in on the day |
+| Every desk user | Create internal meetings they organize |
+
+Internal meetings are visible to the organizer, the attendees and managers only. Attendees who do not
+organize a meeting can edit its minutes and action items, but not its schedule, attendees or agenda,
+and cannot send invitations. Only a Seminar Manager can change a meeting's organizer.
+
+## Development
 
 ```bash
 bench --site <site> set-config allow_tests true
 bench --site <site> run-tests --app eventmeet
 ```
 
-外部 API（Zoom / Google / Stripe）はテストでモックする。
+Zoom, Google and Stripe are mocked in the tests. See [CONTRIBUTING.md](CONTRIBUTING.md) for linting
+and pull requests.
 
-## セキュリティ
-ゲスト到達エンドポイントの認可・入力検証・レート制限は
-[docs/security/guest-endpoint-audit.md](docs/security/guest-endpoint-audit.md) を参照。
+## Security
 
-## ライセンス
+Please report vulnerabilities privately; see [SECURITY.md](SECURITY.md). Authorization, input
+validation and rate limits of every guest-reachable endpoint are documented in
+[docs/security/guest-endpoint-audit.md](docs/security/guest-endpoint-audit.md).
 
-[MIT License](license.txt) © 2026 Lifegence Corporation
+## License
+
+[MIT](license.txt) © 2026 Lifegence Corporation
