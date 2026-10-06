@@ -2,7 +2,20 @@
 
 ## Unreleased
 
-Fixes found while verifying Zoom seminars against a live Zoom Pro account.
+### Added
+
+- Website design for the public pages (`/seminars`, seminar pages, registration status, survey):
+  - Seminar Settings > Website Design: four built-in designs (Standard, Corporate, Friendly, Minimal),
+    Custom CSS with design tokens (CSS variables), sanitized Header HTML and Footer HTML;
+  - template overrides from another app through the `eventmeet_website_templates` hook; the pages are
+    split into blocks that can be overridden one by one;
+  - an example theme app in `examples/eventmeet_theme_example` and a guide in `docs/en` / `docs/ja`.
+
+### Fixed
+
+- A seminar's banner image replaced the site logo in the navbar of its page.
+
+Fixes found while verifying Zoom seminars against a live Zoom Pro account:
 
 - Zoom: registrants are always sent a last name (the name is split on the first space, `-` if there is
   none). Zoom rejected registrants with "The parameter is required: last_name", so no personal join

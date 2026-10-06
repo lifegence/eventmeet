@@ -40,6 +40,7 @@ Reports from your own setup are welcome in the issues.
 | Internal meetings | Agenda, attendees, **external guests** (no account needed, invited by email or Google Calendar), invitations, minutes, action items (two-way sync with ToDo); visible to the organizer and attendees only |
 | Google Meet | Event with a Meet link in the organizer's Google Calendar, invitations / updates / cancellations sent by Google, attendance import, Gemini "Take notes for me" import |
 | Zoom licenses | Hosts are allocated from a pool of licensed accounts, so you need as many licenses as concurrent sessions, not one per employee |
+| Website design | Four built-in designs for the public pages, design tokens and custom CSS, header and footer HTML, and template overrides from your own app ([guide](docs/en/website-design.md)) |
 
 Conferencing tools sit behind the provider interface in `eventmeet/conferencing/providers/`, so another
 tool (for example a self-hosted LiveKit or Jitsi) can be added the same way.
@@ -116,6 +117,12 @@ The step-by-step guide (which console to use, verification, troubleshooting) is 
    `checkout.session.async_payment_succeeded` and `checkout.session.async_payment_failed`.
 3. To issue invoices as receipts (for example Japanese qualified invoices), configure your registration
    number and invoice settings in Stripe.
+
+### Website design
+
+Choose a design and add CSS or a header and footer in **Seminar Settings > Website Design**, or replace
+the page templates from your own app. See [docs/en/website-design.md](docs/en/website-design.md) and the
+example app in [examples/eventmeet_theme_example](examples/eventmeet_theme_example).
 
 ### Roles
 

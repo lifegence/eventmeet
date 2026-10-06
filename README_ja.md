@@ -39,6 +39,7 @@ EventMeet 0.1.0 は最初の公開版です。すべての連携は外部 API �
 | 社内ミーティング | 議題・参加者・**社外参加者**（アカウント不要、メール／Google カレンダーで招待）・招待・議事録・アクションアイテム（ToDo と双方向同期）。閲覧は主催者と参加者のみ |
 | Google Meet | 主催者の Google カレンダーに Meet 付きの予定を作成、招待・変更・中止は Google から通知、出席の取り込み、Gemini「自動メモ作成」の取り込み |
 | Zoom ライセンス | ホストアカウントのプールから空きを自動割当（必要なライセンス数は社員数ではなく同時開催数のピーク） |
+| ウェブサイトのデザイン | 公開ページの標準デザイン 4 種、デザイントークンとカスタム CSS、ヘッダー・フッターの HTML、自社アプリからのテンプレート差し替え（[手順書](docs/ja/website-design.md)） |
 
 会議ツールは `eventmeet/conferencing/providers/` のインタフェースで抽象化しており、
 自前の基盤（LiveKit / Jitsi など）も同じ形で追加できます。
@@ -112,6 +113,12 @@ bench --site <site> migrate
    イベント `checkout.session.completed` / `checkout.session.expired` /
    `checkout.session.async_payment_succeeded` / `checkout.session.async_payment_failed`
 3. 領収書（適格請求書）を発行する場合は、Stripe 側で登録番号と請求書の設定を行う
+
+### ウェブサイトのデザイン
+
+「セミナー設定」→「ウェブサイトのデザイン」でデザインを選び、CSS やヘッダー・フッターを追加できます。
+レイアウトを変える場合は、自社アプリからページのテンプレートを差し替えます。
+[docs/ja/website-design.md](docs/ja/website-design.md) と、デモアプリ [examples/eventmeet_theme_example](examples/eventmeet_theme_example) を参照してください。
 
 ### ロール
 
