@@ -123,5 +123,11 @@ class TestWebsiteDesign(SeminarTestCase):
 		self.assertIn('<div class="custom-card">Design Test</div>', html)
 		self.assertIn("em-design-standard", html, "the layout of EventMeet is kept")
 
+	def test_safe_html_removes_scripts_with_their_content(self):
+		html = website.safe_html('<p>Hi</p><script>alert(1)</script><img src="x.png" onerror="alert(2)">')
+		self.assertIn("<p>Hi</p>", html)
+		self.assertNotIn("alert", html)
+		self.assertNotIn("script", html)
+
 	def test_safe_css_cannot_close_the_style_element(self):
 		self.assertNotIn("</style", website.safe_css("a{} </style><script>x</script>"))
