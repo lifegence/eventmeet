@@ -1,8 +1,8 @@
 app_name = "eventmeet"
 app_title = "EventMeet"
-app_publisher = "Lifegence"
+app_publisher = "Lifegence Corporation"
 app_description = "Seminar & internal meeting management: registration, Stripe payments, Zoom / Google Meet, minutes and action items"
-app_email = "info@lifegence.com"
+app_email = "contact@lifegence.com"
 app_license = "MIT"
 
 add_to_apps_screen = [

@@ -276,7 +276,7 @@ class TestExternalAttendees(SeminarTestCase):
 			self.organizer,
 			[self.member],
 			external_attendees=[
-				{"guest_name": "Nomura (Guest)", "email": " Guest@Partner.test ", "organization": "Partner"}
+				{"guest_name": "Taylor (Guest)", "email": " Guest@Partner.test ", "organization": "Partner"}
 			],
 			**kwargs,
 		)
@@ -295,7 +295,7 @@ class TestExternalAttendees(SeminarTestCase):
 		self.assertIn("Open in Frappe", internal["rendered"])
 		self.assertIn(meeting.join_url, external["rendered"])
 		ics = external["attachments"][0]["fcontent"].decode()
-		self.assertIn("CN=Nomura (Guest):mailto:guest@partner.test", ics)
+		self.assertIn("CN=Taylor (Guest):mailto:guest@partner.test", ics)
 
 	def test_guest_validation(self):
 		with self.assertRaises(frappe.ValidationError):
@@ -318,7 +318,7 @@ class TestExternalAttendees(SeminarTestCase):
 
 	def test_guest_attendance_is_recorded(self):
 		meeting = self.meeting_with_guest()
-		self.fakes["Zoom"].participants = [ParticipantRecord("Nomura", "guest@partner.test", None, None, 33)]
+		self.fakes["Zoom"].participants = [ParticipantRecord("Taylor", "guest@partner.test", None, None, 33)]
 		conference.sync_attendance(meeting.conference_session)
 		meeting.reload()
 		self.assertEqual(

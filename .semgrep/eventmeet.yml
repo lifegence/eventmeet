@@ -3,9 +3,9 @@
 rules:
   - id: eventmeet-fstring-sql
     message: >
-      frappe.db.sql に f-string を渡しています。値はプレースホルダ (%s /
-      %(name)s) でパラメータ化してください。定数のみの補間で安全な場合は
-      行末に「# nosemgrep: eventmeet-fstring-sql」と根拠コメントを付与。
+      frappe.db.sql receives an f-string or formatted string. Pass values as
+      parameters (%s / %(name)s). If only constants are interpolated, add
+      "# nosemgrep: eventmeet-fstring-sql" with a comment explaining why.
     severity: ERROR
     languages: [python]
     patterns:
@@ -17,9 +17,9 @@ rules:
 
   - id: eventmeet-silent-except-pass
     message: >
-      'except Exception: pass' は障害を握りつぶします。最低限
-      frappe.logger().warning / frappe.log_error を入れるか、捕捉する
-      例外型を限定して意図をコメントしてください。
+      'except Exception: pass' hides failures. Log them at least
+      (frappe.logger().warning / frappe.log_error), or catch a narrower
+      exception type and comment on the intent.
     severity: WARNING
     languages: [python]
     pattern: |
@@ -29,7 +29,7 @@ rules:
           pass
 
   - id: eventmeet-bare-except
-    message: "裸の except: は SystemExit/KeyboardInterrupt まで捕捉します。except Exception: 以上に限定してください。"
+    message: "A bare except: also catches SystemExit and KeyboardInterrupt. Catch Exception (or narrower) instead."
     severity: ERROR
     languages: [python]
     pattern: |
@@ -40,17 +40,18 @@ rules:
 
   - id: eventmeet-new-guest-endpoint
     message: >
-      新規の allow_guest=True エンドポイントです。docs/security/
-      guest-endpoint-audit の表に追記し、認可方式・入力検証・レート制限
-      (frappe.rate_limiter) を設計してください。既存監査済みは nosemgrep 可。
+      New allow_guest=True endpoint. Add it to the table in
+      docs/security/guest-endpoint-audit.md with its authorization, input
+      validation and rate limit (frappe.rate_limiter). Audited endpoints may
+      use nosemgrep.
     severity: WARNING
     languages: [python]
     pattern: frappe.whitelist(allow_guest=True, ...)
 
   - id: eventmeet-guest-ignore-permissions-insert
     message: >
-      ignore_permissions=True の書込です。ゲスト到達パスから呼ばれる場合は
-      認可設計（トークン/署名/レート制限）を必ず添えてください。
+      Write with ignore_permissions=True. If a guest can reach this path, it
+      must be guarded by a token, a signature or a rate limit.
     severity: INFO
     languages: [python]
     patterns:
