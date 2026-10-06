@@ -52,6 +52,9 @@ bench --site <site> install-app eventmeet
 ```
 
 ### Zoom
+Zoom の設定とセミナーの運用手順（初回の検証手順を含む。未検証のドラフト）は
+[docs/setup/20261006_ZoomSeminarGuide_JA_v1.0_Draft.docx](docs/setup/20261006_ZoomSeminarGuide_JA_v1.0_Draft.docx) を参照。
+
 1. Zoom App Marketplace で **Server-to-Server OAuth** アプリを作成し、`zoom.py` 冒頭のスコープを付与
 2. Event Subscription を有効化: URL `https://<site>/api/method/eventmeet.api.webhooks.zoom`、
    イベント `meeting.ended` / `webinar.ended` / `meeting.summary_completed`
@@ -61,7 +64,7 @@ bench --site <site> install-app eventmeet
 
 ### Google Meet（社内 MTG）
 詳細な手順（管理コンソールの画面操作、動作確認、トラブルシューティング）は
-[docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.1_Draft.docx](docs/setup/20260929_GoogleWorkspaceSetupGuide_JA_v1.1_Draft.docx) を参照。
+[docs/setup/20261006_GoogleWorkspaceSetupGuide_JA_v1.2_Draft.docx](docs/setup/20261006_GoogleWorkspaceSetupGuide_JA_v1.2_Draft.docx) を参照。
 
 1. Google Cloud でサービスアカウントを作成し、JSON 鍵を発行。Calendar API / Google Meet REST API /
    People API（メモ取込時は Drive API）を有効化
