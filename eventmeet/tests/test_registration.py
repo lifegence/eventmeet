@@ -32,6 +32,22 @@ class TestFreeRegistration(SeminarTestCase):
 	def setUp(self):
 		self.mail = capture_mail(self)
 
+	def test_default_deadline_follows_the_start_time(self):
+		seminar = make_seminar()
+		self.assertEqual(seminar.registration_closes_at, seminar.starts_at)
+		seminar.starts_at = add_to_date(seminar.starts_at, hours=1)
+		seminar.ends_at = add_to_date(seminar.ends_at, hours=1)
+		seminar.save(ignore_permissions=True)
+		self.assertEqual(seminar.registration_closes_at, seminar.starts_at)
+
+		deadline = add_to_date(seminar.starts_at, days=-1)
+		seminar.registration_closes_at = deadline
+		seminar.save(ignore_permissions=True)
+		seminar.starts_at = add_to_date(seminar.starts_at, hours=1)
+		seminar.ends_at = add_to_date(seminar.ends_at, hours=1)
+		seminar.save(ignore_permissions=True)
+		self.assertEqual(seminar.registration_closes_at, deadline, "an edited deadline is kept")
+
 	def test_free_registration_is_confirmed_immediately(self):
 		seminar = make_seminar()
 		result = register(seminar)

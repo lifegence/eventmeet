@@ -33,6 +33,14 @@ class Seminar(WebsiteGenerator):
 	def validate_schedule(self):
 		if get_datetime(self.ends_at) <= get_datetime(self.starts_at):
 			frappe.throw(_("End time must be after start time."))
+		previous = self.get_doc_before_save()
+		if (
+			previous
+			and get_datetime(previous.registration_closes_at) == get_datetime(previous.starts_at)
+			and get_datetime(self.registration_closes_at) == get_datetime(previous.registration_closes_at)
+		):
+			# The deadline was the default (the start time) and was not edited: follow the new start.
+			self.registration_closes_at = self.starts_at
 		if not self.registration_closes_at:
 			self.registration_closes_at = self.starts_at
 		if self.format != "Online" and not self.venue:
