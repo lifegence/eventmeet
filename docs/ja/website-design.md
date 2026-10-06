@@ -2,7 +2,7 @@
 
 EventMeet ─ 公開ページの見た目とレイアウトを変える
 
-対象: EventMeet 0.1.0 より後の版（Frappe v15 / v16）。読者: Frappe システム管理者、Web デザイナー、開発者。
+対象: EventMeet 0.2.0 以降（Frappe v15 / v16）。読者: Frappe システム管理者、Web デザイナー、開発者。
 
 [English](../en/website-design.md)
 

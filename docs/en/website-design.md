@@ -2,7 +2,7 @@
 
 EventMeet ─ changing the look and the layout of the public seminar pages
 
-Applies to: EventMeet after 0.1.0 (Frappe v15 / v16). Audience: Frappe system administrators, web designers and developers.
+Applies to: EventMeet 0.2.0 or later (Frappe v15 / v16). Audience: Frappe system administrators, web designers and developers.
 
 [日本語](../ja/website-design.md)
 
