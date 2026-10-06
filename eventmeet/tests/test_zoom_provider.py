@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, patch
 import frappe
 
 from eventmeet.conferencing.providers import ConferenceProviderError, ConferenceSpec, SessionRef
-from eventmeet.conferencing.providers.zoom import ZoomClient, ZoomProvider, render_summary_html
+from eventmeet.conferencing.providers.zoom import ZoomClient, ZoomProvider, render_summary_html, split_name
 from eventmeet.tests.utils import SeminarTestCase
 
 
@@ -51,6 +51,26 @@ class TestZoomProvider(SeminarTestCase):
 
 		self.provider.create("host@example.com", self.spec)
 		self.assertEqual(requests.post.call_count, 1, "token must be cached")
+
+	@patch("eventmeet.conferencing.providers.zoom.requests")
+	def test_registrant_always_has_a_last_name(self, requests):
+		requests.post.return_value = response(payload={"access_token": "tok", "expires_in": 3600})
+		requests.request.return_value = response(
+			201, {"registrant_id": "r1", "join_url": "https://zoom.us/w/1"}
+		)
+
+		self.provider.add_registrant(SessionRef("Meeting", "1"), "a@example.com", "Yamada  Taro Jr")
+		body = requests.request.call_args.kwargs["json"]
+		self.assertEqual((body["first_name"], body["last_name"]), ("Yamada", "Taro Jr"))
+
+		self.provider.add_registrant(SessionRef("Meeting", "1"), "b@example.com", "山田太郎")
+		body = requests.request.call_args.kwargs["json"]
+		self.assertEqual((body["first_name"], body["last_name"]), ("山田太郎", "-"))
+
+	def test_split_name(self):
+		self.assertEqual(split_name("Taro Yamada"), ("Taro", "Yamada"))
+		self.assertEqual(split_name(" 山田　太郎 "), ("山田", "太郎"))
+		self.assertEqual(split_name(""), ("-", "-"))
 
 	@patch("eventmeet.conferencing.providers.zoom.requests")
 	def test_refreshes_token_once_on_401(self, requests):

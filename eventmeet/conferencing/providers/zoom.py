@@ -101,6 +101,18 @@ def _collection(kind: str) -> str:
 	raise ConferenceProviderError(f"Unknown conference kind: {kind}")
 
 
+def split_name(full_name: str) -> tuple[str, str]:
+	"""Split a single name field into Zoom's first / last name.
+
+	Accounts can make the last name mandatory on registration, so it is never empty. Zoom shows
+	"first last", which keeps the order the attendee typed (e.g. "Yamada Taro" or "Taro Yamada").
+	"""
+	parts = (full_name or "").strip().split(None, 1)
+	if len(parts) == 2:
+		return parts[0], parts[1]
+	return (parts[0] if parts else "-"), "-"
+
+
 def _parse_zoom_time(value: str | None) -> datetime.datetime | None:
 	"""Zoom returns UTC timestamps such as 2026-09-28T03:00:00Z."""
 	if not value:
@@ -172,10 +184,12 @@ class ZoomProvider(ConferenceProvider):
 		self.client.request("DELETE", f"/{_collection(ref.kind)}/{ref.external_id}", allow_404=True)
 
 	def add_registrant(self, ref: SessionRef, email: str, first_name: str, last_name: str = "") -> Registrant:
+		if not last_name:
+			first_name, last_name = split_name(first_name)
 		data = self.client.request(
 			"POST",
 			f"/{_collection(ref.kind)}/{ref.external_id}/registrants",
-			json={"email": email, "first_name": first_name[:64], "last_name": (last_name or "")[:64]},
+			json={"email": email, "first_name": first_name[:64], "last_name": last_name[:64]},
 		)
 		return Registrant(
 			registrant_id=str(data.get("registrant_id") or data.get("id")), join_url=data.get("join_url", "")
