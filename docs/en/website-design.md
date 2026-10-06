@@ -92,6 +92,27 @@ change between versions; prefer the tokens.
 ("Early-bird price until 31 October") or links to your terms. The HTML is sanitized: `<script>`
 elements and event attributes (`onclick` etc.) are removed, and it is not run as a template.
 
+### 3.4 Example: custom CSS with header and footer
+
+[`examples/website-design`](../../examples/website-design) has a ready-to-paste set for the Standard
+design: `custom.css` (a teal brand colour, white cards on a light background, three columns with the
+image on top, two on tablets and one on phones), `header.html` (an early-bird notice and an
+introduction) and `footer.html` (organizer, contact address and links to the terms). The texts are in
+Japanese and the company is fictitious.
+
+| Wide screen | Phone |
+|---|---|
+| ![Custom CSS, header and footer](../images/website-design/custom-list.png) | ![On a phone](../images/website-design/custom-mobile.png) |
+
+Two things to keep in mind:
+
+- Custom CSS comes after the built-in styles, including their phone layout. If you change
+  `--em-list-columns` or the card layout, add your own media queries for smaller screens, as the
+  example does.
+- The header and footer HTML may use `class` and `style` attributes; style the classes in Custom CSS.
+  Saved HTML is sanitized (Frappe v15 turns a `<script>` into plain text when the settings are
+  saved; it is never run).
+
 ## 4. Template override (level 3)
 
 To change the layout or the HTML, replace the page templates from an app of your own. EventMeet looks

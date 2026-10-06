@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Sample custom CSS and header / footer HTML in `examples/website-design`, with screenshots in the
+  website design guide.
+
 ## 0.2.0 - 2026-10-06
 
 ### Added
