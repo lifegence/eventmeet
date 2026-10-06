@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.1 - 2026-10-06
 
 - Website design: a **Custom** design. Custom CSS now applies only when Custom is selected (on top of
   the Standard design), so switching to another built-in design no longer mixes it with your CSS; the
