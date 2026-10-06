@@ -86,6 +86,8 @@ jobs:
           bench setup requirements --dev
           bench new-site --db-root-password root --admin-password admin test_site
           bench --site test_site install-app eventmeet
+          # The website page tests render Frappe's templates, which need the built assets.
+          bench build --app frappe
         env:
           CI: "Yes"
 
