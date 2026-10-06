@@ -32,21 +32,30 @@ Attendees,参加者
 Auto Recording,自動録画
 Back to seminar,セミナーページに戻る
 Buffer Between Sessions (Minutes),セッション間の余裕時間（分）
+Business,Business,Zoom Host Account
 Cancel and Refund,キャンセルして返金
 Cancel and refund the full amount via Stripe?,Stripe で全額返金してキャンセルしますか？
 Cancel this registration without refund?,返金せずにこの申込をキャンセルしますか？
+Cancelled,中止,Seminar
+Cancelled,中止,Internal Meeting
 Cancelled: {0},中止: {0}
 Cannot delete a seminar that has registrations. Cancel it instead.,申込があるセミナーは削除できません。代わりに中止にしてください。
 Capacity,定員
 Check in,受付する
 Check-in,受付
+Check-in QR code,受付用 QR コード
 Checked In,受付済
 Checked In At,受付日時
 Checked In By,受付担当
 Checked in,受付しました
 Checkout Expiry (Minutes),決済画面の有効時間（分）
+Closed,受付終了,Seminar
+Closed,完了,Internal Meeting Action
+Closed,完了,Seminar Task
 Collect Feedback,アンケートを実施
 "Comma-separated, e.g. example.com. Organizers must have an email address in one of these domains.",カンマ区切り（例: example.com）。主催者はいずれかのドメインのメールアドレスを持つ必要があります。
+Completed,終了,Seminar
+Completed,終了,Internal Meeting
 Conference Kind,会議の種類
 Conference Participant,会議参加記録
 Conference Registrant ID,会議登録者 ID
@@ -87,6 +96,7 @@ Google Calendar notifies attendees automatically when the meeting is cancelled.,
 Google Calendar will email the invitation to all attendees. Continue?,Google カレンダーから全参加者に招待メールが送信されます。続行しますか？
 "Google Meet: after invitations are sent, Google Calendar notifies attendees of changes and cancellation. Zoom / on-site: use 'Resend Invitation' after changes.",Google Meet：招待送信後の変更・中止は Google カレンダーが参加者に通知します。Zoom・対面：変更後は「招待を再送」で送り直してください。
 Guest Name,氏名
+Host,ホスト,Conference Session
 Host Account,ホストアカウント
 Host Allocation,ホスト割当
 Host account {0} is busy at the new time. Choose another time.,ホストアカウント {0} は変更後の時間に使用中です。別の時間を選んでください。
@@ -139,8 +149,11 @@ No enabled Zoom host account can host a {0} for {1} attendees.,{1} 名の {0} �
 No upcoming seminars.,開催予定のセミナーはありません。
 Not an attendee of this meeting: {0},このミーティングの参加者ではありません: {0}
 Notes,メモ
+Offline,対面,Seminar
 On-site,会場
 On-site check-in,会場での受付
+Online,オンライン,Seminar
+Online,オンライン
 Online (Zoom),オンライン（Zoom）
 Online Meeting,オンライン会議
 Online Minutes,オンライン視聴時間（分）
@@ -152,6 +165,9 @@ Only pending registrations can be confirmed.,支払い待ちの申込のみ確�
 Only seminar staff can check in attendees.,受付はセミナースタッフのみ行えます。
 Only the organizer can send invitations.,招待を送信できるのは主催者のみです。
 Only the organizer can start this meeting as host.,このミーティングをホストとして開始できるのは主催者のみです。
+Open,受付中,Seminar
+Open,未完了,Internal Meeting Action
+Open,未完了,Seminar Task
 Open in Frappe,Frappe で開く
 Optional,任意参加
 "Optional. When filled in, this text is used as the invitation email body, or as the event description for Google Meet (the join URL is always included).",任意。入力すると、この文面が招待メールの本文になります。Google Meet の場合は Google カレンダーの予定の説明になります（参加 URL は常に含まれます）。
@@ -247,7 +263,7 @@ Thank you for attending {0}. Please take a minute to answer our survey.,{0} に�
 Thank you for registering. Your registration is confirmed.,お申し込みありがとうございます。お申し込みが確定しました。
 The AI summary is imported automatically about 15 to 25 minutes after the scheduled end time.,AI 要約は、予定終了時刻の約 15〜25 分後に自動で取り込まれます。
 The JSON is not a service account key.,この JSON はサービスアカウント鍵ではありません。
-The Zoom session is created automatically when the status is set to Open.,ステータスを Open にすると Zoom が自動作成されます。
+The Zoom session is created automatically when the status is set to Open.,ステータスを「受付中」にすると Zoom が自動作成されます。
 The following meeting has been cancelled.,以下のミーティングは中止になりました。
 The link is invalid or has expired.,リンクが無効か、有効期限が切れています。
 The online join link will be sent in a separate email.,オンライン参加リンクは別途メールでお送りします。
@@ -305,8 +321,11 @@ Zoom User,Zoom ユーザー
 Zoom is disabled; consider making Google Meet the default.,Zoom が無効です。既定を Google Meet にすることを検討してください。
 "Zoom user of the host account, or the Google organizer.",ホストアカウントの Zoom ユーザー、または Google の主催者
 cancel,取消
+cloud,クラウド,Conferencing Settings
 create,作成
+local,ローカル（ホストの PC）,Conferencing Settings
 min,分
+none,録画しない,Conferencing Settings
 open,開始
 the join link will be sent with the invitation,参加リンクは招待メールでお送りします
 update,更新

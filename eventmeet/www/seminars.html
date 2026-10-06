@@ -11,7 +11,7 @@
 			{% if s.banner_image %}<img class="ls-card-image" src="{{ s.banner_image | e }}" alt="">{% endif %}
 			<div class="ls-card-body">
 				<div class="ls-meta">
-					<span class="ls-badge">{{ _(s.format) }}</span>
+					<span class="ls-badge">{{ _(s.format, context="Seminar") }}</span>
 					{{ frappe.utils.format_datetime(s.starts_at, "yyyy-MM-dd HH:mm") }}
 					{% if s.venue %} · {{ s.venue | e }}{% endif %}
 				</div>

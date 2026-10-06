@@ -4,7 +4,7 @@
 {% include "eventmeet/templates/includes/seminar_styles.html" %}
 <div class="ls-container">
 	{% if doc.banner_image %}<img class="ls-banner" src="{{ doc.banner_image | e }}" alt="">{% endif %}
-	<div class="ls-meta"><span class="ls-badge">{{ _(doc.format) }}</span></div>
+	<div class="ls-meta"><span class="ls-badge">{{ _(doc.format, context="Seminar") }}</span></div>
 	<h1 class="ls-title">{{ doc.title | e }}</h1>
 
 	<table class="ls-table">
