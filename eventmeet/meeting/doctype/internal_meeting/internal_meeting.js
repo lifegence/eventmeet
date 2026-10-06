@@ -17,7 +17,11 @@ frappe.ui.form.on("Internal Meeting", {
 	},
 
 	refresh(frm) {
+		const can_manage = can_manage_meeting(frm);
+		if (!is_manager()) frm.set_df_property("organizer", "read_only", 1);
+		if (!can_manage) lock_organizer_fields(frm);
 		if (frm.is_new()) return;
+		render_ai_summary_status(frm);
 
 		const tool = frm.doc.conference_provider || "Zoom";
 		const is_google = tool === "Google Meet";
@@ -28,6 +32,7 @@ frappe.ui.form.on("Internal Meeting", {
 		if (frm.doc.conference_session) {
 			eventmeet.add_session_buttons(frm, __(tool));
 		}
+		if (!can_manage) return;
 
 		// Google Calendar notifies cancellations itself once invitations were sent.
 		if (frm.doc.status === "Cancelled" && (is_google || !frm.doc.invitations_sent)) return;
@@ -74,6 +79,63 @@ frappe.ui.form.on("Internal Meeting", {
 		);
 	},
 });
+
+// Attendees who do not organize the meeting edit only these (the server discards anything else).
+const ATTENDEE_EDITABLE_FIELDS = ["minutes", "actions"];
+// Kept in sync with the summary window of eventmeet.services.conference.
+const SUMMARY_WINDOW_HOURS = 48;
+
+function is_manager() {
+	return frappe.session.user === "Administrator" || frappe.user.has_role(["System Manager", "Seminar Manager"]);
+}
+
+function can_manage_meeting(frm) {
+	if (frm.is_new() || is_manager()) return true;
+	return [frm.doc.organizer, frm.doc.owner].includes(frappe.session.user);
+}
+
+function lock_organizer_fields(frm) {
+	frm.meta.fields.forEach((df) => {
+		if (ATTENDEE_EDITABLE_FIELDS.includes(df.fieldname)) return;
+		if (df.fieldtype === "Button") {
+			frm.set_df_property(df.fieldname, "hidden", 1);
+		} else if (
+			frappe.model.table_fields.includes(df.fieldtype) ||
+			!frappe.model.no_value_type.includes(df.fieldtype)
+		) {
+			frm.set_df_property(df.fieldname, "read_only", 1);
+		}
+	});
+}
+
+function render_ai_summary_status(frm) {
+	const field = frm.get_field("ai_summary_status");
+	if (!field || frm.doc.ai_summary) return;
+
+	let message;
+	if (!frm.doc.online) {
+		message = __("AI summaries are imported only for online meetings.");
+	} else if (
+		moment(frm.doc.ends_at).add(SUMMARY_WINDOW_HOURS, "hours").isBefore(moment(frappe.datetime.now_datetime()))
+	) {
+		message = __("No AI summary was imported for this meeting.");
+	} else {
+		const how =
+			frm.doc.conference_provider === "Google Meet"
+				? __('Start Gemini "Take notes for me" during the meeting.')
+				: __("Zoom AI Companion meeting summary must be enabled.");
+		message =
+			__("The AI summary is imported automatically about 15 to 25 minutes after the scheduled end time.") +
+			" " +
+			how;
+	}
+	field.$wrapper.html(
+		`<div class="form-group">
+			<div class="clearfix"><label class="control-label">${__("AI Summary / Meeting Notes")}</label></div>
+			<div class="text-muted small">${frappe.utils.escape_html(message)}</div>
+		</div>`
+	);
+}
 
 function ensure_saved(frm) {
 	if (frm.is_dirty()) {

@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+from frappe.model import no_value_fields, table_fields
 from frappe.model.document import Document
 from frappe.utils import (
 	cint,
@@ -18,10 +19,14 @@ from eventmeet.conferencing.providers import Invitee
 from eventmeet.services import conference, notifications, todo_sync
 
 MANAGER_ROLES = {"System Manager", "Seminar Manager"}
+# What attendees who do not organize the meeting may change: the shared minutes and action items.
+ATTENDEE_EDITABLE_FIELDS = frozenset({"minutes", "actions"})
 
 
 class InternalMeeting(Document):
 	def validate(self):
+		self.validate_organizer()
+		self.keep_organizer_fields()
 		if get_datetime(self.ends_at) <= get_datetime(self.starts_at):
 			frappe.throw(_("End time must be after start time."))
 		if self.online and not self.conference_provider:
@@ -34,6 +39,37 @@ class InternalMeeting(Document):
 			self.conference_provider = existing or conference.default_internal_provider()
 		self.set_attendee_details()
 		self.validate_external_attendees()
+
+	def validate_organizer(self):
+		if self.flags.ignore_permissions or is_admin_or_manager(frappe.session.user):
+			return
+		previous = self.get_doc_before_save()
+		if previous is None and self.organizer != frappe.session.user:
+			frappe.throw(_("You can only create meetings that you organize."), frappe.PermissionError)
+		if previous is not None and previous.organizer != self.organizer:
+			frappe.throw(_("Only a Seminar Manager can change the organizer."), frappe.PermissionError)
+
+	def keep_organizer_fields(self):
+		"""Attendees edit only the minutes and action items; anything else they send is discarded.
+
+		Discarding (rather than rejecting) keeps a stale form from failing when the system has
+		updated attendance or invitation fields since it was loaded.
+		"""
+		previous = self.get_doc_before_save()
+		if previous is None or self.flags.ignore_permissions or self.can_manage():
+			return
+		for df in self.meta.fields:
+			if df.fieldname in ATTENDEE_EDITABLE_FIELDS:
+				continue
+			if df.fieldtype in table_fields:
+				self.set(df.fieldname, [row.as_dict() for row in previous.get(df.fieldname)])
+			elif df.fieldtype not in no_value_fields:
+				self.set(df.fieldname, previous.get(df.fieldname))
+
+	def can_manage(self, user: str | None = None) -> bool:
+		"""Organizer-level rights: edit everything and send invitations."""
+		user = user or frappe.session.user
+		return user in (self.organizer, self.owner) or is_admin_or_manager(user)
 
 	def set_attendee_details(self):
 		seen = set()
@@ -216,6 +252,8 @@ class InternalMeeting(Document):
 	def send_invitations(self, recipients=None):
 		"""Send the invitation to everyone, or only to `recipients` (emails selected in the attendee tables)."""
 		self.check_permission("write")
+		if not self.can_manage():
+			frappe.throw(_("Only the organizer can send invitations."), frappe.PermissionError)
 		selected = self._selected_recipients(recipients)
 		native = self.online and conference.provider_has_native_invitations(self.conference_session)
 		cancelled = self.status == "Cancelled"
@@ -288,9 +326,13 @@ def _is_manager(user: str) -> bool:
 	return bool(MANAGER_ROLES & set(frappe.get_roles(user)))
 
 
+def is_admin_or_manager(user: str) -> bool:
+	return user == "Administrator" or _is_manager(user)
+
+
 def get_permission_query_conditions(user: str | None = None) -> str:
 	user = user or frappe.session.user
-	if user == "Administrator" or _is_manager(user):
+	if is_admin_or_manager(user):
 		return ""
 	escaped = frappe.db.escape(user)
 	return (
@@ -302,11 +344,12 @@ def get_permission_query_conditions(user: str | None = None) -> str:
 
 def has_permission(doc, ptype: str | None = None, user: str | None = None) -> bool:
 	user = user or frappe.session.user
-	if user == "Administrator" or _is_manager(user):
+	if is_admin_or_manager(user):
 		return True
 	if doc.is_new() and ptype == "create":
 		return True
 	if user in (doc.organizer, doc.owner):
 		return True
-	# Attendees can read the meeting and edit minutes/action items collaboratively.
+	# Attendees can read the meeting and edit minutes/action items collaboratively
+	# (keep_organizer_fields discards their changes to anything else).
 	return ptype in ("read", "print", "email", "write") and user in {row.user for row in doc.attendees}

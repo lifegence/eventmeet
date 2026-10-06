@@ -5,6 +5,8 @@ A refund of {0} has been issued to your original payment method.,{0} をお支�
 AI Summary (Zoom),AI 要約（Zoom）
 AI Summary / Meeting Notes,AI 要約 / 会議メモ
 AI Summary Imported,AI 要約取込済
+AI Summary Status,AI 要約の状態
+AI summaries are imported only for online meetings.,AI 要約はオンライン会議でのみ取り込まれます。
 Access Notes,アクセス案内
 Account ID,アカウント ID
 Action Detail,対応内容
@@ -130,6 +132,7 @@ Meeting Minutes,議事録
 Meeting Place,開催場所
 Meeting: registration-based Zoom meeting (up to the host's meeting capacity). Webinar: requires a host with a Webinar license.,Meeting: 登録制の Zoom ミーティング（ホストのミーティング上限人数まで）。Webinar: Webinar ライセンスを持つホストが必要です。
 No AI summary is available yet. Make sure AI Companion meeting summary is enabled in Zoom.,AI 要約はまだありません。Zoom で AI Companion の会議要約が有効か確認してください。
+No AI summary was imported for this meeting.,この会議の AI 要約は取り込まれませんでした。
 No Stripe payment is linked to this registration; refund it manually.,この申込には Stripe の決済が紐付いていません。手動で返金してください。
 No Zoom Host Available,利用可能な Zoom ホストがありません
 No enabled Zoom host account can host a {0} for {1} attendees.,{1} 名の {0} を開催できる有効な Zoom ホストアカウントがありません。
@@ -143,9 +146,11 @@ Online Meeting,オンライン会議
 Online Minutes,オンライン視聴時間（分）
 Online participation,オンライン参加
 Online payment is not available. Enable Stripe in Seminar Settings.,オンライン決済は利用できません。セミナー設定で Stripe を有効にしてください。
+Only a Seminar Manager can change the organizer.,主催者を変更できるのは Seminar Manager のみです。
 Only confirmed registrations can be resent.,確定済みの申込のみ再送できます。
 Only pending registrations can be confirmed.,支払い待ちの申込のみ確定できます。
 Only seminar staff can check in attendees.,受付はセミナースタッフのみ行えます。
+Only the organizer can send invitations.,招待を送信できるのは主催者のみです。
 Only the organizer can start this meeting as host.,このミーティングをホストとして開始できるのは主催者のみです。
 Open in Frappe,Frappe で開く
 Optional,任意参加
@@ -227,6 +232,7 @@ Shown on the seminar list.,セミナー一覧に表示されます。
 Sold out,満席
 Speaker,講師
 Speakers,講師
+"Start Gemini ""Take notes for me"" during the meeting.",会議中に Gemini の「自動メモ作成」を開始してください。
 Start as Host,ホストとして開始
 Starts At,開始日時
 Stripe Checkout Session,Stripe Checkout セッション
@@ -239,6 +245,7 @@ Sync Attendance,参加ログを取得
 Thank you for attending {0},{0} へのご参加ありがとうございました
 Thank you for attending {0}. Please take a minute to answer our survey.,{0} にご参加いただきありがとうございました。アンケートへのご協力をお願いいたします。
 Thank you for registering. Your registration is confirmed.,お申し込みありがとうございます。お申し込みが確定しました。
+The AI summary is imported automatically about 15 to 25 minutes after the scheduled end time.,AI 要約は、予定終了時刻の約 15〜25 分後に自動で取り込まれます。
 The JSON is not a service account key.,この JSON はサービスアカウント鍵ではありません。
 The Zoom session is created automatically when the status is set to Open.,ステータスを Open にすると Zoom が自動作成されます。
 The following meeting has been cancelled.,以下のミーティングは中止になりました。
@@ -286,10 +293,12 @@ Webinar Capacity,ウェビナー上限人数
 Workspace Domains,Workspace ドメイン
 Would Recommend,推奨意向
 You are invited to the following meeting.,以下のミーティングにご招待します。
+You can only create meetings that you organize.,自分が主催するミーティングのみ作成できます。
 Your Registration,お申し込み内容
 Your registration has been cancelled.,お申し込みはキャンセルされました。
 Your registration is confirmed.,お申し込みは確定しています。
 Zoom (the join link is emailed after registration),Zoom（参加リンクはお申し込み後にメールでお送りします）
+Zoom AI Companion meeting summary must be enabled.,Zoom の AI Companion 会議要約が有効になっている必要があります。
 Zoom Host Account,Zoom ホストアカウント
 Zoom Host Allocation,Zoom ホスト割当
 Zoom User,Zoom ユーザー

@@ -85,7 +85,10 @@ bench --site <site> install-app eventmeet
 ### ロール
 - **Seminar Manager**: セミナー・申込・設定の管理
 - **Seminar Staff**: 閲覧と当日チェックイン
-- 社内 MTG は全デスクユーザーが作成可。閲覧は主催者・参加者（と Manager）のみ
+- 社内 MTG は全デスクユーザーが作成可（主催者は自分のみ。主催者の変更は Manager のみ）。
+  閲覧は主催者・参加者（と Manager）のみ。主催者以外の参加者が編集できるのは議事録とアクションアイテムだけで、
+  招待の送信は主催者と Manager のみ
+- Conferencing Settings / Seminar Settings / Zoom Host Account は System Manager・Seminar Manager のみ
 
 ## テスト
 

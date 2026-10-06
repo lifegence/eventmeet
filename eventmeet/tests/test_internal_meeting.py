@@ -148,6 +148,63 @@ class TestInternalMeeting(SeminarTestCase):
 		)
 		self.assertTrue(visible)
 
+	def as_user(self, user):
+		frappe.set_user(user)
+		self.addCleanup(frappe.set_user, "Administrator")
+
+	def test_attendee_edits_only_minutes_and_actions(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.as_user(self.member)
+		meeting = frappe.get_doc("Internal Meeting", meeting.name)
+		meeting.title = "Renamed by attendee"
+		meeting.append("agenda", {"topic": "Added by attendee"})
+		meeting.minutes = "<p>Notes by attendee</p>"
+		meeting.append("actions", {"description": "Follow up"})
+		meeting.save()
+
+		meeting.reload()
+		self.assertEqual(meeting.title, "Weekly sync")
+		self.assertEqual([row.topic for row in meeting.agenda], ["Status", "Risks"])
+		self.assertEqual(meeting.minutes, "<p>Notes by attendee</p>")
+		self.assertEqual([row.description for row in meeting.actions], ["Follow up"])
+		self.assertFalse(self.provider.called("update"), "attendee edits are not pushed to the calendar")
+
+	def test_organizer_edits_everything(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.as_user(self.organizer)
+		meeting = frappe.get_doc("Internal Meeting", meeting.name)
+		meeting.title = "Renamed"
+		meeting.save()
+		self.assertEqual(frappe.db.get_value("Internal Meeting", meeting.name, "title"), "Renamed")
+
+	def test_only_organizer_sends_invitations(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.as_user(self.member)
+		with self.assertRaises(frappe.PermissionError):
+			frappe.get_doc("Internal Meeting", meeting.name).send_invitations()
+		self.assertFalse(self.mail)
+
+	def test_cannot_create_meeting_for_someone_else(self):
+		self.as_user(self.member)
+		with self.assertRaises(frappe.PermissionError):
+			frappe.get_doc(
+				{
+					"doctype": "Internal Meeting",
+					"title": "On someone's calendar",
+					"organizer": self.organizer,
+					"starts_at": add_to_date(now_datetime(), days=1),
+					"ends_at": add_to_date(now_datetime(), days=1, hours=1),
+				}
+			).insert()
+
+	def test_organizer_cannot_be_reassigned(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.as_user(self.organizer)
+		meeting = frappe.get_doc("Internal Meeting", meeting.name)
+		meeting.organizer = self.member
+		with self.assertRaises(frappe.PermissionError):
+			meeting.save()
+
 	def test_action_items_sync_with_todo(self):
 		meeting = make_meeting(self.organizer, [self.member])
 		meeting.append("actions", {"description": "Draft proposal", "assigned_to": self.member})
