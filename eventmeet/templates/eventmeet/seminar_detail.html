@@ -1,0 +1,110 @@
+{% extends "eventmeet/templates/eventmeet/layout.html" %}
+{#- Seminar page. Context: doc (Seminar), venue, speakers (dict), tickets, registration_open,
+    registration_block_reason. The page script submits the form with id "ls-register-form"
+    (fields ticket_type, attendee_name, email, company, phone, website) and shows messages in
+    "ls-register-message"; keep these ids when you override em_registration. -#}
+
+{% block em_content %}
+	{% block em_hero %}
+	{% if doc.banner_image %}<img class="ls-banner" src="{{ doc.banner_image | e }}" alt="">{% endif %}
+	<div class="ls-meta"><span class="ls-badge">{{ _(doc.format, context="Seminar") }}</span></div>
+	<h1 class="ls-title">{{ doc.title | e }}</h1>
+	{% endblock %}
+	{% block em_overview %}
+	<table class="ls-table">
+		<tr><th style="width: 30%">{{ _("Date") }}</th>
+			<td>{{ frappe.utils.format_datetime(doc.starts_at, "yyyy-MM-dd HH:mm") }} – {{ frappe.utils.format_datetime(doc.ends_at, "HH:mm") }}</td></tr>
+		{% if venue %}
+		<tr><th>{{ _("Venue") }}</th>
+			<td>{{ venue.venue_name | e }}{% if venue.address %}<br>{{ venue.address | e }}{% endif %}
+				{% if venue.map_url %}<br><a href="{{ venue.map_url | e }}" target="_blank" rel="noopener">{{ _("Map") }}</a>{% endif %}</td></tr>
+		{% endif %}
+		{% if doc.format != "Offline" %}
+		<tr><th>{{ _("Online") }}</th><td>{{ _("Zoom (the join link is emailed after registration)") }}</td></tr>
+		{% endif %}
+		<tr><th>{{ _("Registration closes") }}</th>
+			<td>{{ frappe.utils.format_datetime(doc.registration_closes_at, "yyyy-MM-dd HH:mm") }}</td></tr>
+	</table>
+	{% endblock %}
+	{% block em_description %}
+	{% if doc.description %}
+	<div class="ls-section">{{ doc.description }}</div>
+	{% endif %}
+	{% endblock %}
+	{% block em_program %}
+	{% if doc.sessions %}
+	<div class="ls-section">
+		<h2>{{ _("Program") }}</h2>
+		<table class="ls-table">
+			{% for row in doc.sessions %}
+			<tr>
+				<td style="width: 20%; white-space: nowrap">{{ frappe.utils.format_time(row.from_time, "HH:mm") }}{% if row.to_time %} – {{ frappe.utils.format_time(row.to_time, "HH:mm") }}{% endif %}</td>
+				<td>
+					<strong>{{ row.title | e }}</strong>
+					{% if row.speaker and speakers.get(row.speaker) %}
+					<div class="ls-muted">{{ speakers[row.speaker].full_name | e }}{% if speakers[row.speaker].organization %} ({{ speakers[row.speaker].organization | e }}){% endif %}</div>
+					{% endif %}
+					{% if row.description %}<div>{{ row.description | e }}</div>{% endif %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% endif %}
+	{% endblock %}
+	{% block em_speakers %}
+	{% if speakers %}
+	<div class="ls-section">
+		<h2>{{ _("Speakers") }}</h2>
+		{% for speaker in speakers.values() %}
+		<div class="ls-box">
+			<strong>{{ speaker.full_name | e }}</strong>
+			<div class="ls-muted">{{ (speaker.organization or "") | e }} {{ (speaker.job_title or "") | e }}</div>
+			{% if speaker.bio %}<div>{{ speaker.bio }}</div>{% endif %}
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+	{% endblock %}
+	{% block em_registration %}
+	<div class="ls-section" id="register">
+		<h2>{{ _("Registration") }}</h2>
+		<table class="ls-table">
+			{% for t in tickets %}
+			<tr>
+				<td>{{ t.ticket.ticket_name | e }}{% if t.ticket.description %}<div class="ls-muted">{{ t.ticket.description | e }}</div>{% endif %}</td>
+				<td style="width: 25%">{% if t.ticket.price %}{{ frappe.utils.fmt_money(t.ticket.price, currency=t.ticket.currency) }}{% else %}{{ _("Free") }}{% endif %}</td>
+				<td style="width: 20%">{% if t.sold_out %}{{ _("Sold out") }}{% elif t.remaining is not none %}{{ _("{0} seats left").format(t.remaining) }}{% endif %}</td>
+			</tr>
+			{% endfor %}
+		</table>
+
+		{% if registration_open %}
+		<form class="ls-form ls-box" id="ls-register-form">
+			<label for="ls-ticket">{{ _("Ticket") }}</label>
+			<select class="form-control" id="ls-ticket" name="ticket_type" required>
+				{% for t in tickets %}{% if not t.sold_out %}
+				<option value="{{ t.ticket.ticket_name | e }}">{{ t.ticket.ticket_name | e }}</option>
+				{% endif %}{% endfor %}
+			</select>
+			<label for="ls-name">{{ _("Name") }}</label>
+			<input class="form-control" id="ls-name" name="attendee_name" maxlength="140" required autocomplete="name">
+			<label for="ls-email">{{ _("Email") }}</label>
+			<input class="form-control" id="ls-email" name="email" type="email" maxlength="140" required autocomplete="email">
+			<label for="ls-company">{{ _("Company") }}</label>
+			<input class="form-control" id="ls-company" name="company" maxlength="140" autocomplete="organization">
+			<label for="ls-phone">{{ _("Phone") }}</label>
+			<input class="form-control" id="ls-phone" name="phone" maxlength="40" autocomplete="tel">
+			<div class="ls-honeypot" aria-hidden="true">
+				<label for="ls-website">Website</label>
+				<input id="ls-website" name="website" tabindex="-1" autocomplete="off">
+			</div>
+			<button class="btn btn-primary" style="margin-top: 16px" type="submit">{{ _("Register") }}</button>
+			<p class="ls-muted" id="ls-register-message" role="status"></p>
+		</form>
+		{% else %}
+		<p class="ls-muted">{{ (registration_block_reason or _("Registration is not available.")) | e }}</p>
+		{% endif %}
+	</div>
+	{% endblock %}
+{% endblock %}

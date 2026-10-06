@@ -2,6 +2,8 @@ import frappe
 from frappe import _
 from frappe.utils import now_datetime
 
+from eventmeet import website
+
 no_cache = 1
 
 
@@ -25,4 +27,4 @@ def get_context(context):
 		order_by="starts_at asc",
 		limit=100,
 	)
-	return context
+	return website.apply(context, "seminar_list")

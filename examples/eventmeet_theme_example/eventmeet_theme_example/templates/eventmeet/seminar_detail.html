@@ -1,0 +1,31 @@
+{% extends "eventmeet/templates/eventmeet/seminar_detail.html" %}
+{#- Two columns: the content on the left and the registration box fixed on the right. -#}
+
+{% block em_styles %}
+{{ super() }}
+<style>
+	.em-page { --em-max-width: 1100px; }
+	.demo-columns { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 32px; align-items: start; }
+	.demo-aside { position: sticky; top: 80px; }
+	.demo-aside .ls-section { margin-top: 0; padding: 20px; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0; }
+	.demo-aside .ls-section h2 { margin-top: 0; }
+	.demo-aside .ls-table td { border: 0; border-bottom: 1px solid #e2e8f0; }
+	.demo-aside .ls-table td + td { white-space: nowrap; width: auto !important; }
+	@media (max-width: 900px) { .demo-columns { grid-template-columns: 1fr; } .demo-aside { position: static; } }
+</style>
+{% endblock %}
+
+{% block em_content %}
+{{ self.em_hero() }}
+<div class="demo-columns">
+	<main>
+		{{ self.em_overview() }}
+		{{ self.em_description() }}
+		{{ self.em_program() }}
+		{{ self.em_speakers() }}
+	</main>
+	<aside class="demo-aside">
+		{{ self.em_registration() }}
+	</aside>
+</div>
+{% endblock %}

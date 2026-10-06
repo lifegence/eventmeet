@@ -1,0 +1,44 @@
+{% extends "eventmeet/templates/eventmeet/seminar_list.html" %}
+{#- Event landing page: a hero section and cards with a date tile. -#}
+
+{% block em_styles %}
+{{ super() }}
+<style>
+	.demo-hero { margin: 0 0 32px; padding: 48px 32px; border-radius: 20px; color: #fff;
+		background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 55%, #db2777 100%); }
+	.demo-hero h1 { font-size: 2.4rem; font-weight: 800; margin: 0 0 8px; color: #fff; }
+	.demo-hero p { font-size: 1.1rem; opacity: 0.9; margin: 0; }
+	.demo-card { display: flex; gap: 20px; align-items: stretch; padding: 0; overflow: hidden; }
+	.demo-date { flex: 0 0 96px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+		background: #eef2ff; color: #4338ca; }
+	.demo-date .month { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; }
+	.demo-date .day { font-size: 2rem; font-weight: 800; line-height: 1; }
+	.demo-card .ls-card-body { padding: 16px 16px 16px 0; }
+	.demo-card .demo-more { color: #4f46e5; font-weight: 600; }
+</style>
+{% endblock %}
+
+{% block em_list_header %}
+<section class="demo-hero">
+	<h1>{{ _("Seminars") }}</h1>
+	<p>{{ _("Learn from practitioners. Join online or on-site.") }}</p>
+</section>
+{% endblock %}
+
+{% block em_card %}
+<a class="ls-card demo-card" href="/{{ s.route | e }}">
+	<div class="demo-date">
+		<span class="month">{{ frappe.utils.format_datetime(s.starts_at, "MMM") }}</span>
+		<span class="day">{{ frappe.utils.format_datetime(s.starts_at, "d") }}</span>
+	</div>
+	<div class="ls-card-body">
+		<div class="ls-meta">
+			<span class="ls-badge">{{ _(s.format, context="Seminar") }}</span>
+			{{ frappe.utils.format_datetime(s.starts_at, "HH:mm") }}{% if s.venue %} · {{ s.venue | e }}{% endif %}
+		</div>
+		<h2 class="ls-card-title">{{ s.title | e }}</h2>
+		{% if s.summary %}<p class="ls-muted">{{ s.summary | e }}</p>{% endif %}
+		<span class="demo-more">{{ _("Details") }} →</span>
+	</div>
+</a>
+{% endblock %}

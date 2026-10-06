@@ -15,7 +15,13 @@
   "stripe_webhook_secret",
   "column_break_stripe",
   "checkout_expiry_minutes",
-  "stripe_create_invoice"
+  "stripe_create_invoice",
+  "website_section",
+  "website_design",
+  "website_custom_css",
+  "column_break_website",
+  "website_header_html",
+  "website_footer_html"
  ],
  "fields": [
   {
@@ -88,12 +94,49 @@
    "fieldname": "stripe_create_invoice",
    "fieldtype": "Check",
    "label": "Create Stripe Invoice (Receipt)"
+  },
+  {
+   "fieldname": "website_section",
+   "fieldtype": "Section Break",
+   "label": "Website Design",
+   "collapsible": 1
+  },
+  {
+   "default": "Standard",
+   "fieldname": "website_design",
+   "fieldtype": "Select",
+   "label": "Design",
+   "options": "Standard\nCorporate\nFriendly\nMinimal",
+   "description": "Built-in look of the public seminar pages (/seminars, seminar pages, registration and survey pages)."
+  },
+  {
+   "fieldname": "website_custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS",
+   "description": "Added after the design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens."
+  },
+  {
+   "fieldname": "column_break_website",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "website_header_html",
+   "fieldtype": "HTML Editor",
+   "label": "Header HTML",
+   "description": "Shown above the seminar pages, e.g. a notice or a banner. Scripts and event handlers are removed."
+  },
+  {
+   "fieldname": "website_footer_html",
+   "fieldtype": "HTML Editor",
+   "label": "Footer HTML",
+   "description": "Shown below the seminar pages. Scripts and event handlers are removed."
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-10-06 19:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",

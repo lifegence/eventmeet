@@ -1,0 +1,3 @@
+{% extends "eventmeet/templates/eventmeet/seminar_list.html" %}
+{% block em_list_header %}<h1 class="ls-title" id="custom-list-header">Custom header</h1>{% endblock %}
+{% block em_card %}<div class="custom-card">{{ s.title | e }}</div>{% endblock %}

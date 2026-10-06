@@ -1,0 +1,29 @@
+{% extends "eventmeet/templates/eventmeet/layout.html" %}
+{#- Seminar list (/seminars). Context: seminars (title, summary, format, starts_at, ends_at, banner_image, route, status, venue). -#}
+
+{% block em_content %}
+	{% block em_list_header %}<h1 class="ls-title">{{ _("Seminars") }}</h1>{% endblock %}
+	{% if seminars %}
+	<div class="ls-list">
+		{% for s in seminars %}
+		{% block em_card scoped %}
+		<a class="ls-card" href="/{{ s.route | e }}">
+			{% if s.banner_image %}<img class="ls-card-image" src="{{ s.banner_image | e }}" alt="">{% endif %}
+			<div class="ls-card-body">
+				<div class="ls-meta">
+					<span class="ls-badge">{{ _(s.format, context="Seminar") }}</span>
+					{{ frappe.utils.format_datetime(s.starts_at, "yyyy-MM-dd HH:mm") }}
+					{% if s.venue %} · {{ s.venue | e }}{% endif %}
+				</div>
+				<h2 class="ls-card-title">{{ s.title | e }}</h2>
+				{% if s.summary %}<p class="ls-muted">{{ s.summary | e }}</p>{% endif %}
+				{% if s.status == "Closed" %}<span class="ls-badge">{{ _("Registration closed") }}</span>{% endif %}
+			</div>
+		</a>
+		{% endblock %}
+		{% endfor %}
+	</div>
+	{% else %}
+	{% block em_empty %}<p class="ls-muted">{{ _("No upcoming seminars.") }}</p>{% endblock %}
+	{% endif %}
+{% endblock %}

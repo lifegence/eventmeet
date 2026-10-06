@@ -1,0 +1,10 @@
+{#- Shared frame of the public seminar pages. Page templates extend this and fill `em_content`. -#}
+{% block em_styles %}{% include "eventmeet/templates/includes/seminar_styles.html" %}{% endblock %}
+{% if em.custom_css %}<style>{{ em.custom_css }}</style>{% endif %}
+<div class="em-page em-design-{{ em.design }}">
+	{% block em_header %}{% if em.header_html %}<div class="em-site-header">{{ em.header_html }}</div>{% endif %}{% endblock %}
+	<div class="ls-container">
+		{% block em_content %}{% endblock %}
+	</div>
+	{% block em_footer %}{% if em.footer_html %}<div class="em-site-footer">{{ em.footer_html }}</div>{% endif %}{% endblock %}
+</div>

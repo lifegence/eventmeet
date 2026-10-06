@@ -7,6 +7,7 @@ from frappe.model.naming import make_autoname
 from frappe.utils import cint, flt, get_datetime, now_datetime
 from frappe.website.website_generator import WebsiteGenerator
 
+from eventmeet import website
 from eventmeet.services import conference, todo_sync
 
 ONLINE_ACTIVE_STATUSES = ("Open", "Closed", "Completed")
@@ -160,6 +161,9 @@ class Seminar(WebsiteGenerator):
 		context.show_sidebar = False
 		# Frappe's breadcrumb include renders the page title unescaped; the page has its own heading.
 		context.no_breadcrumbs = True
+		# Frappe copies the document's fields into the context, so the seminar's banner_image would
+		# replace the site logo in the navbar (which reads the same name). The page uses doc.banner_image.
+		context.banner_image = frappe.db.get_single_value("Website Settings", "banner_image")
 		context.venue = frappe.get_doc("Seminar Venue", self.venue) if self.venue else None
 
 		speaker_names = {row.speaker for row in self.sessions if row.speaker}
@@ -191,3 +195,4 @@ class Seminar(WebsiteGenerator):
 			not t["sold_out"] for t in tickets
 		)
 		context.csrf_token = frappe.sessions.get_csrf_token() if frappe.session.user != "Guest" else ""
+		website.apply(context, "seminar_detail")

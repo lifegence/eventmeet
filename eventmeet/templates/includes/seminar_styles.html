@@ -1,22 +1,84 @@
 <style>
-	.ls-container { max-width: 880px; margin: 0 auto; padding: 24px 0 64px; }
-	.ls-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 20px; }
-	.ls-muted { color: #6b7280; }
-	.ls-list { display: grid; gap: 16px; }
-	.ls-card { display: flex; gap: 16px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; color: inherit; text-decoration: none; }
-	.ls-card:hover { border-color: #9ca3af; text-decoration: none; }
-	.ls-card-image { width: 200px; height: 112px; object-fit: cover; border-radius: 6px; }
-	.ls-card-title { font-size: 1.2rem; font-weight: 600; margin: 6px 0; }
-	.ls-meta { font-size: 0.9rem; color: #374151; }
-	.ls-badge { display: inline-block; border: 1px solid #d1d5db; border-radius: 999px; padding: 0 8px; font-size: 0.8rem; margin-right: 6px; }
+	/* Design tokens. Override them in Seminar Settings > Custom CSS, e.g. .em-page { --em-primary: #0f766e; } */
+	.em-page {
+		--em-primary: var(--primary, #2490ef);
+		--em-on-primary: #fff;
+		--em-text: inherit;
+		--em-muted: #6b7280;
+		--em-border: #e5e7eb;
+		--em-border-strong: #9ca3af;
+		--em-surface: transparent;
+		--em-page-bg: transparent;
+		--em-radius: 8px;
+		--em-badge-radius: 999px;
+		--em-max-width: 880px;
+		--em-title-size: 1.8rem;
+		--em-title-weight: 700;
+		--em-heading-size: 1.2rem;
+		--em-list-columns: 1;
+		--em-card-direction: row;
+		--em-card-image-width: 200px;
+		--em-card-image-height: 112px;
+		--em-shadow: none;
+		color: var(--em-text);
+		background: var(--em-page-bg);
+	}
+	.em-site-header, .em-site-footer { max-width: var(--em-max-width); margin: 0 auto; }
+	.em-site-header { padding-top: 16px; }
+	.em-site-footer { padding-bottom: 32px; color: var(--em-muted); }
+	.ls-container { max-width: var(--em-max-width); margin: 0 auto; padding: 24px 0 64px; }
+	.ls-title { font-size: var(--em-title-size); font-weight: var(--em-title-weight); margin-bottom: 20px; }
+	.ls-meta + .ls-title { margin-top: 8px; }
+	.ls-muted { color: var(--em-muted); }
+	.ls-list { display: grid; gap: 16px; grid-template-columns: repeat(var(--em-list-columns), minmax(0, 1fr)); }
+	.ls-card { display: flex; flex-direction: var(--em-card-direction); gap: 16px; border: 1px solid var(--em-border); border-radius: var(--em-radius); padding: 16px; color: inherit; text-decoration: none; background: var(--em-surface); box-shadow: var(--em-shadow); }
+	.ls-card:hover { border-color: var(--em-border-strong); text-decoration: none; color: inherit; }
+	.ls-card-image { width: var(--em-card-image-width); height: var(--em-card-image-height); object-fit: cover; border-radius: calc(var(--em-radius) - 2px); }
+	.ls-card-title { font-size: var(--em-heading-size); font-weight: 600; margin: 6px 0; }
+	.ls-meta { font-size: 0.9rem; }
+	.ls-badge { display: inline-block; border: 1px solid var(--em-border-strong); border-radius: var(--em-badge-radius); padding: 0 8px; font-size: 0.8rem; margin-right: 6px; }
 	.ls-section { margin-top: 32px; }
-	.ls-section h2 { font-size: 1.2rem; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding-bottom: 6px; }
+	.ls-section h2 { font-size: var(--em-heading-size); font-weight: 600; border-bottom: 1px solid var(--em-border); padding-bottom: 6px; }
 	.ls-table { width: 100%; border-collapse: collapse; }
-	.ls-table td, .ls-table th { border: 1px solid #e5e7eb; padding: 8px; vertical-align: top; text-align: left; }
+	.ls-table td, .ls-table th { border: 1px solid var(--em-border); padding: 8px; vertical-align: top; text-align: left; }
 	.ls-form label { display: block; font-weight: 500; margin: 12px 0 4px; }
 	.ls-form input, .ls-form select, .ls-form textarea { width: 100%; }
 	.ls-honeypot { position: absolute; left: -10000px; }
-	.ls-box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-top: 16px; }
-	.ls-banner { width: 100%; max-height: 360px; object-fit: cover; border-radius: 8px; margin-bottom: 20px; }
-	@media (max-width: 640px) { .ls-card { flex-direction: column; } .ls-card-image { width: 100%; height: auto; } }
+	.ls-box { border: 1px solid var(--em-border); border-radius: var(--em-radius); padding: 16px; margin-top: 16px; background: var(--em-surface); box-shadow: var(--em-shadow); }
+	.ls-banner { width: 100%; max-height: 360px; object-fit: cover; border-radius: var(--em-radius); margin-bottom: 20px; }
+	.em-page:not(.em-design-standard) .btn-primary { background: var(--em-primary); border-color: var(--em-primary); color: var(--em-on-primary); border-radius: var(--em-radius); }
+
+	/* Corporate: navy, square corners, a coloured title band */
+	.em-design-corporate {
+		--em-primary: #1e3a8a; --em-border: #cbd5e1; --em-border-strong: #1e3a8a;
+		--em-radius: 2px; --em-badge-radius: 2px; --em-max-width: 960px; --em-title-weight: 600;
+	}
+	.em-design-corporate .ls-title { background: var(--em-primary); color: #fff; padding: 20px 24px; border-radius: var(--em-radius); }
+	.em-design-corporate .ls-badge { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+	.em-design-corporate .ls-section h2 { border-bottom: 2px solid var(--em-primary); }
+	.em-design-corporate .ls-table th { background: #f1f5f9; }
+
+	/* Friendly: warm colours, rounded cards in a two-column grid with the image on top */
+	.em-design-friendly {
+		--em-primary: #ea580c; --em-border: #fed7aa; --em-border-strong: #fb923c; --em-surface: #fffaf5;
+		--em-radius: 16px; --em-max-width: 1040px; --em-title-size: 2.2rem; --em-list-columns: 2;
+		--em-card-direction: column; --em-card-image-width: 100%; --em-card-image-height: 180px;
+		--em-shadow: 0 4px 14px rgba(234, 88, 12, 0.08);
+	}
+	.em-design-friendly .ls-badge { background: #ffedd5; border-color: transparent; color: #9a3412; }
+	.em-design-friendly .ls-card:hover { transform: translateY(-2px); transition: transform 0.15s; }
+
+	/* Minimal: no boxes, large type, thin dividers */
+	.em-design-minimal {
+		--em-primary: #111827; --em-border: #e5e7eb; --em-border-strong: #111827; --em-muted: #6b7280;
+		--em-radius: 0; --em-badge-radius: 0; --em-max-width: 760px; --em-title-size: 2.6rem; --em-title-weight: 800;
+	}
+	.em-design-minimal .ls-card { border: 0; border-bottom: 1px solid var(--em-border); padding: 24px 0; }
+	.em-design-minimal .ls-box { border: 0; border-left: 3px solid var(--em-primary); padding: 8px 16px; }
+	.em-design-minimal .ls-table td, .em-design-minimal .ls-table th { border: 0; border-bottom: 1px solid var(--em-border); }
+	.em-design-minimal .ls-badge { border: 0; padding: 0; text-transform: uppercase; letter-spacing: 0.06em; }
+
+	@media (max-width: 640px) {
+		.em-page { --em-list-columns: 1; --em-card-direction: column; --em-card-image-width: 100%; --em-card-image-height: auto; }
+	}
 </style>

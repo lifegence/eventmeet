@@ -4,6 +4,7 @@ import frappe
 from frappe import _
 from frappe.utils import get_datetime, now_datetime
 
+from eventmeet import website
 from eventmeet.services.notifications import qr_png
 from eventmeet.services.registration import checkin_url, feedback_url, get_registration_by_token
 
@@ -16,7 +17,7 @@ def get_context(context):
 	registration = get_registration_by_token(frappe.form_dict.get("token"))
 	context.registration = registration
 	if not registration:
-		return context
+		return website.apply(context, "registration")
 
 	seminar = frappe.get_doc("Seminar", registration.seminar)
 	context.seminar = seminar
@@ -37,4 +38,4 @@ def get_context(context):
 		and not frappe.db.exists("Seminar Feedback", {"registration": registration.name})
 	):
 		context.feedback_link = feedback_url(registration)
-	return context
+	return website.apply(context, "registration")

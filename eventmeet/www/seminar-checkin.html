@@ -2,7 +2,7 @@
 
 {% block page_content %}
 {% include "eventmeet/templates/includes/seminar_styles.html" %}
-<div class="ls-container">
+<div class="em-page em-design-standard"><div class="ls-container">
 	<h1 class="ls-title">{{ _("Check-in") }}</h1>
 	{% if not registration %}
 	<div class="ls-box">{{ _("Invalid check-in code.") }}</div>
@@ -24,7 +24,7 @@
 		{% endif %}
 	</div>
 	{% endif %}
-</div>
+</div></div>
 {% endblock %}
 
 {% block script %}
