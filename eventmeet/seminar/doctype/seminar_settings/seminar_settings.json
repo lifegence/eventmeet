@@ -106,15 +106,16 @@
    "fieldname": "website_design",
    "fieldtype": "Select",
    "label": "Design",
-   "options": "Standard\nCorporate\nFriendly\nMinimal",
-   "description": "Built-in look of the public seminar pages (/seminars, seminar pages, registration and survey pages)."
+   "options": "Standard\nCorporate\nFriendly\nMinimal\nCustom",
+   "description": "Built-in look of the public seminar pages (/seminars, seminar pages, registration and survey pages). Custom: the Standard design plus your Custom CSS."
   },
   {
    "fieldname": "website_custom_css",
    "fieldtype": "Code",
    "label": "Custom CSS",
    "options": "CSS",
-   "description": "Added after the design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens."
+   "description": "Used only with the Custom design, on top of the Standard design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens.",
+   "depends_on": "eval:doc.website_design=='Custom'"
   },
   {
    "fieldname": "column_break_website",
@@ -136,7 +137,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 19:00:00.000000",
+ "modified": "2026-10-06 20:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",

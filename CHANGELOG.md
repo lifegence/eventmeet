@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Website design: a **Custom** design. Custom CSS now applies only when Custom is selected (on top of
+  the Standard design), so switching to another built-in design no longer mixes it with your CSS; the
+  CSS is kept for when you switch back. Sites with the Standard design and Custom CSS are moved to
+  Custom on migrate.
 - Sample custom CSS and header / footer HTML in `examples/website-design`, with screenshots in the
   website design guide.
 

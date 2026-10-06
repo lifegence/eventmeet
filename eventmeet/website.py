@@ -18,7 +18,7 @@ TEMPLATES = {
 	"registration": "eventmeet/templates/eventmeet/registration.html",
 	"feedback": "eventmeet/templates/eventmeet/feedback.html",
 }
-DESIGNS = ("Standard", "Corporate", "Friendly", "Minimal")
+DESIGNS = ("Standard", "Corporate", "Friendly", "Minimal", "Custom")
 
 
 def get_template(key: str) -> str:
@@ -55,7 +55,8 @@ def get_design() -> frappe._dict:
 	design = settings.get("website_design") or "Standard"
 	return frappe._dict(
 		design=(design if design in DESIGNS else "Standard").lower(),
-		custom_css=safe_css(settings.get("website_custom_css")),
+		# Custom CSS belongs to the "Custom" design (Standard + the CSS); other designs ignore it.
+		custom_css=safe_css(settings.get("website_custom_css")) if design == "Custom" else "",
 		# Sanitized: scripts and event handlers are removed, and the HTML is not run as a template.
 		header_html=safe_html(settings.get("website_header_html")),
 		footer_html=safe_html(settings.get("website_footer_html")),

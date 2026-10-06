@@ -86,8 +86,8 @@ class TestWebsiteDesign(SeminarTestCase):
 
 	def test_design_css_and_sanitized_html(self):
 		self.configure(
-			website_design="Friendly",
-			website_custom_css=".em-page { --em-primary: #0f766e; } </style><script>alert(1)</script>",
+			website_design="Custom",
+			website_custom_css=".em-page { --em-primary: #13579b; } </style><script>alert(1)</script>",
 			website_header_html='<p class="notice">Early bird ends Friday</p><script>alert(2)</script>',
 			website_footer_html='<a href="/contact" onclick="alert(3)">Contact</a>',
 		)
@@ -95,14 +95,31 @@ class TestWebsiteDesign(SeminarTestCase):
 			with self.subTest(path=path):
 				status, html = render(path)
 				self.assertEqual(status, 200)
-				self.assertIn("em-design-friendly", html)
-				self.assertIn("--em-primary: #0f766e", html)
+				self.assertIn("em-design-custom", html)
+				self.assertIn("--em-primary: #13579b", html)
 				self.assertIn("Early bird ends Friday", html)
 				self.assertIn('href="/contact"', html)
 				self.assertNotIn("alert(1)</script>", html)
 				# No executable script. (Frappe v15 already escapes it to text when the settings are saved.)
 				self.assertNotIn("<script>alert(2)", html)
 				self.assertNotIn("onclick", html)
+
+	def test_custom_css_only_with_the_custom_design(self):
+		self.configure(website_design="Friendly", website_custom_css=".em-page { --em-primary: #13579b; }")
+		status, html = render("seminars")
+		self.assertEqual(status, 200)
+		self.assertIn("em-design-friendly", html)
+		self.assertNotIn("--em-primary: #13579b", html, "kept in the settings, not applied")
+		self.configure(website_design="Custom")
+		self.assertIn("--em-primary: #13579b", render("seminars")[1])
+
+	def test_patch_moves_standard_with_css_to_custom(self):
+		from eventmeet.patches.v0_2 import use_custom_design_for_custom_css
+
+		frappe.db.set_single_value("Seminar Settings", "website_design", "Standard")
+		frappe.db.set_single_value("Seminar Settings", "website_custom_css", ".em-page { --em-radius: 0; }")
+		use_custom_design_for_custom_css.execute()
+		self.assertEqual(frappe.db.get_single_value("Seminar Settings", "website_design"), "Custom")
 
 	def test_unknown_design_falls_back_to_standard(self):
 		frappe.db.set_single_value("Seminar Settings", "website_design", "Nope")

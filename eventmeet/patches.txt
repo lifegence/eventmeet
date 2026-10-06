@@ -4,3 +4,4 @@
 [post_model_sync]
 # Patches added in this section will be executed after doctypes are migrated
 eventmeet.patches.v0_2.set_internal_meeting_provider
+eventmeet.patches.v0_2.use_custom_design_for_custom_css

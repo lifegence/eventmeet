@@ -1,6 +1,6 @@
 # Sample custom CSS and header / footer HTML
 
-Copy these into **Seminar Settings > Website Design** (with the Standard design):
+In **Seminar Settings > Website Design**, set **Design** to **Custom** and copy these in:
 
 | File | Field |
 |---|---|

@@ -14,10 +14,10 @@ The public pages are `/seminars` (list), each seminar's page, the registration s
 | Level | What you change | Where | Skills |
 |---|---|---|---|
 | 1. Frappe website settings | Logo, navbar, footer, colours and fonts of the whole site, the home page | Website Settings, Website Theme (Frappe) | None |
-| 2. EventMeet design settings | A built-in design, design tokens (colours, corners, widths, columns), extra CSS, a header and a footer around the seminar pages | Seminar Settings > Website Design | CSS (optional) |
+| 2. EventMeet design settings | A built-in design, or the Custom design (design tokens such as colours, corners, widths and columns, and any CSS), and a header and a footer around the seminar pages | Seminar Settings > Website Design | CSS (optional) |
 | 3. Template override | The layout and the HTML of each page | A small Frappe app of your own | HTML / Jinja, deploying an app |
 
-Levels can be combined: for example a built-in design with a few tokens changed, plus your logo in
+Levels can be combined: for example the Custom design with your brand colour, plus your logo in
 Website Settings.
 
 ## 2. Frappe website settings (level 1)
@@ -47,6 +47,7 @@ These settings apply to the whole website, including the login page.
 | Corporate | Navy, square corners, a coloured title band, wider page |
 | Friendly | Warm colours, rounded cards in two columns with the image on top |
 | Minimal | No boxes, large titles, thin dividers |
+| Custom | The Standard design plus your Custom CSS (see 3.2) |
 
 | Standard | Corporate |
 |---|---|
@@ -56,9 +57,10 @@ These settings apply to the whole website, including the login page.
 
 ### 3.2 Custom CSS and design tokens
 
-"Custom CSS" is added after the design, so it can change the design tokens (CSS variables) or any
-style. The page wrapper is `.em-page`, with the class `em-design-<design>` (for example
-`em-design-friendly`).
+Choose **Custom** as the design to use "Custom CSS" (the field appears when Custom is selected). The CSS
+is added on top of the Standard design, so it can change the design tokens (CSS variables) or any
+style. With the other designs the CSS is not used, but it is kept: switching back to Custom restores it.
+The page wrapper is `.em-page`, with the class `em-design-<design>` (`em-design-custom` here).
 
 ```css
 /* Brand colour, smaller corners and three columns on wide screens */
@@ -94,7 +96,7 @@ elements and event attributes (`onclick` etc.) are removed, and it is not run as
 
 ### 3.4 Example: custom CSS with header and footer
 
-[`examples/website-design`](../../examples/website-design) has a ready-to-paste set for the Standard
+[`examples/website-design`](../../examples/website-design) has a ready-to-paste set for the Custom
 design: `custom.css` (a teal brand colour, white cards on a light background, three columns with the
 image on top, two on tablets and one on phones), `header.html` (an early-bird notice and an
 introduction) and `footer.html` (organizer, contact address and links to the terms). The texts are in
@@ -109,7 +111,8 @@ Two things to keep in mind:
 - Custom CSS comes after the built-in styles, including their phone layout. If you change
   `--em-list-columns` or the card layout, add your own media queries for smaller screens, as the
   example does.
-- The header and footer HTML may use `class` and `style` attributes; style the classes in Custom CSS.
+- The header and footer HTML are shown with every design. They may use `class` and `style` attributes;
+  classes styled in Custom CSS only get that style with the Custom design.
   Saved HTML is sanitized (Frappe v15 turns a `<script>` into plain text when the settings are
   saved; it is never run).
 

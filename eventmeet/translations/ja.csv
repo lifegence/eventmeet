@@ -13,7 +13,6 @@ Action Detail,対応内容
 Action Items,アクションアイテム
 Add at least one attendee with an email address.,メールアドレスを持つ参加者を 1 名以上追加してください。
 Add at least one enabled ticket type before opening registration.,申込受付を開始する前に、有効なチケット種別を 1 つ以上追加してください。
-"Added after the design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens.",デザインの後に追加される CSS です。デザイントークンを変更できます（例：.em-page { --em-primary: #0f766e; --em-radius: 4px; }）。トークンの一覧は docs/ja/website-design.md を参照してください。
 Agenda,議題
 All Zoom host accounts are busy between {0} and {1}. Add a host account or change the time.,{0} 〜 {1} はすべての Zoom ホストアカウントが使用中です。ホストアカウントを追加するか、時間を変更してください。
 Already checked in,受付済み
@@ -33,7 +32,7 @@ Attendees,参加者
 Auto Recording,自動録画
 Back to seminar,セミナーページに戻る
 Buffer Between Sessions (Minutes),セッション間の余裕時間（分）
-"Built-in look of the public seminar pages (/seminars, seminar pages, registration and survey pages).",公開ページ（/seminars、セミナーのページ、申込内容・アンケートのページ）の標準デザインです。
+"Built-in look of the public seminar pages (/seminars, seminar pages, registration and survey pages). Custom: the Standard design plus your Custom CSS.",公開ページ（/seminars、セミナーのページ、申込内容・アンケートのページ）のデザインです。カスタム：標準デザインにカスタム CSS を加えたものです。
 Business,Business,Zoom Host Account
 Cancel and Refund,キャンセルして返金
 Cancel and refund the full amount via Stripe?,Stripe で全額返金してキャンセルしますか？
@@ -70,6 +69,7 @@ Confirm this registration (e.g. invoice / bank transfer / invited guest)?,この
 Corporate,コーポレート,Seminar Settings
 Could not {0} the online session: {1},オンライン会議を{0}できませんでした: {1}
 Create Stripe Invoice (Receipt),Stripe 請求書（領収書）を発行
+Custom,カスタム,Seminar Settings
 Custom CSS,カスタム CSS
 "Dear {0},",{0} 様
 Default Currency,既定の通貨
@@ -305,6 +305,7 @@ Unknown action.,不明な操作です。
 Unsupported conference provider: {0},未対応の会議プロバイダーです: {0}
 Use for Internal Meetings,社内ミーティングに使用
 Use for Seminars,セミナーに使用
+"Used only with the Custom design, on top of the Standard design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens.",デザインが「カスタム」のときだけ、標準デザインの上に適用されます。デザイントークンを変更できます（例：.em-page { --em-primary: #0f766e; --em-radius: 4px; }）。トークンの一覧は docs/ja/website-design.md を参照してください。
 Venue,会場
 Venue Name,会場名
 Venue is required for offline and hybrid seminars.,会場開催・ハイブリッドのセミナーには会場が必要です。
