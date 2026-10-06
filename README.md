@@ -17,12 +17,12 @@
 ## Status
 
 EventMeet 0.1.0 is the first public release. Every integration is covered by automated tests with
-mocked APIs; verification against the live services is still in progress:
+mocked APIs, and the integrations below have been verified against the live services:
 
 | Integration | Verified against the live service |
 |---|---|
 | Google Meet (internal meetings) | Yes: event and Meet link creation, Google Calendar invitations, attendance and Gemini notes import (Frappe 16.33) |
-| Zoom (seminars, internal meetings) | Not yet. Follow the first-run checklist in the [Zoom guide](docs/en/zoom-seminar-guide.md#6-first-run-verification) |
+| Zoom (seminars) | Yes, with Zoom Pro: registration-based meetings created, updated and deleted, personal join links, Start as Host, end-of-meeting webhook, attendance import. Webinars not yet. See the [Zoom guide](docs/en/zoom-seminar-guide.md#6-first-run-verification) |
 | Stripe (paid tickets) | Not yet |
 
 Reports from your own setup are welcome in the issues.

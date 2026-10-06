@@ -6,10 +6,10 @@ Applies to: EventMeet 0.1.0 or later (Frappe v15 / v16). Audience: Zoom account 
 
 [日本語](../ja/zoom-seminar-guide.md)
 
-> [!IMPORTANT]
-> This guide was written from the EventMeet source code and **has not yet been tested against a real Zoom account**.
+> [!NOTE]
+> This guide was verified on 6 October 2026 with a Zoom Pro account (seminars as registration-based meetings: items 1-8 and 10 in section 6). **Webinars (item 9) have not been verified yet.**
 >
-> Before using it for a real seminar, go through "6. First-run verification" with a test seminar and fill in the result column. Zoom screen names and layouts change with Zoom updates. If what you see differs from this guide, please let us know in a GitHub issue.
+> When you set it up for the first time, go through "6. First-run verification" with a test seminar before using it for a real seminar. Zoom screen names and layouts change with Zoom updates. If what you see differs from this guide, please let us know in a GitHub issue.
 
 ## 1. Overview
 
@@ -33,6 +33,7 @@ This guide describes the Zoom and Frappe settings needed to hold EventMeet semin
 | Host licenses | Zoom users with a paid license (Pro or higher). One license can run only one meeting at a time, so **the number of licenses you need is the peak number of concurrent sessions** (not the number of employees) |
 | Webinars | To use the webinar format, assign the Zoom Webinars add-on (with an attendee limit) to the host user. Not needed for regular registration-based meetings |
 | Participant reports | Attendance and viewing time are imported from Zoom reports (Pro or higher) |
+| Free (Basic) plan | Not usable for seminars: registration-based meetings and participant reports need a paid license |
 | Permission to create apps | A Zoom administrator must give the user who creates the Server-to-Server OAuth app the permission to do so through their role |
 
 ### 1.4 Where each step is done, and by whom
@@ -69,12 +70,13 @@ This guide describes the Zoom and Frappe settings needed to hold EventMeet semin
 > **Screen:** Zoom App Marketplace (`https://marketplace.zoom.us/`)
 
 1. Sign in to the Zoom App Marketplace as a Zoom account administrator.
-2. At the top right, choose "Develop" > "Build App".
-3. Choose "Server to Server OAuth App" as the app type and create it. Name it e.g. `EventMeet`.
-4. On the "Information" page, enter the company name and the developer contact (name and email address).
+2. Click "Developers" at the bottom left to open "Created Apps".
+3. Click the "+" next to "Developer" at the top left and choose "Build an app".
+4. Choose "Server-to-Server OAuth app" and click "Create". Name it e.g. `EventMeet`.
+5. On the "Information" page, enter the company name and the developer contact (name and email address).
 
 > [!NOTE]
-> If "Server to Server OAuth App" cannot be selected, a Zoom administrator must grant the view/edit permission for Server-to-Server OAuth apps to the user's role in "User Management" > "Roles".
+> If "Server-to-Server OAuth app" cannot be selected, a Zoom administrator must grant the user's role, in "User Management" > "Roles", the permission to view and edit Server-to-Server OAuth apps and the permissions for scopes (admin level).
 
 ### 3.2 Note the credentials
 
@@ -253,8 +255,8 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 ### 5.5 Checking attendance afterwards
 
 1. Attendance import starts automatically 15 minutes ("Attendance Sync Delay") after the scheduled end time. It runs every 10 minutes and retries up to 12 times if Zoom's report is not ready yet.
-2. To check right away, click "Zoom" > "**Sync Attendance**" on the seminar.
-3. Check "Attended Online" and "Online Minutes" on each registration. Matching is by email address, so it covers people who joined through their personal join URL.
+2. To check right away, click "Zoom" > "**Sync Attendance**" on the seminar. Right after the meeting ends, Zoom's participant report may not be ready yet (in our test it was available a few minutes later); if nothing is imported, try again a little later.
+3. Check "Attended Online" and "Online Minutes" on each registration. Matching is by email address, so it covers people who joined through their personal join URL (the host is not a registrant and is not matched).
 4. When done, set the seminar's status to "Completed" and save.
 
 > [!NOTE]
@@ -263,12 +265,12 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 ### 5.6 Changes and cancellation
 
 - **Changing date/time or title**: saving the seminar updates Zoom automatically. Personal join URLs stay the same. Notify registrants of the change separately if needed (Zoom does not notify them).
-- **Cancellation**: set the status to "Cancelled" and save to delete the Zoom meeting. Contact registrants and refund paid tickets per registration.
+- **Cancellation**: set the status to "Cancelled" and save to delete the Zoom meeting (a meeting that has already ended is not deleted). Contact registrants and refund paid tickets per registration.
 - **Cancelling a registration**: cancelling a registration also cancels it in Zoom, and the personal join URL stops working.
 
 ## 6. First-run verification
 
-Because this guide is untested, the first time go through the following with a test seminar (free ticket, small capacity, unpublish it after the test) and fill in the result column.
+When you set it up for the first time, go through the following with a test seminar (free ticket, small capacity, unpublish it after the test) and fill in the result column. Use a second test seminar for item 10, because a meeting that has already ended is not deleted.
 
 | No. | Action | Expected result | Result |
 |---|---|---|---|
@@ -301,6 +303,8 @@ Error details are in Frappe's "Error Log" list.
 | The confirmation email has no personal join URL | Registering with Zoom failed temporarily | Wait for the automatic retry every 10 minutes. If it continues, check the Error Log |
 | Zoom's "Validate" fails | The Secret Token is not saved in Frappe or is wrong, or the site cannot be reached from the internet | Save the Webhook Secret Token in 4.1, then click again. Check that the URL opens over HTTPS |
 | Attendance is not imported | Zoom's report is not ready yet, the participant joined via the generic URL or a different email address, or the report scopes are missing | Click "Sync Attendance" later. Ask participants to join via their personal join URL. Check the `report:` scopes in 3.3 |
+| "The parameter is required: last_name" in the Error Log | A bug in EventMeet 0.1.0 (the registrant's last name was not sent) | Update EventMeet. Registrations without a personal join URL are registered again within 10 minutes and the confirmation email is resent |
+| Registration closed after the start time was moved later | A bug in EventMeet 0.1.0 (an empty registration deadline kept the original start time) | Set "Registration Closes At" to the new start time and save. The latest version moves it automatically |
 
 ## 8. Security and operations
 

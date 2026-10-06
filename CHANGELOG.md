@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Fixes found while verifying Zoom seminars against a live Zoom Pro account.
+
+- Zoom: registrants are always sent a last name (the name is split on the first space, `-` if there is
+  none). Zoom rejected registrants with "The parameter is required: last_name", so no personal join
+  link was issued.
+- A registration deadline left at its default (the start time) now moves with the start time;
+  previously, moving the start later closed registration early.
+- Zoom guide: current App Marketplace menus, report timing, and notes from the verification.
+
 ## 0.1.0 - 2026-10-06
 
 First public release.
