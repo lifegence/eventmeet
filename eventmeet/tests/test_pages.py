@@ -100,7 +100,8 @@ class TestWebsiteDesign(SeminarTestCase):
 				self.assertIn("Early bird ends Friday", html)
 				self.assertIn('href="/contact"', html)
 				self.assertNotIn("alert(1)</script>", html)
-				self.assertNotIn("alert(2)", html)
+				# No executable script. (Frappe v15 already escapes it to text when the settings are saved.)
+				self.assertNotIn("<script>alert(2)", html)
 				self.assertNotIn("onclick", html)
 
 	def test_unknown_design_falls_back_to_standard(self):
