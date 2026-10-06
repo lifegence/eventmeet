@@ -17,6 +17,9 @@ classifiers = [
 ]
 dependencies = [
     # "frappe>=15.0.0,<17.0.0" # Installed and managed by bench.
+    # Check-in QR codes in confirmation emails (pyqrcode writes PNGs through pypng).
+    "pyqrcode>=1.2.1,<2",
+    "pypng>=0.20220715.0",
 ]
 
 [project.urls]
