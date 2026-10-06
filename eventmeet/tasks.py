@@ -108,7 +108,8 @@ def send_feedback_requests():
 		"update `tabSeminar` set status = 'Completed' where status in ('Open', 'Closed') and ends_at < %(now)s",
 		{"now": now},
 	)
-	frappe.db.commit()
+	# Persist the status change: a failed email below rolls back the transaction.
+	frappe.db.commit()  # nosemgrep: frappe-manual-commit
 
 	if not cint(frappe.db.get_single_value("Seminar Settings", "send_feedback_request")):
 		return

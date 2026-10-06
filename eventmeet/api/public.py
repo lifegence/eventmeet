@@ -26,6 +26,8 @@ def register(
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])
 @rate_limit(limit=10, seconds=10 * 60)
-def submit_feedback(token: str, rating, comments: str | None = None, would_recommend=None):
+def submit_feedback(
+	token: str, rating: int | str, comments: str | None = None, would_recommend: int | str | None = None
+):
 	registration.submit_feedback(token, rating, comments, would_recommend)
 	return {"ok": True}

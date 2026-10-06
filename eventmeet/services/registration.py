@@ -229,7 +229,7 @@ def cancel_registration(name: str, refund: bool = False, notify: bool = True):
 			)
 		except stripe_api.StripeError as e:
 			frappe.log_error(title="Stripe refund failed", message=frappe.get_traceback())
-			frappe.throw(_("Refund failed: {0}").format(e))
+			frappe.throw(_("Refund failed: {0}").format(str(e)))
 		registration.refunded_amount = stripe_api.from_minor_units(
 			result.get("amount", 0), registration.currency
 		)

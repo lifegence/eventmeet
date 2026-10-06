@@ -402,7 +402,8 @@ def process_ended_sessions() -> None:
 					cint(session.attendance_sync_attempts) + 1,
 					update_modified=False,
 				)
-				frappe.db.commit()
+				# Keep the attempt count even if a later session in this batch fails.
+				frappe.db.commit()  # nosemgrep: frappe-manual-commit
 		if (
 			session.kind == "Meeting"
 			and session.reference_doctype == "Internal Meeting"

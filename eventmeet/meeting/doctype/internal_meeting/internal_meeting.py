@@ -236,7 +236,8 @@ class InternalMeeting(Document):
 			for row in self.agenda
 			if row.topic
 		]
-		return frappe.render_template(
+		# The template path is a constant; user input only reaches the template as context values.
+		return frappe.render_template(  # nosemgrep: frappe-ssti
 			"eventmeet/templates/includes/meeting_invitation_message.html",
 			{
 				"meeting": self,
@@ -249,7 +250,7 @@ class InternalMeeting(Document):
 		).strip()
 
 	@frappe.whitelist()
-	def send_invitations(self, recipients=None):
+	def send_invitations(self, recipients: list[str] | str | None = None):
 		"""Send the invitation to everyone, or only to `recipients` (emails selected in the attendee tables)."""
 		self.check_permission("write")
 		if not self.can_manage():
