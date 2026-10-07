@@ -441,3 +441,55 @@ class TestSelectiveInvitation(SeminarTestCase):
 		self.assertEqual(self.mail[0]["attachments"], [], "no .ics: guests already have the Google event")
 		self.assertIn(meeting.join_url, self.mail[0]["rendered"])
 		self.assertEqual(len(self.fakes["Google Meet"].called("update")), updates, "Google does not notify")
+
+
+class TestOrganizerInvitation(SeminarTestCase):
+	def setUp(self):
+		reset_conference_sessions()
+		self.mail = capture_mail(self)
+		make_host("Internal Host")
+		self.fakes = patch_providers(self)
+		self.organizer = make_user("organizer@example.com")
+		self.member = make_user("member@example.com")
+		frappe.db.set_single_value("Conferencing Settings", "google_workspace_domains", "example.com")
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 1)
+
+	def tearDown(self):
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 1)
+
+	def recipients(self):
+		return sorted(email for m in self.mail for email in m["recipients"])
+
+	def test_google_meet_full_send_emails_the_organizer_a_copy(self):
+		meeting = make_meeting(self.organizer, [self.member], conference_provider="Google Meet")
+		self.assertEqual(meeting.send_invitations(), "google")
+		self.assertTrue(self.fakes["Google Meet"].called("update")[-1][2].notify)
+		self.assertEqual(self.recipients(), [self.organizer], "Google emails everyone else")
+		self.assertEqual(self.mail[0]["attachments"], [], "no .ics: the event is in their calendar")
+		meeting.reload()
+		self.assertTrue(all(row.invited_at for row in meeting.attendees))
+
+	def test_google_meet_full_send_without_organizer_copy(self):
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 0)
+		meeting = make_meeting(self.organizer, [self.member], conference_provider="Google Meet")
+		self.assertEqual(meeting.send_invitations(), "google")
+		self.assertEqual(self.mail, [])
+
+	def test_email_full_send_includes_organizer_by_default(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.assertEqual(meeting.send_invitations(), "email")
+		self.assertEqual(self.recipients(), [self.member, self.organizer])
+
+	def test_email_full_send_can_skip_organizer(self):
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 0)
+		meeting = make_meeting(self.organizer, [self.member])
+		self.assertEqual(meeting.send_invitations(), "email")
+		self.assertEqual(self.recipients(), [self.member])
+		meeting.reload()
+		self.assertEqual((meeting.status, meeting.invitations_sent), ("Invited", 1))
+
+	def test_selected_organizer_is_emailed_even_when_copy_is_off(self):
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 0)
+		meeting = make_meeting(self.organizer, [self.member])
+		self.assertEqual(meeting.send_invitations(recipients=[self.organizer]), "selected")
+		self.assertEqual(self.recipients(), [self.organizer])

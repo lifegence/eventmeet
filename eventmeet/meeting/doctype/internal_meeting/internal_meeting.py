@@ -285,14 +285,29 @@ class InternalMeeting(Document):
 				notify=True,
 			)
 			self._mark_invited([i.email for i in self.invitees()])
+			organizer_email = self.organizer_email()
+			if organizer_email and self.send_to_organizer():
+				# Google does not email the organizer about their own event, so send them a copy.
+				sent = notifications.send_meeting_invitation(
+					self, only={organizer_email.lower()}, attach_ics=False
+				)
+				self._mark_invited(sent)
 		else:
-			sent = notifications.send_meeting_invitation(self, cancelled=cancelled)
+			only = None
+			if not self.send_to_organizer():
+				only = self.participant_emails() - {(self.organizer_email() or "").lower()}
+			sent = notifications.send_meeting_invitation(self, cancelled=cancelled, only=only)
 			self._mark_invited(sent)
 		values = {"invitations_sent": 1}
 		if self.status == "Planned":
 			values["status"] = "Invited"
 		self.db_set(values)
 		return "google" if native else "email"
+
+	@staticmethod
+	def send_to_organizer() -> bool:
+		"""Whether a full send also emails the organizer (people picked in the tables always get it)."""
+		return bool(cint(frappe.db.get_single_value("Conferencing Settings", "send_invitation_to_organizer")))
 
 	def participant_emails(self) -> set[str]:
 		rows = list(self.attendees) + list(self.external_attendees)

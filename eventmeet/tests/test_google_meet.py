@@ -313,7 +313,10 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 
 		self.assertEqual(meeting.send_invitations(), "google")
 		self.assertTrue(self.google.called("update")[-1][2].notify)
-		self.assertEqual(self.mail, [], "no duplicate ICS email for Google meetings")
+		self.assertEqual(
+			[m["recipients"] for m in self.mail], [[self.organizer]], "only the organizer gets an email copy"
+		)
+		self.assertEqual(self.mail[0]["attachments"], [], "no duplicate ICS for Google meetings")
 		meeting.reload()
 		self.assertEqual((meeting.status, meeting.invitations_sent), ("Invited", 1))
 
@@ -402,7 +405,11 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 			sorted(i.email for i in created_spec.attendees), sorted([self.member, "guest@partner.test"])
 		)
 		self.assertEqual(meeting.send_invitations(), "google")
-		self.assertEqual(self.mail, [], "Google Calendar sends the invitations, including to guests")
+		self.assertEqual(
+			[m["recipients"] for m in self.mail],
+			[[self.organizer]],
+			"Google Calendar sends the invitations, including to guests",
+		)
 
 	def test_invitation_message_is_the_google_description(self):
 		meeting = make_meeting(self.organizer, [self.member], agenda=[{"topic": "Only topic"}])
