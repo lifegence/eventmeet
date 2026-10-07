@@ -262,6 +262,7 @@ class GoogleMeetProvider(ConferenceProvider):
 			external_id=event["id"],
 			join_url=event["hangoutLink"],
 			meeting_code=(event.get("conferenceData") or {}).get("conferenceId", ""),
+			ical_uid=event.get("iCalUID", ""),
 		)
 
 	def _wait_for_conference(self, host: str, event: dict, attempts: int = 3) -> dict:

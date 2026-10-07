@@ -183,6 +183,7 @@ def schedule_session(
 				"timezone": spec.timezone,
 				"external_id": created.external_id,
 				"meeting_code": created.meeting_code,
+				"ical_uid": created.ical_uid,
 				"join_url": created.join_url,
 				"passcode": created.passcode,
 				"registration_required": 1 if registration_required else 0,

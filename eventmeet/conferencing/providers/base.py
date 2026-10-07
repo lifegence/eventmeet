@@ -62,6 +62,7 @@ class CreatedConference:
 	join_url: str
 	passcode: str = ""
 	meeting_code: str = ""
+	ical_uid: str = ""
 
 
 @dataclass

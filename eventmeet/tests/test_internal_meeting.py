@@ -432,13 +432,15 @@ class TestSelectiveInvitation(SeminarTestCase):
 			meeting.send_invitations(recipients=["stranger@example.com"])
 		self.assertEqual(self.mail, [])
 
-	def test_google_meet_selected_send_uses_email_without_ics(self):
+	def test_google_meet_selected_send_uses_email_with_google_uid(self):
 		frappe.db.set_single_value("Conferencing Settings", "google_workspace_domains", "example.com")
 		meeting = self.meeting(conference_provider="Google Meet")
 		updates = len(self.fakes["Google Meet"].called("update"))
 		self.assertEqual(meeting.send_invitations(recipients=["guest@partner.test"]), "selected")
 		self.assertEqual([m["recipients"] for m in self.mail], [["guest@partner.test"]])
-		self.assertEqual(self.mail[0]["attachments"], [], "no .ics: guests already have the Google event")
+		ics = self.mail[0]["attachments"][0]["fcontent"].decode()
+		external_id = frappe.db.get_value("Conference Session", meeting.conference_session, "external_id")
+		self.assertIn(f"UID:{external_id}@google.com\r\n", ics, "Google event UID: no duplicate")
 		self.assertIn(meeting.join_url, self.mail[0]["rendered"])
 		self.assertEqual(len(self.fakes["Google Meet"].called("update")), updates, "Google does not notify")
 
@@ -465,7 +467,7 @@ class TestOrganizerInvitation(SeminarTestCase):
 		self.assertEqual(meeting.send_invitations(), "google")
 		self.assertTrue(self.fakes["Google Meet"].called("update")[-1][2].notify)
 		self.assertEqual(self.recipients(), [self.organizer], "Google emails everyone else")
-		self.assertEqual(self.mail[0]["attachments"], [], "no .ics: the event is in their calendar")
+		self.assertEqual(self.mail[0]["attachments"][0]["fname"], "invite.ics")
 		meeting.reload()
 		self.assertTrue(all(row.invited_at for row in meeting.attendees))
 
@@ -493,3 +495,13 @@ class TestOrganizerInvitation(SeminarTestCase):
 		meeting = make_meeting(self.organizer, [self.member])
 		self.assertEqual(meeting.send_invitations(recipients=[self.organizer]), "selected")
 		self.assertEqual(self.recipients(), [self.organizer])
+
+	def test_ics_uid_falls_back_for_sessions_without_stored_uid(self):
+		meeting = make_meeting(self.organizer, [self.member], conference_provider="Google Meet")
+		frappe.db.set_value("Conference Session", meeting.conference_session, "ical_uid", "")
+		external_id = frappe.db.get_value("Conference Session", meeting.conference_session, "external_id")
+		self.assertIn(f"UID:{external_id}@google.com\r\n", notifications.meeting_ics(meeting))
+
+	def test_zoom_ics_keeps_site_uid(self):
+		meeting = make_meeting(self.organizer, [self.member])
+		self.assertIn(f"UID:{meeting.name}@{frappe.local.site}\r\n", notifications.meeting_ics(meeting))

@@ -96,6 +96,7 @@ class FakeGoogleProvider(FakeProvider):
 	def create(self, host, spec):
 		created = super().create(host, spec)
 		created.join_url = f"https://meet.test/{created.meeting_code}"
+		created.ical_uid = f"{created.external_id}@google.com"
 		return created
 
 
