@@ -6,6 +6,7 @@
  "field_order": [
   "defaults_section",
   "internal_meeting_provider",
+  "send_invitation_to_organizer",
   "zoom_section",
   "zoom_enabled",
   "zoom_account_id",
@@ -39,6 +40,13 @@
    "fieldtype": "Select",
    "label": "Internal Meeting Provider",
    "options": "Zoom\nGoogle Meet"
+  },
+  {
+   "default": "1",
+   "description": "Also email the invitation to the meeting organizer. With Google Meet the organizer already has the event in their own calendar, but Google does not email them, so they get a copy from this system.",
+   "fieldname": "send_invitation_to_organizer",
+   "fieldtype": "Check",
+   "label": "Send Invitations to the Organizer"
   },
   {
    "fieldname": "zoom_section",
@@ -161,7 +169,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-09-28 16:00:00.000000",
+ "modified": "2026-10-07 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Conferencing",
  "name": "Conferencing Settings",

@@ -349,3 +349,5 @@ update,更新
 {0} is too long.,{0} が長すぎます。
 {0} min in total,計 {0} 分
 {0} seats left,残り {0} 席
+Send Invitations to the Organizer,主催者にも招待を送信
+"Also email the invitation to the meeting organizer. With Google Meet the organizer already has the event in their own calendar, but Google does not email them, so they get a copy from this system.",主催者にも招待メールを送ります。Google Meet では主催者自身のカレンダーに予定が入りますが、Google は主催者にはメールを送らないため、このシステムから写しを送ります。
