@@ -351,3 +351,12 @@ update,更新
 {0} seats left,残り {0} 席
 Send Invitations to the Organizer,主催者にも招待を送信
 "Also email the invitation to the meeting organizer. With Google Meet the organizer already has the event in their own calendar, but Google does not email them, so they get a copy from this system.",主催者にも招待メールを送ります。Google Meet では主催者自身のカレンダーに予定が入りますが、Google は主催者にはメールを送らないため、このシステムから写しを送ります。
+Open List,一覧を開く
+Add Registration,申込を追加
+Confirmed: {0},確定: {0}
+Confirmed: {0} / Capacity {1},確定: {0} / 定員 {1}
+Pending Payment: {0},支払い待ち: {0}
+Checked In: {0},受付済: {0}
+No registrations yet.,まだ申込はありません。
+Showing the first {0} registrations. Open the list to see all.,最初の {0} 件を表示しています。すべて見るには一覧を開いてください。
+Confirmed,確定,Seminar Registration
