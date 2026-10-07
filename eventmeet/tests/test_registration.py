@@ -308,3 +308,36 @@ class TestOnlineSeminar(SeminarTestCase):
 		self.assertEqual(
 			frappe.db.get_value("Conference Session", seminar.conference_session, "status"), "Ended"
 		)
+
+
+class TestRegistrationOverview(SeminarTestCase):
+	def setUp(self):
+		self.mail = capture_mail(self)
+
+	def test_overview_counts_and_lists_registrations(self):
+		seminar = make_seminar(capacity=10)
+		register(seminar, email="one@example.com", name="One")
+		register(seminar, email="two@example.com", name="Two")
+		register(seminar, email="three@example.com", name="Three")
+		frappe.db.set_value(
+			"Seminar Registration", registration_for(seminar, "two@example.com").name, "checked_in", 1
+		)
+		frappe.db.set_value(
+			"Seminar Registration", registration_for(seminar, "three@example.com").name, "status", "Cancelled"
+		)
+
+		overview = seminar.get_registration_overview()
+		self.assertEqual(overview["capacity"], 10)
+		self.assertEqual(overview["counts"], {"Confirmed": 2, "Cancelled": 1})
+		self.assertEqual(overview["checked_in"], 1)
+		self.assertEqual([r.attendee_name for r in overview["registrations"]], ["One", "Two", "Three"])
+		self.assertFalse(overview["truncated"])
+
+	def test_overview_of_seminar_without_registrations(self):
+		overview = make_seminar().get_registration_overview()
+		self.assertEqual((overview["counts"], overview["checked_in"], overview["registrations"]), ({}, 0, []))
+
+	def test_dashboard_links_registrations_and_feedback(self):
+		data = frappe.get_meta("Seminar").get_dashboard_data()
+		self.assertEqual(data.fieldname, "seminar")
+		self.assertEqual(data.transactions[0]["items"], ["Seminar Registration", "Seminar Feedback"])

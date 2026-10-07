@@ -11,6 +11,8 @@ from eventmeet import website
 from eventmeet.services import conference, todo_sync
 
 ONLINE_ACTIVE_STATUSES = ("Open", "Closed", "Completed")
+# The Registrations tab lists this many; the full list is one click away.
+REGISTRATION_LIST_LIMIT = 500
 
 
 class Seminar(WebsiteGenerator):
@@ -152,6 +154,39 @@ class Seminar(WebsiteGenerator):
 	def validate_open_for_registration(self):
 		if reason := self.get_registration_block_reason():
 			frappe.throw(reason)
+
+	@frappe.whitelist()
+	def get_registration_overview(self) -> dict:
+		"""Counts and the registration list for the Registrations tab.
+
+		Uses get_list, so users only see the registrations they are allowed to read."""
+		self.check_permission("read")
+		registrations = frappe.get_list(
+			"Seminar Registration",
+			filters={"seminar": self.name},
+			fields=[
+				"name",
+				"attendee_name",
+				"email",
+				"company",
+				"ticket_type",
+				"status",
+				"checked_in",
+				"attended_online",
+			],
+			order_by="creation asc",
+			limit_page_length=0,
+		)
+		counts = {}
+		for row in registrations:
+			counts[row.status] = counts.get(row.status, 0) + 1
+		return {
+			"capacity": cint(self.capacity),
+			"counts": counts,
+			"checked_in": sum(1 for r in registrations if r.checked_in and r.status == "Confirmed"),
+			"registrations": registrations[:REGISTRATION_LIST_LIMIT],
+			"truncated": len(registrations) > REGISTRATION_LIST_LIMIT,
+		}
 
 	# ----------------------------------------------------------------- website
 	def get_context(self, context):

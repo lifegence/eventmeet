@@ -25,6 +25,8 @@
   "sessions",
   "tickets_tab",
   "ticket_types",
+  "registrations_tab",
+  "registrations_html",
   "online_tab",
   "conference_kind",
   "conference_session",
@@ -157,6 +159,16 @@
    "options": "Seminar Ticket Type"
   },
   {
+   "fieldname": "registrations_tab",
+   "fieldtype": "Tab Break",
+   "label": "Registrations"
+  },
+  {
+   "fieldname": "registrations_html",
+   "fieldtype": "HTML",
+   "label": "Registrations"
+  },
+  {
    "depends_on": "eval:doc.format!='Offline'",
    "fieldname": "online_tab",
    "fieldtype": "Tab Break",
@@ -233,7 +245,7 @@
  "index_web_pages_for_search": 0,
  "is_published_field": "published",
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-10-07 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar",
