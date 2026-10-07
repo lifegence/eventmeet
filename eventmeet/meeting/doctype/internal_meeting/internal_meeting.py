@@ -263,10 +263,8 @@ class InternalMeeting(Document):
 
 		if selected is not None:
 			# Google Calendar can only notify everyone, so selected people get an email from this
-			# system instead (without .ics: they already have the Google Calendar event).
-			sent = notifications.send_meeting_invitation(
-				self, cancelled=cancelled, only=selected, attach_ics=not native
-			)
+			# system instead (its .ics carries the Google event's UID, so no duplicate event).
+			sent = notifications.send_meeting_invitation(self, cancelled=cancelled, only=selected)
 			self._mark_invited(sent)
 			self.add_comment("Info", _("Invitation sent to: {0}").format(", ".join(sent)))
 			return "selected"
@@ -288,9 +286,7 @@ class InternalMeeting(Document):
 			organizer_email = self.organizer_email()
 			if organizer_email and self.send_to_organizer():
 				# Google does not email the organizer about their own event, so send them a copy.
-				sent = notifications.send_meeting_invitation(
-					self, only={organizer_email.lower()}, attach_ics=False
-				)
+				sent = notifications.send_meeting_invitation(self, only={organizer_email.lower()})
 				self._mark_invited(sent)
 		else:
 			only = None

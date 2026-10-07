@@ -129,6 +129,22 @@ def _ics_time(value) -> str:
 	return local.astimezone(ZoneInfo("UTC")).strftime("%Y%m%dT%H%M%SZ")
 
 
+def _calendar_uid(meeting) -> str:
+	"""The Google Calendar event's own UID for Google Meet, so calendars treat the .ics and the
+	Google invitation as the same event instead of adding a duplicate."""
+	if meeting.get("conference_session"):
+		session = frappe.db.get_value(
+			"Conference Session",
+			meeting.conference_session,
+			["provider", "external_id", "ical_uid"],
+			as_dict=True,
+		)
+		if session and session.provider == "Google Meet" and session.external_id:
+			# Sessions created before ical_uid was stored: Google's UID is "<event id>@google.com".
+			return session.ical_uid or f"{session.external_id}@google.com"
+	return f"{meeting.name}@{frappe.local.site}"
+
+
 def meeting_ics(meeting, method: str = "REQUEST") -> str:
 	organizer = frappe.db.get_value("User", meeting.organizer, "email") or meeting.organizer
 	location = meeting.join_url or meeting.location or ""
@@ -139,7 +155,7 @@ def meeting_ics(meeting, method: str = "REQUEST") -> str:
 		"VERSION:2.0",
 		f"METHOD:{method}",
 		"BEGIN:VEVENT",
-		f"UID:{meeting.name}@{frappe.local.site}",
+		f"UID:{_calendar_uid(meeting)}",
 		f"SEQUENCE:{int(get_datetime(meeting.modified).timestamp())}",
 		f"DTSTAMP:{_ics_time(frappe.utils.now_datetime())}",
 		f"DTSTART:{_ics_time(meeting.starts_at)}",
@@ -162,9 +178,7 @@ def meeting_ics(meeting, method: str = "REQUEST") -> str:
 	return "\r\n".join(lines) + "\r\n"
 
 
-def send_meeting_invitation(
-	meeting, cancelled: bool = False, only: set[str] | None = None, attach_ics: bool = True
-) -> list[str]:
+def send_meeting_invitation(meeting, cancelled: bool = False, only: set[str] | None = None) -> list[str]:
 	"""Email the invitation (or cancellation). `only` limits recipients to these emails.
 
 	Returns the recipients that were emailed."""
@@ -183,9 +197,7 @@ def send_meeting_invitation(
 		"starts_at": format_datetime(meeting.starts_at, "yyyy-MM-dd HH:mm"),
 		"ends_at": format_datetime(meeting.ends_at, "HH:mm"),
 	}
-	attachments = (
-		[{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}] if attach_ics else []
-	)
+	attachments = [{"fname": "invite.ics", "fcontent": meeting_ics(meeting, method).encode()}]
 	if internal:
 		_send(
 			internal,

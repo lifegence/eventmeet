@@ -77,6 +77,7 @@ class TestGoogleMeetProvider(SeminarTestCase):
 			{
 				("POST", "/calendars/primary/events"): {
 					"id": "evt1",
+					"iCalUID": "evt1@google.com",
 					"hangoutLink": "https://meet.google.com/abc-defg-hij",
 					"conferenceData": {"conferenceId": "abc-defg-hij"},
 				}
@@ -84,8 +85,8 @@ class TestGoogleMeetProvider(SeminarTestCase):
 		)
 		created = GoogleMeetProvider(client).create("organizer@example.com", spec())
 		self.assertEqual(
-			(created.external_id, created.join_url, created.meeting_code),
-			("evt1", "https://meet.google.com/abc-defg-hij", "abc-defg-hij"),
+			(created.external_id, created.join_url, created.meeting_code, created.ical_uid),
+			("evt1", "https://meet.google.com/abc-defg-hij", "abc-defg-hij", "evt1@google.com"),
 		)
 		sent = client.requests[0]
 		self.assertEqual(sent["subject"], "organizer@example.com", "impersonates the organizer")
@@ -316,7 +317,9 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 		self.assertEqual(
 			[m["recipients"] for m in self.mail], [[self.organizer]], "only the organizer gets an email copy"
 		)
-		self.assertEqual(self.mail[0]["attachments"], [], "no duplicate ICS for Google meetings")
+		ics = self.mail[0]["attachments"][0]["fcontent"].decode()
+		session = frappe.db.get_value("Conference Session", meeting.conference_session, "ical_uid")
+		self.assertIn(f"UID:{session}\r\n", ics, "same UID as the Google event: no duplicate")
 		meeting.reload()
 		self.assertEqual((meeting.status, meeting.invitations_sent), ("Invited", 1))
 

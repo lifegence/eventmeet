@@ -360,3 +360,5 @@ Checked In: {0},受付済: {0}
 No registrations yet.,まだ申込はありません。
 Showing the first {0} registrations. Open the list to see all.,最初の {0} 件を表示しています。すべて見るには一覧を開いてください。
 Confirmed,確定,Seminar Registration
+Calendar UID,カレンダー UID
+"UID of the calendar event (Google Meet), used in the .ics attachment so calendars do not create a duplicate.",カレンダー予定の UID（Google Meet）。添付する .ics に使い、カレンダーに同じ予定が二重に登録されないようにします。

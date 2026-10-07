@@ -23,6 +23,7 @@
   "provider_section",
   "external_id",
   "meeting_code",
+  "ical_uid",
   "join_url",
   "registration_required",
   "column_break_3",
@@ -153,6 +154,13 @@
    "read_only": 1
   },
   {
+   "description": "UID of the calendar event (Google Meet), used in the .ics attachment so calendars do not create a duplicate.",
+   "fieldname": "ical_uid",
+   "fieldtype": "Data",
+   "label": "Calendar UID",
+   "read_only": 1
+  },
+  {
    "fieldname": "join_url",
    "fieldtype": "Small Text",
    "label": "Join URL",
@@ -209,7 +217,7 @@
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-28 16:00:00.000000",
+ "modified": "2026-10-07 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Conferencing",
  "name": "Conference Session",
