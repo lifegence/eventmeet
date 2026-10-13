@@ -1,5 +1,31 @@
 # Changelog
 
+## 0.3.0 - 2026-10-13
+
+### Added
+
+- Recurring internal meetings: "Series > Repeat..." creates the later meetings of a series (weekdays,
+  weekly, every 2 weeks, monthly on the same date or the same weekday; up to 52 meetings, by count or
+  end date), optionally sending the invitations. Each occurrence is a separate meeting with its own
+  online meeting, invitations, attendance and minutes. "Update Following Meetings" copies a meeting's
+  details to the later ones (each keeps its date) and "Cancel This and Following Meetings" cancels
+  them, notifying invited attendees.
+- Google Meet: Conferencing Settings > "Calendar for Organizers outside Workspace". Google Meet meetings
+  of organizers outside the Workspace domains are created in that account's calendar and the organizer
+  is invited as a guest; previously they were rejected. Changing the account affects only new meetings.
+- Seminar form: registrations at a glance. Connections (registrations and feedback with counts),
+  indicators (confirmed / capacity, pending payment, checked in) and a Registrations tab listing the
+  attendees.
+- Internal meetings: the invitation is emailed to the organizer too, including for Google Meet (Google
+  does not email organizers about their own events). Conferencing Settings > "Send Invitations to the
+  Organizer" (on by default) turns it off.
+
+### Changed
+
+- Google Meet invitations sent by email (the organizer copy, "Send to Selected Attendees") now carry an
+  .ics with the Google event's UID, so calendars merge it with the Google Calendar event instead of
+  adding a second one.
+
 ## 0.2.1 - 2026-10-06
 
 - Website design: a **Custom** design. Custom CSS now applies only when Custom is selected (on top of
