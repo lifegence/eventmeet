@@ -32,6 +32,7 @@ frappe.ui.form.on("Internal Meeting", {
 		if (frm.doc.conference_session) {
 			eventmeet.add_session_buttons(frm, __(tool));
 		}
+		add_series_buttons(frm, can_manage);
 		if (!can_manage) return;
 
 		// Google Calendar notifies cancellations itself once invitations were sent.
@@ -79,6 +80,129 @@ frappe.ui.form.on("Internal Meeting", {
 		);
 	},
 });
+
+const REPEAT_FREQUENCIES = [
+	"Weekdays",
+	"Weekly",
+	"Every 2 Weeks",
+	"Monthly (same date)",
+	"Monthly (same weekday)",
+];
+// Kept in sync with eventmeet.meeting.series.
+const MAX_SERIES_MEETINGS = 52;
+
+function add_series_buttons(frm, can_manage) {
+	const group = __("Series");
+	const open = ["Planned", "Invited"].includes(frm.doc.status);
+	if (frm.doc.series) {
+		frm.add_custom_button(
+			__("Show Series"),
+			() => frappe.set_route("List", "Internal Meeting", { series: frm.doc.series }),
+			group
+		);
+	}
+	if (!can_manage || !open) return;
+	if (!frm.doc.series) {
+		frm.add_custom_button(__("Repeat..."), () => repeat_dialog(frm), group);
+		return;
+	}
+	frm.add_custom_button(
+		__("Update Following Meetings"),
+		() => {
+			if (!ensure_saved(frm)) return;
+			frappe.confirm(
+				__(
+					"Copy the title, time, place, conferencing tool, attendees, agenda and invitation message of this meeting to the later meetings of the series? Each meeting keeps its date."
+				),
+				() => call_series(frm, "update_following", (n) => __("{0} meetings updated", [n]))
+			);
+		},
+		group
+	);
+	frm.add_custom_button(
+		__("Cancel This and Following Meetings"),
+		() => {
+			if (!ensure_saved(frm)) return;
+			frappe.confirm(
+				__("Cancel this meeting and the later meetings of the series? Invited attendees are notified."),
+				() => call_series(frm, "cancel_following", (n) => __("{0} meetings cancelled", [n]))
+			);
+		},
+		group
+	);
+}
+
+function repeat_dialog(frm) {
+	if (!ensure_saved(frm)) return;
+	const dialog = new frappe.ui.Dialog({
+		title: __("Repeat Meeting"),
+		fields: [
+			{
+				fieldname: "frequency",
+				fieldtype: "Select",
+				label: __("Repeat"),
+				options: REPEAT_FREQUENCIES.map((value) => ({ value, label: __(value) })),
+				default: "Weekly",
+				reqd: 1,
+			},
+			{
+				fieldname: "count",
+				fieldtype: "Int",
+				label: __("Number of Meetings"),
+				description: __("Including this meeting; at most {0}.", [MAX_SERIES_MEETINGS]),
+				default: 4,
+			},
+			{
+				fieldname: "until",
+				fieldtype: "Date",
+				label: __("Or Repeat Until"),
+				description: __("Used when the number of meetings is empty."),
+			},
+			{
+				fieldname: "send_invitations",
+				fieldtype: "Check",
+				label: __("Send invitations for the new meetings"),
+				default: frm.doc.invitations_sent ? 1 : 0,
+			},
+			{
+				fieldtype: "HTML",
+				options: `<p class="text-muted small">${__(
+					"Each meeting of the series is a separate meeting with its own online meeting, invitations, attendance and minutes."
+				)}</p>`,
+			},
+		],
+		primary_action_label: __("Create Meetings"),
+		primary_action(values) {
+			dialog.hide();
+			frm.call({
+				doc: frm.doc,
+				method: "create_repeats",
+				args: {
+					frequency: values.frequency,
+					count: values.count || null,
+					until: values.count ? null : values.until,
+					send_invitations: values.send_invitations,
+				},
+				freeze: true,
+				freeze_message: __("Creating meetings..."),
+			}).then((r) => {
+				frappe.show_alert({
+					message: __("{0} meetings created", [(r.message || []).length]),
+					indicator: "green",
+				});
+				frm.reload_doc();
+			});
+		},
+	});
+	dialog.show();
+}
+
+function call_series(frm, method, message) {
+	return frm.call({ doc: frm.doc, method, freeze: true }).then((r) => {
+		frappe.show_alert({ message: message((r.message || []).length), indicator: "green" });
+		frm.reload_doc();
+	});
+}
 
 // Attendees who do not organize the meeting edit only these (the server discards anything else).
 const ATTENDEE_EDITABLE_FIELDS = ["minutes", "actions"];

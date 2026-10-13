@@ -362,3 +362,42 @@ Showing the first {0} registrations. Open the list to see all.,最初の {0} 件
 Confirmed,確定,Seminar Registration
 Calendar UID,カレンダー UID
 "UID of the calendar event (Google Meet), used in the .ics attachment so calendars do not create a duplicate.",カレンダー予定の UID（Google Meet）。添付する .ics に使い、カレンダーに同じ予定が二重に登録されないようにします。
+A series can have at most {0} meetings.,繰り返しは最大 {0} 回までです。
+A series can have at most {0} meetings. Choose an earlier end date.,繰り返しは最大 {0} 回までです。終了日を早めてください。
+Calendar for Organizers outside Workspace,Workspace 外の主催者用カレンダー
+Cancel This and Following Meetings,この回以降を中止
+Cancel this meeting and the later meetings of the series? Invited attendees are notified.,この回とシリーズの以降のミーティングを中止しますか？招待済みの参加者には通知されます。
+"Copy the title, time, place, conferencing tool, attendees, agenda and invitation message of this meeting to the later meetings of the series? Each meeting keeps its date.",このミーティングのタイトル・時刻・開催場所・会議ツール・参加者・議題・招待メッセージを、シリーズの以降のミーティングに反映しますか？各回の日付は変わりません。
+Create Meetings,ミーティングを作成
+Creating meetings...,ミーティングを作成しています...
+"Each meeting of the series is a separate meeting with its own online meeting, invitations, attendance and minutes.",各回は個別のミーティングとして作成され、オンライン会議・招待・出欠・議事録をそれぞれ持ちます。
+Every 2 Weeks,隔週
+First meeting of the recurring series this meeting belongs to.,このミーティングが属する繰り返しシリーズの初回です。
+Including this meeting; at most {0}.,この回を含みます（最大 {0} 回）。
+Monthly (same date),毎月（同じ日付）
+Monthly (same weekday),毎月（同じ第n曜日）
+No meetings to create before the end date.,終了日までに作成するミーティングがありません。
+Number of Meetings,回数
+Only planned or invited meetings can be repeated.,繰り返し設定できるのは、予定または招待済みのミーティングだけです。
+Only the organizer can change the meeting series.,繰り返しシリーズを変更できるのは主催者だけです。
+"Optional. Google Meet meetings whose organizer is not in the Workspace domains (for example a partner's member) are created in this account's Google Calendar, and the organizer is invited as a guest. Use a person or a shared account in the Workspace domains; changing it affects only new meetings.",任意。主催者が Workspace ドメイン外（社外の協力メンバーなど）の Google Meet 会議は、このアカウントの Google カレンダーに作成し、主催者はゲストとして招待します。Workspace ドメインの個人または共用アカウントを指定してください。変更は新しく作る会議から反映されます。
+Or Repeat Until,または終了日
+Repeat,繰り返し
+Repeat Meeting,ミーティングの繰り返し
+Repeat...,繰り返し設定...
+Send invitations for the new meetings,作成したミーティングの招待を送信する
+Series,繰り返しシリーズ
+Set the number of meetings or the end date.,回数または終了日を指定してください。
+Show Series,シリーズを表示
+The calendar for organizers outside Workspace must be an account of {0}.,Workspace 外の主催者用カレンダーには {0} のアカウントを指定してください。
+This meeting is already part of a series.,このミーティングはすでに繰り返しシリーズに含まれています。
+This meeting is not part of a series.,このミーティングは繰り返しシリーズに含まれていません。
+Unknown repeat frequency: {0},不明な繰り返し間隔です: {0}
+Update Following Meetings,以降のミーティングに反映
+"Use Zoom, or set a calendar for organizers outside Workspace in Conferencing Settings.",Zoom を使うか、オンライン会議設定で「Workspace 外の主催者用カレンダー」を設定してください。
+Used when the number of meetings is empty.,回数が空欄のときに使います。
+Weekdays,平日毎日
+Weekly,毎週
+{0} meetings cancelled,{0} 件のミーティングを中止しました
+{0} meetings created,{0} 件のミーティングを作成しました
+{0} meetings updated,{0} 件のミーティングを更新しました
