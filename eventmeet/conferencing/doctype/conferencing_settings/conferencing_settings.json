@@ -19,6 +19,7 @@
   "google_section",
   "google_meet_enabled",
   "google_workspace_domains",
+  "google_fallback_host",
   "google_import_meeting_notes",
   "column_break_google",
   "google_service_account_key",
@@ -124,6 +125,14 @@
    "mandatory_depends_on": "google_meet_enabled"
   },
   {
+   "depends_on": "google_meet_enabled",
+   "description": "Optional. Google Meet meetings whose organizer is not in the Workspace domains (for example a partner's member) are created in this account's Google Calendar, and the organizer is invited as a guest. Use a person or a shared account in the Workspace domains; changing it affects only new meetings.",
+   "fieldname": "google_fallback_host",
+   "fieldtype": "Data",
+   "label": "Calendar for Organizers outside Workspace",
+   "options": "Email"
+  },
+  {
    "default": "0",
    "depends_on": "google_meet_enabled",
    "description": "Imports \"Take notes for me\" documents into the minutes. Requires the drive.readonly scope.",
@@ -169,7 +178,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-07 12:00:00.000000",
+ "modified": "2026-10-13 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Conferencing",
  "name": "Conferencing Settings",

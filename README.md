@@ -37,7 +37,7 @@ Reports from your own setup are welcome in the issues.
 | Online | Registration-based Zoom meetings or webinars created, updated and cancelled automatically; personal join link per registrant; "Start as Host" |
 | On the day | QR check-in at `/seminar-checkin` (staff only), reminder emails |
 | Afterwards | Zoom attendance import (attended, minutes watched), feedback survey at `/seminar-feedback` |
-| Internal meetings | Agenda, attendees, **external guests** (no account needed, invited by email or Google Calendar), invitations, minutes, action items (two-way sync with ToDo); visible to the organizer and attendees only |
+| Internal meetings | Agenda, attendees, **external guests** (no account needed, invited by email or Google Calendar), invitations, minutes, action items (two-way sync with ToDo), **recurring series** (weekdays, weekly, every 2 weeks, monthly; each occurrence is a separate meeting); visible to the organizer and attendees only |
 | Google Meet | Event with a Meet link in the organizer's Google Calendar, invitations / updates / cancellations sent by Google, attendance import, Gemini "Take notes for me" import |
 | Zoom licenses | Hosts are allocated from a pool of licensed accounts, so you need as many licenses as concurrent sessions, not one per employee |
 | Website design | Four built-in designs for the public pages, design tokens and custom CSS, header and footer HTML, and template overrides from your own app ([guide](docs/en/website-design.md)) |
@@ -48,7 +48,7 @@ tool (for example a self-hosted LiveKit or Jitsi) can be added the same way.
 | | Zoom | Google Meet |
 |---|---|---|
 | Used for | Seminars (registration-based meetings / webinars), internal meetings | Internal meetings |
-| Host | Allocated from the pool of licensed host accounts | The organizer (a Google Workspace user) |
+| Host | Allocated from the pool of licensed host accounts | The organizer (a Google Workspace user); organizers outside Workspace can use a fallback calendar account |
 | Invitations | Email with an .ics file, sent by EventMeet | Google Calendar invitation (sent when you press "Send Invitation") |
 | Attendance | Zoom report API | Meet REST API (emails resolved with the People API, display names as a fallback) |
 | AI summary | Zoom AI Companion meeting summary | Gemini "Take notes for me" document (optional) |

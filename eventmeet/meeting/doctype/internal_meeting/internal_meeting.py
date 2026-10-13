@@ -16,6 +16,7 @@ from frappe.utils import (
 )
 
 from eventmeet.conferencing.providers import Invitee
+from eventmeet.meeting import series
 from eventmeet.services import conference, notifications, todo_sync
 
 MANAGER_ROLES = {"System Manager", "Seminar Manager"}
@@ -109,10 +110,11 @@ class InternalMeeting(Document):
 
 	# ------------------------------------------------------------------ online
 	def invitees(self) -> list[Invitee]:
+		organizer_invited = self.organizer_is_guest()
 		internal = [
 			Invitee(email=row.email, optional=bool(row.optional))
 			for row in self.attendees
-			if row.email and row.user != self.organizer
+			if row.email and (organizer_invited or row.user != self.organizer)
 		]
 		external = [
 			Invitee(email=row.email, optional=bool(row.optional))
@@ -124,11 +126,22 @@ class InternalMeeting(Document):
 	def organizer_email(self) -> str | None:
 		return frappe.db.get_value("User", self.organizer, "email") if self.organizer else None
 
+	def organizer_is_guest(self) -> bool:
+		"""Google Meet events of an organizer outside the Workspace domains live in another
+		account's calendar, so the organizer is invited like the other attendees."""
+		if not self.online or self.conference_provider != "Google Meet":
+			return False
+		email = self.organizer_email()
+		session = self._session()
+		if session and session.provider == "Google Meet" and session.status == "Scheduled":
+			return (session.host_user or "").lower() != (email or "").lower()
+		return not conference.in_google_workspace(email)
+
 	def _session(self):
 		if not self.conference_session:
 			return None
 		return frappe.db.get_value(
-			"Conference Session", self.conference_session, ["status", "provider"], as_dict=True
+			"Conference Session", self.conference_session, ["status", "provider", "host_user"], as_dict=True
 		)
 
 	def _cancel_session(self):
@@ -284,7 +297,7 @@ class InternalMeeting(Document):
 			)
 			self._mark_invited([i.email for i in self.invitees()])
 			organizer_email = self.organizer_email()
-			if organizer_email and self.send_to_organizer():
+			if organizer_email and self.send_to_organizer() and not self.organizer_is_guest():
 				# Google does not email the organizer about their own event, so send them a copy.
 				sent = notifications.send_meeting_invitation(self, only={organizer_email.lower()})
 				self._mark_invited(sent)
@@ -304,6 +317,28 @@ class InternalMeeting(Document):
 	def send_to_organizer() -> bool:
 		"""Whether a full send also emails the organizer (people picked in the tables always get it)."""
 		return bool(cint(frappe.db.get_single_value("Conferencing Settings", "send_invitation_to_organizer")))
+
+	# ------------------------------------------------------------------ series
+	def _check_can_manage_series(self):
+		self.check_permission("write")
+		if not self.can_manage():
+			frappe.throw(_("Only the organizer can change the meeting series."), frappe.PermissionError)
+
+	@frappe.whitelist()
+	def create_repeats(self, frequency: str, until=None, count=None, send_invitations=0) -> list[str]:
+		"""Create the later meetings of a recurring series from this one."""
+		self._check_can_manage_series()
+		return series.create_repeats(self, frequency, until, count, bool(cint(send_invitations)))
+
+	@frappe.whitelist()
+	def update_following(self) -> list[str]:
+		self._check_can_manage_series()
+		return series.update_following(self)
+
+	@frappe.whitelist()
+	def cancel_following(self) -> list[str]:
+		self._check_can_manage_series()
+		return series.cancel_following(self)
 
 	def participant_emails(self) -> set[str]:
 		rows = list(self.attendees) + list(self.external_attendees)

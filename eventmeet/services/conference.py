@@ -98,23 +98,38 @@ def _raise(action: str, error: Exception):
 	)
 
 
-def _validate_google_organizer(email: str | None) -> str:
-	if not email:
-		frappe.throw(_("The organizer needs an email address to host a Google Meet meeting."))
-	domains = {
+def google_workspace_domains() -> set[str]:
+	return {
 		d.strip().lower().lstrip("@")
 		for d in (
 			frappe.db.get_single_value("Conferencing Settings", "google_workspace_domains") or ""
 		).split(",")
 		if d.strip()
 	}
-	if domains and email.rsplit("@", 1)[-1].lower() not in domains:
-		frappe.throw(
-			_("Organizer {0} is not a Google Workspace user of {1}.").format(
-				email, ", ".join(sorted(domains))
-			)
+
+
+def in_google_workspace(email: str | None) -> bool:
+	domains = google_workspace_domains()
+	return bool(email) and (not domains or email.rsplit("@", 1)[-1].lower() in domains)
+
+
+def google_meet_host(organizer_email: str | None) -> str:
+	"""The account whose Google Calendar holds the event: the organizer, or for an organizer
+	outside the Workspace domains, the calendar set in Conferencing Settings."""
+	if not organizer_email:
+		frappe.throw(_("The organizer needs an email address to host a Google Meet meeting."))
+	if in_google_workspace(organizer_email):
+		return organizer_email
+	fallback = frappe.db.get_single_value("Conferencing Settings", "google_fallback_host")
+	if fallback:
+		return fallback
+	frappe.throw(
+		_("Organizer {0} is not a Google Workspace user of {1}.").format(
+			organizer_email, ", ".join(sorted(google_workspace_domains()))
 		)
-	return email
+		+ " "
+		+ _("Use Zoom, or set a calendar for organizers outside Workspace in Conferencing Settings.")
+	)
 
 
 def schedule_session(
@@ -158,7 +173,7 @@ def schedule_session(
 		host_account = allocate_host(kind, starts_at, ends_at, expected_attendees, purpose)
 		host_user = frappe.db.get_value("Zoom Host Account", host_account, "zoom_user")
 	else:
-		host_user = _validate_google_organizer(organizer_email)
+		host_user = google_meet_host(organizer_email)
 
 	try:
 		created = provider.create(host_user, spec)

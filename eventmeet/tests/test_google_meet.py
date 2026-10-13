@@ -306,6 +306,42 @@ class TestInternalMeetingWithGoogleMeet(SeminarTestCase):
 		with self.assertRaises(frappe.ValidationError):
 			make_meeting(outsider, [self.member])
 
+	def test_outside_organizer_uses_the_fallback_calendar_and_is_invited(self):
+		frappe.db.set_single_value("Conferencing Settings", "google_fallback_host", "meetings@example.com")
+		self.addCleanup(frappe.db.set_single_value, "Conferencing Settings", "google_fallback_host", "")
+		outsider = make_user("someone@other.test")
+		meeting = make_meeting(outsider, [self.member])
+
+		_action, host, created_spec = self.google.called("create")[0]
+		self.assertEqual(host, "meetings@example.com")
+		self.assertEqual(
+			frappe.db.get_value("Conference Session", meeting.conference_session, "host_user"),
+			"meetings@example.com",
+		)
+		self.assertEqual(sorted(i.email for i in created_spec.attendees), sorted([outsider, self.member]))
+		frappe.db.set_single_value("Conferencing Settings", "send_invitation_to_organizer", 1)
+		self.assertEqual(meeting.send_invitations(), "google")
+		self.assertEqual(self.mail, [], "Google invites the organizer as a guest; no extra copy")
+
+		# Meetings keep their calendar when the setting changes later (e.g. to a shared account).
+		frappe.db.set_single_value("Conferencing Settings", "google_fallback_host", "shared@example.com")
+		meeting.title = "Renamed"
+		meeting.save(ignore_permissions=True)
+		ref = self.google.called("update")[-1][1]
+		self.assertEqual(ref.host, "meetings@example.com")
+		self.assertIn(outsider, [i.email for i in self.google.called("update")[-1][2].attendees])
+		make_meeting(outsider)
+		self.assertEqual(self.google.called("create")[-1][1], "shared@example.com", "new meetings use it")
+
+	def test_fallback_calendar_must_be_in_the_workspace(self):
+		settings = frappe.get_single("Conferencing Settings")
+		settings.google_fallback_host = "someone@other.test"
+		with self.assertRaises(frappe.ValidationError):
+			settings.validate_google_fallback_host()
+		settings.google_fallback_host = " Meetings@Example.com "
+		settings.validate_google_fallback_host()
+		self.assertEqual(settings.google_fallback_host, "meetings@example.com")
+
 	def test_invitations_are_sent_by_google_and_changes_notified_afterwards(self):
 		meeting = make_meeting(self.organizer, [self.member])
 		meeting.title = "Weekly sync (updated)"

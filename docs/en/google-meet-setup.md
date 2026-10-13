@@ -190,6 +190,7 @@ In the meeting, the organizer or an attendee starts "Take notes for me" during t
 |---|---|---|
 | Google Meet | Enable Google Meet | On |
 | Google Meet | Workspace Domains | Your domain (e.g. example.com). Separate several domains with commas |
+| Google Meet | Calendar for Organizers outside Workspace | Optional. See 3.9 |
 | Google Meet | Service Account Key (JSON) | Paste the entire content of the JSON file downloaded in 3.4 |
 | Google Meet | Import Gemini Meeting Notes | On only if you completed 3.7 |
 | Defaults | Internal Meeting Provider | "Google Meet" to make it the default for internal meetings |
@@ -201,6 +202,22 @@ In the meeting, the organizer or an attendee starts "Take notes for me" during t
 > The key is stored encrypted in Frappe and shown as "*****". To replace the key, paste the new JSON and save.
 >
 > Changing the default tool does not change existing internal meetings; they keep their original tool.
+
+### 3.9 Organizers outside your Workspace (optional)
+
+A Google Meet meeting lives in its organizer's Google Calendar, so an organizer must have an account in
+the Workspace Domains. To let other people organize Google Meet meetings too (for example members of a
+partner company who have a Frappe account), set **Calendar for Organizers outside Workspace** to an
+account in your Workspace domains, a person or a shared account such as `meetings@example.com`.
+
+- Meetings whose organizer is outside the Workspace domains are created in that account's Google
+  Calendar. The organizer is invited as a guest, and is still the organizer in EventMeet (editing,
+  invitations, minutes).
+- The Google Meet host is that account: host controls, recording and Gemini "Take notes for me" are
+  available to it, not to the organizer.
+- You can start with your own account and change to a shared account later. Changing it affects only
+  new meetings; existing ones stay in the calendar where they were created.
+- Without this setting, such organizers can still use Zoom.
 
 ## 4. Verification
 
@@ -229,7 +246,7 @@ Error details are in Frappe's "Error Log" list.
 | "Directory" or "Domain-wide delegation" cannot be found in the Admin console | You are in the Google Cloud console, or not a super administrator | Check that the URL is `admin.google.com` and that the account at the top right is a super administrator. Use the direct URL in 3.5 or the search box at the top |
 | "Google authorization failed …" on save (e.g. unauthorized_client) | Delegation not set up, wrong Client ID, missing scopes, or not yet in effect | Check the Client ID and scopes in 3.5. If you just set it up, retry later (up to 24 hours) |
 | "Google API … failed (403)" saying an API is disabled | The API is not enabled | Enable the API in 3.2 |
-| "Organizer … is not a Google Workspace user of …" | The organizer's email domain is not in Workspace Domains | Make the organizer a Workspace user, or check the domain setting in 3.8 |
+| "Organizer … is not a Google Workspace user of …" | The organizer's email domain is not in Workspace Domains | Make the organizer a Workspace user, check the domain setting in 3.8, set a calendar for organizers outside Workspace (3.9), or use Zoom |
 | "The organizer needs an email address to host a Google Meet meeting." | The organizer's Frappe user has no email address | Set an email address for the user |
 | "The JSON is not a service account key." | A different file was pasted, e.g. an OAuth client JSON | Paste the service account key created in 3.4 |
 | Attendance is not imported and the Error Log shows "No Google Meet conference record yet" | The meeting has not taken place yet, or the record is still being generated | Normal before the meeting. Retried automatically up to 12 times. If it continues after the meeting, check the `meetings.space.readonly` delegation |
