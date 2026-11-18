@@ -1,0 +1,39 @@
+{#- Remembers where the visitor came from (UTM parameters of the landing URL and the referring page)
+    for the browser tab, so a registration made after moving from the list to a seminar keeps it.
+    A visit with UTM parameters replaces the stored values; a visit without them keeps them.
+    window.eventmeetSource() returns the values; the registration form sends them. -#}
+<script>
+	(function () {
+		var KEY = "eventmeet_source";
+		var FIELDS = ["utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content"];
+		function read() {
+			try {
+				return JSON.parse(window.sessionStorage.getItem(KEY) || "null");
+			} catch (e) {
+				return null;
+			}
+		}
+		try {
+			var params = new URLSearchParams(window.location.search);
+			var found = {};
+			FIELDS.forEach(function (key) {
+				var value = (params.get(key) || "").trim();
+				if (value) found[key] = value.slice(0, 140);
+			});
+			var stored = read();
+			if (Object.keys(found).length || !stored) {
+				var referrer = document.referrer || "";
+				if (referrer && new URL(referrer).origin === window.location.origin) {
+					referrer = (stored && stored.referrer) || "";
+				}
+				if (referrer) found.referrer = referrer.slice(0, 500);
+				window.sessionStorage.setItem(KEY, JSON.stringify(found));
+			}
+		} catch (e) {
+			/* Storage blocked or malformed URL: registration works without the source. */
+		}
+		window.eventmeetSource = function () {
+			return read() || {};
+		};
+	})();
+</script>

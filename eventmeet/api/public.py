@@ -17,11 +17,27 @@ def register(
 	company: str | None = None,
 	phone: str | None = None,
 	website: str | None = None,
+	utm_source: str | None = None,
+	utm_medium: str | None = None,
+	utm_campaign: str | None = None,
+	utm_term: str | None = None,
+	utm_content: str | None = None,
+	referrer: str | None = None,
 ):
 	if website:
 		# Honeypot field that is hidden from humans.
 		frappe.throw(_("Registration could not be completed."))
-	return registration.create_registration(seminar, ticket_type, attendee_name, email, company, phone)
+	tracking = {
+		"utm_source": utm_source,
+		"utm_medium": utm_medium,
+		"utm_campaign": utm_campaign,
+		"utm_term": utm_term,
+		"utm_content": utm_content,
+		"referrer": referrer,
+	}
+	return registration.create_registration(
+		seminar, ticket_type, attendee_name, email, company, phone, tracking=tracking
+	)
 
 
 @frappe.whitelist(allow_guest=True, methods=["POST"])

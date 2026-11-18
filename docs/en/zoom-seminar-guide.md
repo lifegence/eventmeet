@@ -246,6 +246,19 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 - If registering with Zoom fails temporarily, it is retried automatically every 10 minutes, and the confirmation email is sent once it succeeds.
 - Open the list of registrations with the "Registrations" button on the seminar.
 
+#### Recording where registrations come from
+
+Add UTM parameters to the links in your announcements and each registration records its source:
+
+```text
+https://<site>/seminars/<route>?utm_source=mailmag&utm_medium=email&utm_campaign=202611
+```
+
+- The registration's "Source" section stores the UTM source, medium, campaign, term and content, and the referrer (the page the visitor came from). The seminar's Registrations tab shows the source and campaign.
+- The values are remembered for the browser tab, so they are kept when the visitor lands on the list (`/seminars?utm_source=...`) and then opens a seminar.
+- Count registrations per channel with the filters of the registration list or "Group By" in the report view.
+- Redirects from another site work as long as they pass the parameters on. Registrations without parameters leave the fields empty.
+
 ### 5.4 On the day
 
 - A few minutes before the start, a Seminar Manager clicks "Zoom" > "**Start as Host**" on the seminar to open Zoom as the assigned host. This link has full host rights; do not share it.

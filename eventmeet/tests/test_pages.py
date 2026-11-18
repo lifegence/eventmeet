@@ -49,6 +49,15 @@ class TestPublicPages(SeminarTestCase):
 				status, _html = render(path, **query)
 				self.assertEqual(status, 200)
 
+	def test_pages_remember_the_registration_source(self):
+		for path in ("seminars", self.seminar.route):
+			with self.subTest(path=path):
+				status, html = render(path, utm_source="mailmag")
+				self.assertEqual(status, 200)
+				self.assertIn("window.eventmeetSource", html)
+		_status, html = render(self.seminar.route)
+		self.assertIn("window.eventmeetSource()", html, "the registration form sends the source")
+
 	def test_seminar_banner_does_not_replace_the_site_logo(self):
 		frappe.db.set_value("Seminar", self.seminar.name, "banner_image", "/files/seminar-banner.png")
 		status, html = render(self.seminar.route)

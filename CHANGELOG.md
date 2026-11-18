@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.4.0 - 2026-11-18
+
+### Added
+
+- Registration sources: the seminar pages remember the UTM parameters of the landing URL
+  (`utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`) and the referring page for the
+  browser tab, and the registration form sends them. They are stored in a new "Source" section of the
+  Seminar Registration (filterable by source and campaign) and shown in the seminar's Registrations tab.
+  Malformed values are dropped instead of blocking the registration.
+
 ## 0.3.0 - 2026-10-13
 
 ### Added

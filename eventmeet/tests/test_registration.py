@@ -341,3 +341,76 @@ class TestRegistrationOverview(SeminarTestCase):
 		data = frappe.get_meta("Seminar").get_dashboard_data()
 		self.assertEqual(data.fieldname, "seminar")
 		self.assertEqual(data.transactions[0]["items"], ["Seminar Registration", "Seminar Feedback"])
+
+
+class TestRegistrationSource(SeminarTestCase):
+	def setUp(self):
+		self.mail = capture_mail(self)
+
+	def test_utm_parameters_and_referrer_are_stored(self):
+		seminar = make_seminar()
+		reg_service.create_registration(
+			seminar.name,
+			"General",
+			"Alice",
+			"alice@example.com",
+			tracking={
+				"utm_source": " mailmag ",
+				"utm_medium": "email",
+				"utm_campaign": "1130",
+				"utm_term": "erp",
+				"utm_content": "header",
+				"referrer": "https://lifegence.com/news/",
+			},
+		)
+		doc = registration_for(seminar)
+		self.assertEqual(doc.utm_source, "mailmag")
+		self.assertEqual(doc.utm_medium, "email")
+		self.assertEqual(doc.utm_campaign, "1130")
+		self.assertEqual(doc.utm_term, "erp")
+		self.assertEqual(doc.utm_content, "header")
+		self.assertEqual(doc.referrer, "https://lifegence.com/news/")
+
+	def test_registration_without_source_still_works(self):
+		seminar = make_seminar()
+		self.assertEqual(register(seminar)["status"], "Confirmed")
+		doc = registration_for(seminar)
+		self.assertFalse(doc.utm_source)
+		self.assertFalse(doc.referrer)
+
+	def test_malformed_values_are_dropped_or_trimmed(self):
+		cleaned = reg_service.clean_tracking(
+			{
+				"utm_source": "<b>news</b>letter\x00",
+				"utm_medium": "x" * 500,
+				"utm_campaign": ["not", "a", "string"],
+				"utm_term": "   ",
+				"unknown": "ignored",
+				"referrer": "javascript:alert(1)",
+			}
+		)
+		self.assertEqual(cleaned["utm_source"], "newsletter")
+		self.assertEqual(len(cleaned["utm_medium"]), reg_service.TRACKING_MAX_LENGTH)
+		self.assertNotIn("utm_campaign", cleaned)
+		self.assertNotIn("utm_term", cleaned)
+		self.assertNotIn("unknown", cleaned)
+		self.assertNotIn("referrer", cleaned)
+
+	def test_public_endpoint_passes_the_source_through(self):
+		from eventmeet.api import public
+
+		seminar = make_seminar()
+		# Outside a web request the endpoint's rate limit does not apply.
+		public.register(
+			seminar=seminar.name,
+			ticket_type="General",
+			attendee_name="Bob",
+			email="bob@example.com",
+			utm_source="lifegence_site",
+			utm_campaign="1130",
+			referrer="https://www.google.com/",
+		)
+		doc = registration_for(seminar, "bob@example.com")
+		self.assertEqual(doc.utm_source, "lifegence_site")
+		self.assertEqual(doc.utm_campaign, "1130")
+		self.assertEqual(doc.referrer, "https://www.google.com/")

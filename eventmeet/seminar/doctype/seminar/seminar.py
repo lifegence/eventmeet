@@ -173,6 +173,8 @@ class Seminar(WebsiteGenerator):
 				"status",
 				"checked_in",
 				"attended_online",
+				"utm_source",
+				"utm_campaign",
 			],
 			order_by="creation asc",
 			limit_page_length=0,

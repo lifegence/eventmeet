@@ -34,7 +34,15 @@
   "column_break_onsite",
   "access_token",
   "reminder_sent",
-  "feedback_requested"
+  "feedback_requested",
+  "source_section",
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "column_break_source",
+  "utm_term",
+  "utm_content",
+  "referrer"
  ],
  "fields": [
   {
@@ -224,11 +232,59 @@
    "fieldtype": "Check",
    "label": "Feedback Requested",
    "read_only": 1
+  },
+  {
+   "fieldname": "source_section",
+   "fieldtype": "Section Break",
+   "label": "Source",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "utm_source",
+   "fieldtype": "Data",
+   "label": "UTM Source",
+   "read_only": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "utm_medium",
+   "fieldtype": "Data",
+   "label": "UTM Medium",
+   "read_only": 1
+  },
+  {
+   "fieldname": "utm_campaign",
+   "fieldtype": "Data",
+   "label": "UTM Campaign",
+   "read_only": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "column_break_source",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "utm_term",
+   "fieldtype": "Data",
+   "label": "UTM Term",
+   "read_only": 1
+  },
+  {
+   "fieldname": "utm_content",
+   "fieldtype": "Data",
+   "label": "UTM Content",
+   "read_only": 1
+  },
+  {
+   "fieldname": "referrer",
+   "fieldtype": "Small Text",
+   "label": "Referrer",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-11-18 18:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Registration",

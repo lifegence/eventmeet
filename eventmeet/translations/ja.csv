@@ -203,6 +203,7 @@ Price,価格
 Program,プログラム
 Provider Details,プロバイダー詳細
 Rating must be between 1 and 5.,評価は 1〜5 で入力してください。
+Referrer,参照元
 Refund failed: {0},返金に失敗しました: {0}
 Refunded,返金済
 Refunded Amount,返金額
@@ -257,6 +258,7 @@ Show this QR code at the reception.,受付でこの QR コードをご提示く�
 Shown below the seminar pages. Scripts and event handlers are removed.,公開ページの下に表示します。スクリプトとイベント属性は削除されます。
 Shown on the seminar list.,セミナー一覧に表示されます。
 Sold out,満席
+Source,流入元
 Speaker,講師
 Speakers,講師
 Standard,標準,Seminar Settings
@@ -306,6 +308,11 @@ Unsupported conference provider: {0},未対応の会議プロバイダーです:
 Use for Internal Meetings,社内ミーティングに使用
 Use for Seminars,セミナーに使用
 "Used only with the Custom design, on top of the Standard design. Change the design tokens, e.g. .em-page { --em-primary: #0f766e; --em-radius: 4px; }. See docs/en/website-design.md for all tokens.",デザインが「カスタム」のときだけ、標準デザインの上に適用されます。デザイントークンを変更できます（例：.em-page { --em-primary: #0f766e; --em-radius: 4px; }）。トークンの一覧は docs/ja/website-design.md を参照してください。
+UTM Campaign,UTM キャンペーン
+UTM Content,UTM コンテンツ
+UTM Medium,UTM メディア
+UTM Source,UTM ソース
+UTM Term,UTM キーワード
 Venue,会場
 Venue Name,会場名
 Venue is required for offline and hybrid seminars.,会場開催・ハイブリッドのセミナーには会場が必要です。

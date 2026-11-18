@@ -58,6 +58,33 @@ def _clean_text(value: str | None, label: str, max_length: int, required: bool =
 	return value
 
 
+# Where a registration came from: UTM parameters of the landing URL and the referring page, captured by
+# the seminar page script. Values are informational; anything malformed is dropped rather than rejected
+# so that a broken link never blocks a registration.
+TRACKING_FIELDS = ("utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content")
+TRACKING_MAX_LENGTH = 140
+REFERRER_MAX_LENGTH = 500
+
+
+def clean_tracking(tracking: dict | None) -> dict:
+	"""Keep the known tracking keys as short plain text; keep the referrer only if it is an http(s) URL."""
+	tracking = tracking or {}
+	cleaned = {}
+	for key in TRACKING_FIELDS:
+		value = tracking.get(key)
+		if not isinstance(value, str):
+			continue
+		value = "".join(ch for ch in strip_html(value) if ch.isprintable()).strip()
+		if value:
+			cleaned[key] = value[:TRACKING_MAX_LENGTH]
+	referrer = tracking.get("referrer")
+	if isinstance(referrer, str):
+		referrer = referrer.strip()
+		if referrer.lower().startswith(("http://", "https://")) and referrer.isprintable():
+			cleaned["referrer"] = referrer[:REFERRER_MAX_LENGTH]
+	return cleaned
+
+
 def create_registration(
 	seminar: str,
 	ticket_type: str,
@@ -65,6 +92,7 @@ def create_registration(
 	email: str,
 	company: str | None = None,
 	phone: str | None = None,
+	tracking: dict | None = None,
 ) -> dict:
 	attendee_name = _clean_text(attendee_name, "Attendee Name", 140, required=True)
 	email = validate_email_address(_clean_text(email, "Email", 140, required=True), throw=True).lower()
@@ -100,6 +128,7 @@ def create_registration(
 			"amount": flt(ticket.price),
 			"currency": ticket.currency or seminar_doc.get_default_currency(),
 			"access_token": frappe.generate_hash(length=40),
+			**clean_tracking(tracking),
 		}
 	)
 	# Guest path: authorization is the published/open seminar check above + rate limit on the endpoint.

@@ -57,6 +57,7 @@ function render_registrations(frm, { registrations, truncated }) {
 	const $wrapper = frm.get_field("registrations_html").$wrapper;
 	const esc = frappe.utils.escape_html;
 	const check = (value) => (value ? "✓" : "");
+	const source = (r) => [r.utm_source, r.utm_campaign].filter(Boolean).join(" / ");
 	const rows = registrations
 		.map(
 			(r) => `<tr>
@@ -64,6 +65,7 @@ function render_registrations(frm, { registrations, truncated }) {
 				<td>${esc(r.email || "")}</td>
 				<td>${esc(r.company || "")}</td>
 				<td>${esc(r.ticket_type || "")}</td>
+				<td>${esc(source(r))}</td>
 				<td><span class="indicator-pill ${STATUS_COLORS[r.status] || "gray"}">${esc(__(r.status, null, "Seminar Registration"))}</span></td>
 				<td class="text-center">${check(r.checked_in)}</td>
 				<td class="text-center">${check(r.attended_online)}</td>
@@ -83,6 +85,7 @@ function render_registrations(frm, { registrations, truncated }) {
 						<th>${__("Email")}</th>
 						<th>${__("Company")}</th>
 						<th>${__("Ticket Type")}</th>
+						<th>${__("Source")}</th>
 						<th>${__("Status")}</th>
 						<th class="text-center">${__("Checked In")}</th>
 						<th class="text-center">${__("Attended Online")}</th>

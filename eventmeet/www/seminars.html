@@ -3,3 +3,8 @@
 {% block page_content %}
 {% include em.template %}
 {% endblock %}
+
+{% block script %}
+{{ super() }}
+{% include "eventmeet/templates/includes/source_tracking.html" %}
+{% endblock %}

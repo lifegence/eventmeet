@@ -6,6 +6,7 @@
 
 {% block script %}
 {{ super() }}
+{% include "eventmeet/templates/includes/source_tracking.html" %}
 <script>
 	(function () {
 		const form = document.getElementById("ls-register-form");
@@ -14,7 +15,8 @@
 			event.preventDefault();
 			const button = form.querySelector("button[type=submit]");
 			const message = document.getElementById("ls-register-message");
-			const data = Object.fromEntries(new FormData(form).entries());
+			const source = window.eventmeetSource ? window.eventmeetSource() : {};
+			const data = Object.assign({}, source, Object.fromEntries(new FormData(form).entries()));
 			data.seminar = {{ (doc.name) | tojson }};
 			button.disabled = true;
 			message.textContent = {{ (_("Processing...")) | tojson }};
