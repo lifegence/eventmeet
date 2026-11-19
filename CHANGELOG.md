@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.1 - 2026-11-19
+
+### Fixed
+
+- Seminar Feedback can no longer be created from the desk (the "+" in the seminar's Connections and "New" in
+  the list opened an empty form, as every field is read-only). Answers come only from the survey link.
+
 ## 0.5.0 - 2026-11-19
 
 ### Added
