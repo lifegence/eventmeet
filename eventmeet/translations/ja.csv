@@ -464,3 +464,17 @@ Topics of Interest,関心のあるテーマ
 Use Own Join URL,自前の視聴 URL を使う
 Wants Further Information,情報提供希望
 We have sent a confirmation email to {0}. Please check it.,受付完了メールを {0} にお送りしました。ご確認ください。
+"No Zoom meeting is created: set up the meeting (microphone, camera, waiting room) in the service you use.",Zoom の会議は作成されません。マイク・カメラ・待機室などは、利用するサービス側で設定してください。
+"Attendance is not imported, so the attended/no-show status stays empty.",出席は取り込まれないため、オンライン出席の記録は空のままです。
+"In a webinar, attendees cannot use their microphone or camera unless the host allows it.",ウェビナーでは、ホストが許可しない限り、視聴者はマイクもカメラも使えません。
+"Saving the seminar sends its title, time and registration settings to Zoom again; change other settings in Zoom.",セミナーを保存するたびに、タイトル・日時・登録の設定を Zoom に送り直します。それ以外の設定は Zoom 側で変更してください。
+"Participants join with the microphone and camera settings of the Zoom host account (Zoom web portal > Settings: ""Mute all participants when they join a meeting"", ""Participants video: off"").",参加者の入室時のマイク・カメラは、Zoom ホストアカウントの設定に従います（Zoom Web ポータルの「設定」で、入室時に参加者をミュートし、参加者のビデオをオフにします）。
+"Participants can turn their microphone and camera on themselves. To prevent it, use a webinar, or turn off ""Allow participants to unmute themselves"" in Zoom during the meeting.",入室時にオフでも、参加者は自分でマイク・カメラをオンにできます。防ぐには、ウェビナーにするか、当日ホストが「参加者に自分のミュート解除を許可します」をオフにしてください。
+"Saving the seminar sends its title, time, waiting room and join-before-host setting to Zoom again; settings changed directly in Zoom for these are overwritten.",セミナーを保存するたびに、タイトル・日時・待機室・ホストより前の参加の設定を Zoom に送り直します。これらを Zoom 側で直接変えていた場合は上書きされます。
+"Confirmation email: right after registering, without the join link (it says the link follows on {0}).",受付完了メール：申込直後に送信。視聴 URL は含めず、{0} に案内する旨を記載します。
+Join information: on {0} to registrants confirmed by then (within 10 minutes). Later registrants receive the join link with their confirmation.,視聴案内メール：{0} に、その時点で確定している申込者へ送信（10 分以内）。以降の申込者には受付完了メールで視聴 URL を案内します。
+"Confirmation email: right after registering, with the join link.",受付完了メール：申込直後に送信。視聴 URL を含めます。
+"Confirmation email: right after registering, with the check-in QR code.",受付完了メール：申込直後に送信。受付用の QR コードを添付します。
+Reminder: {0} hours before the start{1} to confirmed registrants (within 10 minutes).,リマインド：開始の {0} 時間前{1}に、確定している申込者へ送信（10 分以内）。
+Reminder: not sent (0 hours in the Seminar Settings).,リマインド：送信しません（セミナー設定が 0 時間）。
+"Before announcing the seminar, register with your own address to check the emails.",告知を始める前に、ご自身のメールアドレスで申し込んで、メールの内容を確認してください。

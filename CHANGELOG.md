@@ -18,6 +18,10 @@
 - After registering, the page tells the registrant that the confirmation email was sent, when the join link
   follows and to check the spam folder.
 
+- Operational notes on the seminar form: the "Online" tab explains how participants' microphone and camera are
+  set (Zoom host settings, webinar, own join URL) and what saving sends to Zoom; "Attendee Emails" lists when
+  each email is sent, computed from the seminar's times.
+
 ### Changed
 
 - Reminders are checked every 10 minutes instead of hourly, and a seminar can set its own "Send Reminder

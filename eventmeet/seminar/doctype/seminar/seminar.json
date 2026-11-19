@@ -39,9 +39,11 @@
   "column_break_attendee_emails",
   "join_info_send_at",
   "joining_instructions",
+  "attendee_emails_help",
   "registrations_tab",
   "registrations_html",
   "online_tab",
+  "online_help",
   "use_own_join_url",
   "own_join_url",
   "conference_kind",
@@ -351,6 +353,16 @@
    "fieldname": "own_join_url",
    "fieldtype": "Small Text",
    "label": "Own Join URL"
+  },
+  {
+   "fieldname": "attendee_emails_help",
+   "fieldtype": "HTML",
+   "label": "Attendee Emails Help"
+  },
+  {
+   "fieldname": "online_help",
+   "fieldtype": "HTML",
+   "label": "Online Help"
   }
  ],
  "has_web_view": 1,
@@ -358,7 +370,7 @@
  "index_web_pages_for_search": 0,
  "is_published_field": "published",
  "links": [],
- "modified": "2026-11-19 12:00:00.000000",
+ "modified": "2026-11-19 13:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar",

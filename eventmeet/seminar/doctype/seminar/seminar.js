@@ -1,8 +1,24 @@
 // Copyright (c) 2026, Lifegence and contributors
 // For license information, please see license.txt
 
+const HELP_FIELDS = [
+	"format",
+	"starts_at",
+	"conference_kind",
+	"use_own_join_url",
+	"join_info_send_at",
+	"reminder_hours_before",
+];
+
 frappe.ui.form.on("Seminar", {
+	onload(frm) {
+		frappe.db.get_single_value("Seminar Settings", "reminder_hours_before").then((hours) => {
+			frm.__default_reminder_hours = hours || 0;
+			render_help(frm);
+		});
+	},
 	refresh(frm) {
+		render_help(frm);
 		if (frm.is_new()) return;
 
 		frm.add_custom_button(__("Registrations"), () =>
@@ -20,7 +36,84 @@ frappe.ui.form.on("Seminar", {
 		}
 		load_registrations(frm);
 	},
+	...Object.fromEntries(HELP_FIELDS.map((field) => [field, (frm) => render_help(frm)])),
 });
+
+// Operational notes next to the settings they concern, computed from the current values.
+function render_help(frm) {
+	render_online_help(frm);
+	render_attendee_emails_help(frm);
+}
+
+function help_box(items) {
+	const list = items.map((item) => `<li>${item}</li>`).join("");
+	return `<div class="text-muted small" style="margin-bottom: 12px"><ul style="padding-left: 18px; margin: 0">${list}</ul></div>`;
+}
+
+function render_online_help(frm) {
+	const field = frm.get_field("online_help");
+	if (!field) return;
+	let items;
+	if (frm.doc.use_own_join_url) {
+		items = [
+			__("No Zoom meeting is created: set up the meeting (microphone, camera, waiting room) in the service you use."),
+			__("Attendance is not imported, so the attended/no-show status stays empty."),
+		];
+	} else if (frm.doc.conference_kind === "Webinar") {
+		items = [
+			__("In a webinar, attendees cannot use their microphone or camera unless the host allows it."),
+			__("Saving the seminar sends its title, time and registration settings to Zoom again; change other settings in Zoom."),
+		];
+	} else {
+		items = [
+			__("Participants join with the microphone and camera settings of the Zoom host account (Zoom web portal > Settings: \"Mute all participants when they join a meeting\", \"Participants video: off\")."),
+			__("Participants can turn their microphone and camera on themselves. To prevent it, use a webinar, or turn off \"Allow participants to unmute themselves\" in Zoom during the meeting."),
+			__("Saving the seminar sends its title, time, waiting room and join-before-host setting to Zoom again; settings changed directly in Zoom for these are overwritten."),
+		];
+	}
+	field.$wrapper.html(help_box(items));
+}
+
+function render_attendee_emails_help(frm) {
+	const field = frm.get_field("attendee_emails_help");
+	if (!field) return;
+	const doc = frm.doc;
+	const fmt = (value) => (value ? frappe.datetime.str_to_user(value) : "");
+	const online = doc.format !== "Offline";
+	const items = [];
+	if (online && doc.join_info_send_at) {
+		items.push(
+			__("Confirmation email: right after registering, without the join link (it says the link follows on {0}).", [
+				fmt(doc.join_info_send_at),
+			])
+		);
+		items.push(
+			__("Join information: on {0} to registrants confirmed by then (within 10 minutes). Later registrants receive the join link with their confirmation.", [
+				fmt(doc.join_info_send_at),
+			])
+		);
+	} else if (online) {
+		items.push(__("Confirmation email: right after registering, with the join link."));
+	} else {
+		items.push(__("Confirmation email: right after registering, with the check-in QR code."));
+	}
+	const hours = cint(doc.reminder_hours_before) || cint(frm.__default_reminder_hours);
+	if (hours > 0) {
+		const at = doc.starts_at
+			? moment(doc.starts_at).subtract(hours, "hours").format("YYYY-MM-DD HH:mm:ss")
+			: "";
+		items.push(
+			__("Reminder: {0} hours before the start{1} to confirmed registrants (within 10 minutes).", [
+				hours,
+				at ? ` (${fmt(at)})` : "",
+			])
+		);
+	} else {
+		items.push(__("Reminder: not sent (0 hours in the Seminar Settings)."));
+	}
+	items.push(__("Before announcing the seminar, register with your own address to check the emails."));
+	field.$wrapper.html(help_box(items));
+}
 
 const STATUS_COLORS = {
 	Confirmed: "green",
