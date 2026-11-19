@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Registration form questions per seminar ("Tickets" > "Registration Form"): require the company, hide the
+  phone number, ask for the department and job title, questions for the speakers, individual consultation
+  and topics of interest (several can be chosen). Seminar Settings can require consent to the handling of
+  personal information (with a privacy policy link; the time of consent is stored) and offer an optional,
+  unchecked opt-in to further information. The seminar's Registrations tab shows consultation requests.
+- Join information on a set day: with "Send Join Information At", registrants confirmed before that time
+  receive the join URL and "How to Join" in a separate email at that time, and later registrants with their
+  confirmation. Each registration records whether it was sent, so nobody receives it twice.
+- Own join URL: an online seminar can send the same URL to every registrant instead of creating a Zoom
+  session.
+- Contact email (Seminar Settings or per seminar), shown on the registration page and in the emails.
+- After registering, the page tells the registrant that the confirmation email was sent, when the join link
+  follows and to check the spam folder.
+
+### Changed
+
+- Reminders are checked every 10 minutes instead of hourly, and a seminar can set its own "Send Reminder
+  Hours Before" (e.g. 2 hours). The reminder includes "How to Join".
+- When a delayed Zoom registration succeeds, the registrant receives the join information instead of a second
+  confirmation email.
+
 ## 0.4.0 - 2026-11-18
 
 ### Added

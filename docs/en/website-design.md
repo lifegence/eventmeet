@@ -147,7 +147,7 @@ the registration box into a sidebar.
 |---|---|---|---|
 | `seminar_list` | `/seminars` | `eventmeet/templates/eventmeet/seminar_list.html` | `em_list_header`, `em_card` (one card; variable `s`), `em_empty` |
 | `seminar_detail` | seminar page | `eventmeet/templates/eventmeet/seminar_detail.html` | `em_hero`, `em_overview`, `em_description`, `em_program`, `em_speakers`, `em_registration` |
-| `registration` | `/seminar-registration` | `eventmeet/templates/eventmeet/registration.html` | `em_not_found`, `em_title`, `em_status`, `em_details`, `em_join`, `em_checkin_qr`, `em_survey` |
+| `registration` | `/seminar-registration` | `eventmeet/templates/eventmeet/registration.html` | `em_not_found`, `em_title`, `em_status`, `em_details`, `em_join`, `em_checkin_qr`, `em_survey`, `em_contact` |
 | `feedback` | `/seminar-feedback` | `eventmeet/templates/eventmeet/feedback.html` | `em_title`, `em_form` |
 
 All of them extend `eventmeet/templates/eventmeet/layout.html`, which has the blocks `em_styles`

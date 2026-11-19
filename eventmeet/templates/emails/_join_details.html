@@ -1,0 +1,8 @@
+{#- The join link and how to join. Context: join_url, joining_instructions, seminar. -#}
+<p><strong>{{ _("Online participation") }}</strong><br>
+{% if seminar.use_own_join_url %}{{ _("Join with this link:") }}{% else %}{{ _("Join with this personal link (please do not share it):") }}{% endif %}<br>
+<a href="{{ join_url | e }}">{{ join_url | e }}</a></p>
+{% if joining_instructions %}
+<p><strong>{{ _("How to join") }}</strong></p>
+<p style="white-space: pre-line">{{ joining_instructions | e }}</p>
+{% endif %}

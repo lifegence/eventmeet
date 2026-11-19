@@ -209,8 +209,11 @@ Register the host users prepared in 3.6, one record each. You need as many as th
 
 | Field (as shown) | Value |
 |---|---|
-| Send Reminder Hours Before | When to send the reminder email with the personal join URL (e.g. 24) |
+| Send Reminder Hours Before | When to send the reminder email with the join URL (e.g. 24). Checked every 10 minutes; a seminar can set its own value |
 | Send Feedback Request After Seminar | On if you use the survey |
+| Contact Email | Shown on the registration page and in the emails (a seminar can set its own) |
+| Require Privacy Consent | Adds a required "I agree to the handling of personal information" checkbox to the registration form. Set the Privacy Policy URL and, if needed, your own wording. The time of consent is stored on the registration |
+| Ask for Consent to Further Information | Adds an optional, unchecked "I would like to receive information about future events" checkbox |
 
 The Frappe site sends emails to registrants, so an outgoing email account must be set up in Frappe.
 
@@ -223,6 +226,8 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 1. On the "Overview" tab, enter Title, Format, Organizer, Starts At, Ends At, Registration Closes At (defaults to the start time if empty) and Capacity. Choose "Online" for online only, or "Hybrid" for both a venue and online (Hybrid requires a venue).
 2. Enter the Summary, Description, Banner Image and Program. The Summary is shown in the seminar list.
 3. On the "Tickets" tab, add at least one ticket type (price 0 for free).
+   - "Registration Form": choose what the form asks. Name and email are always required; "Require Company" makes the company required, "Ask Phone" can be turned off, and you can ask for the department and job title, questions for the speakers, individual consultation, and topics of interest (one per line, several can be chosen).
+   - "Attendee Emails": the contact email, when to send the reminder (e.g. 2 hours before), when to send the join information and how to join (see 5.3).
 4. On the "Online" tab, choose the "Conference Kind". "Meeting" is a registration-based Zoom meeting; "Webinar" is a Zoom webinar (requires the Webinars add-on).
 5. On the "Website" tab, turn on "Published".
 6. Leave the status as "Draft" and save. Nothing is created in Zoom yet.
@@ -242,9 +247,26 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 ### 5.3 Registrations and personal join URLs
 
 - Registrants sign up on the public page (`https://<site>/seminars`). Free tickets are confirmed immediately; paid tickets are confirmed after the Stripe payment completes.
-- On confirmation, the registrant is registered in Zoom and receives the personal join URL in the confirmation email. It is also stored in the registration's "Personal Join URL" field.
-- If registering with Zoom fails temporarily, it is retried automatically every 10 minutes, and the confirmation email is sent once it succeeds.
+- On confirmation, the registrant is registered in Zoom and receives the personal join URL in the confirmation email (or later, see below). It is also stored in the registration's "Personal Join URL" field.
+- After registering, the page tells the registrant that the confirmation email was sent, when the join link follows, to check the spam folder, and the contact email.
+- If registering with Zoom fails temporarily, it is retried automatically every 10 minutes, and the join information is sent once it succeeds.
 - Open the list of registrations with the "Registrations" button on the seminar.
+
+#### Sending the join information separately
+
+To announce the join link on a set day (e.g. three days before), set "Send Join Information At" on the seminar's "Tickets" tab.
+
+| When the registration is confirmed | What the registrant receives |
+|---|---|
+| Before that time | A confirmation email saying the join link will be emailed at that time. The registration page does not show the link yet |
+| At that time | The "Join information" email with the join URL and "How to Join" (sent within 10 minutes) |
+| After that time | The confirmation email includes the join information; no second email |
+
+Each registration records "Join Information Sent", so nobody receives it twice. The reminder (e.g. 2 hours before) repeats the join URL. Without "Send Join Information At", the confirmation email includes the join URL as before.
+
+#### Using your own join URL
+
+To send the same URL to everyone (for example a meeting you created yourself), turn on "Use Own Join URL" on the "Online" tab and enter the URL. No Zoom session is created (an existing one is cancelled), and attendance is not imported.
 
 #### Recording where registrations come from
 

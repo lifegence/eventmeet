@@ -18,12 +18,35 @@ def qr_png(data: str) -> bytes:
 	return buffer.getvalue()
 
 
-def _seminar_context(registration) -> dict:
-	from eventmeet.services.registration import checkin_url, feedback_url, status_url
+def contact_email(seminar) -> str:
+	return (
+		seminar.get("contact_email") or frappe.db.get_single_value("Seminar Settings", "contact_email") or ""
+	)
+
+
+def _seminar_context(registration, include_join: bool | None = None) -> dict:
+	"""`include_join`: whether the email gives the join link; by default when it is due."""
+	from eventmeet.services.registration import (
+		checkin_url,
+		feedback_url,
+		join_info_ready,
+		join_url_for,
+		status_url,
+	)
 
 	seminar = frappe.get_doc("Seminar", registration.seminar)
 	venue = frappe.get_doc("Seminar Venue", seminar.venue) if seminar.venue else None
+	if include_join is None:
+		include_join = join_info_ready(registration, seminar)
 	return {
+		"join_url": join_url_for(registration, seminar) if include_join else "",
+		"joining_instructions": seminar.get("joining_instructions") or "",
+		"join_info_send_at": (
+			format_datetime(seminar.join_info_send_at, "yyyy-MM-dd HH:mm")
+			if seminar.get("join_info_send_at")
+			else ""
+		),
+		"contact_email": contact_email(seminar),
 		"registration": registration,
 		"seminar": seminar,
 		"venue": venue,
@@ -72,8 +95,8 @@ def _send(
 		return False
 
 
-def send_registration_confirmed(registration) -> bool:
-	context = _seminar_context(registration)
+def send_registration_confirmed(registration, include_join: bool | None = None) -> bool:
+	context = _seminar_context(registration, include_join)
 	attachments = []
 	if context["is_onsite"]:
 		attachments.append({"fname": "checkin-qr.png", "fcontent": qr_png(context["checkin_url"])})
@@ -84,6 +107,17 @@ def send_registration_confirmed(registration) -> bool:
 		context,
 		registration,
 		attachments,
+	)
+
+
+def send_join_info(registration) -> bool:
+	context = _seminar_context(registration, include_join=True)
+	return _send(
+		[registration.email],
+		_("Join information: {0}").format(context["seminar"].title),
+		"seminar_join_info",
+		context,
+		registration,
 	)
 
 

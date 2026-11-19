@@ -1,12 +1,14 @@
 <p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
 <p>{{ _("Thank you for registering. Your registration is confirmed.") }}</p>
 {% include "templates/emails/_seminar_details.html" %}
-{% if is_online and registration.join_url %}
-<p><strong>{{ _("Online participation") }}</strong><br>
-{{ _("Join with this personal link (please do not share it):") }}<br>
-<a href="{{ registration.join_url | e }}">{{ registration.join_url | e }}</a></p>
-{% elif is_online %}
+{% if is_online %}
+	{% if join_url %}
+	{% include "templates/emails/_join_details.html" %}
+	{% elif join_info_send_at %}
+<p>{{ _("The online join link will be emailed on {0}.").format(join_info_send_at) }}</p>
+	{% else %}
 <p>{{ _("The online join link will be sent in a separate email.") }}</p>
+	{% endif %}
 {% endif %}
 {% if is_onsite %}
 <p><strong>{{ _("On-site check-in") }}</strong><br>
@@ -14,3 +16,4 @@
 <a href="{{ status_url }}">{{ status_url }}</a></p>
 {% endif %}
 <p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>
+{% include "templates/emails/_contact.html" %}

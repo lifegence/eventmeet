@@ -1,6 +1,7 @@
 {% extends "eventmeet/templates/eventmeet/layout.html" %}
 {#- Registration status (/seminar-registration?token=...). Context: registration (or None), seminar,
-    venue, checkout ("success" / "cancelled"), show_join, qr_data_uri, feedback_link. -#}
+    venue, checkout ("success" / "cancelled"), is_online, show_join, join_url, join_info_send_at,
+    contact_email, qr_data_uri, feedback_link. -#}
 
 {% block em_content %}
 {% if not registration %}
@@ -24,7 +25,14 @@
 		<div class="ls-box">{{ _("Waiting for payment.") }}</div>
 		{% endif %}
 	{% elif registration.status == "Confirmed" %}
-	<div class="ls-box"><strong>{{ _("Your registration is confirmed.") }}</strong></div>
+	<div class="ls-box">
+		<strong>{{ _("Your registration is confirmed.") }}</strong>
+		<p>{{ _("We have sent a confirmation email to {0}. Please check it.").format(registration.email | e) }}</p>
+		{% if is_online and not show_join %}
+		<p>{% if join_info_send_at %}{{ _("The online join link will be emailed on {0}.").format(frappe.utils.format_datetime(join_info_send_at, "yyyy-MM-dd HH:mm")) }}{% else %}{{ _("The online join link will be sent in a separate email.") }}{% endif %}</p>
+		{% endif %}
+		<p class="ls-muted">{{ _("If the email does not arrive, please check your spam folder.") }}</p>
+	</div>
 	{% else %}
 	<div class="ls-box">{{ _("Status") }}: {{ _(registration.status) }}</div>
 	{% endif %}
@@ -42,8 +50,9 @@
 	{% if show_join %}
 	<div class="ls-box">
 		<strong>{{ _("Online participation") }}</strong>
-		<p>{{ _("This link is personal. Please do not share it.") }}</p>
-		<a class="btn btn-primary" href="{{ registration.join_url | e }}" target="_blank" rel="noopener">{{ _("Join on Zoom") }}</a>
+		{% if not seminar.use_own_join_url %}<p>{{ _("This link is personal. Please do not share it.") }}</p>{% endif %}
+		<a class="btn btn-primary" href="{{ join_url | e }}" target="_blank" rel="noopener">{{ _("Join online") }}</a>
+		{% if seminar.joining_instructions %}<p style="white-space: pre-line; margin-top: 12px">{{ seminar.joining_instructions | e }}</p>{% endif %}
 	</div>
 	{% endif %}
 	{% endblock %}
@@ -61,6 +70,11 @@
 	<div class="ls-box">
 		<a class="btn btn-default" href="{{ feedback_link | e }}">{{ _("Answer the survey") }}</a>
 	</div>
+	{% endif %}
+	{% endblock %}
+	{% block em_contact %}
+	{% if contact_email %}
+	<p class="ls-muted">{{ _("Contact") }}: <a href="mailto:{{ contact_email | e }}">{{ contact_email | e }}</a></p>
 	{% endif %}
 	{% endblock %}
 {% endif %}

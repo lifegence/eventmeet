@@ -39,10 +39,11 @@ scheduler_events = {
 			"eventmeet.tasks.reconcile_pending_payments",
 			"eventmeet.tasks.retry_missing_conference_registrations",
 			"eventmeet.tasks.process_ended_conference_sessions",
+			"eventmeet.tasks.send_join_information",
+			"eventmeet.tasks.send_seminar_reminders",
 		],
 	},
 	"hourly": [
-		"eventmeet.tasks.send_seminar_reminders",
 		"eventmeet.tasks.send_feedback_requests",
 	],
 }
