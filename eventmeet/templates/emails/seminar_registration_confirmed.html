@@ -1,19 +1,21 @@
-<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
-<p>{{ _("Thank you for registering. Your registration is confirmed.") }}</p>
-{% include "templates/emails/_seminar_details.html" %}
-{% if is_online %}
-	{% if join_url %}
+{% extends "templates/emails/_layout.html" %}
+{% from "templates/emails/_macros.html" import note, text_link %}
+{% block label %}{{ _("Registration received") }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 12px;">{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p style="margin: 0 0 24px;">{{ _("Thank you for registering. Your registration is confirmed.") }}</p>
+{% include "templates/emails/_details.html" %}
+{%- if is_online %}
+	{%- if join_url %}
 	{% include "templates/emails/_join_details.html" %}
-	{% elif join_info_send_at %}
-<p>{{ _("The online join link will be emailed on {0}.").format(join_info_send_at) }}</p>
-	{% else %}
-<p>{{ _("The online join link will be sent in a separate email.") }}</p>
-	{% endif %}
-{% endif %}
-{% if is_onsite %}
-<p><strong>{{ _("On-site check-in") }}</strong><br>
-{{ _("Please show the attached QR code at the reception. You can also open it here:") }}<br>
-<a href="{{ status_url }}">{{ status_url }}</a></p>
-{% endif %}
-<p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>
-{% include "templates/emails/_contact.html" %}
+	{%- elif join_info_send_at %}
+	{{ note(_("The online join link will be emailed on {0}.").format(join_info_send_at)) }}
+	{%- else %}
+	{{ note(_("The online join link will be sent in a separate email.")) }}
+	{%- endif %}
+{%- endif %}
+{%- if is_onsite %}
+{{ note(_("On the day, please show the attached QR code at the reception. You can also open it from the link below.")) }}
+{%- endif %}
+{{ text_link(status_url, _("View your registration")) }}
+{% endblock %}

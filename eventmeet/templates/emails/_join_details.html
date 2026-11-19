@@ -1,8 +1,15 @@
-{#- The join link and how to join. Context: join_url, joining_instructions, seminar. -#}
-<p><strong>{{ _("Online participation") }}</strong><br>
-{% if seminar.use_own_join_url %}{{ _("Join with this link:") }}{% else %}{{ _("Join with this personal link (please do not share it):") }}{% endif %}<br>
-<a href="{{ join_url | e }}">{{ join_url | e }}</a></p>
-{% if joining_instructions %}
-<p><strong>{{ _("How to join") }}</strong></p>
-<p style="white-space: pre-line">{{ joining_instructions | e }}</p>
-{% endif %}
+{#- The join link and how to join. Context: join_url, joining_instructions, seminar, brand. -#}
+{%- from "templates/emails/_macros.html" import button -%}
+<div style="margin: 0 0 24px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+	<p style="margin: 0 0 12px; font-size: 15px; font-weight: 700; color: #1a1a1a;">{{ _("Online participation") }}</p>
+	{{ button(join_url, _("Join online"), brand.accent) }}
+	<p style="margin: 0; font-size: 12px; line-height: 1.7; color: #6b7280;">
+		{%- if not seminar.use_own_join_url %}{{ _("This link is personal. Please do not share it.") }}<br>{% endif -%}
+		{{ _("If the button does not work, open this URL:") }}<br>
+		<a href="{{ join_url | e }}" style="color: #6b7280; word-break: break-all;">{{ join_url | e }}</a>
+	</p>
+	{%- if joining_instructions %}
+	<p style="margin: 16px 0 4px; font-size: 14px; font-weight: 700; color: #1a1a1a;">{{ _("How to join") }}</p>
+	<p style="margin: 0; font-size: 14px; line-height: 1.8; color: #333333; white-space: pre-line;">{{ joining_instructions | e }}</p>
+	{%- endif %}
+</div>

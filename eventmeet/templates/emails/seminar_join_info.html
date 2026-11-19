@@ -1,6 +1,10 @@
-<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
-<p>{{ _("Here is how to join the seminar online.") }}</p>
-{% include "templates/emails/_seminar_details.html" %}
+{% extends "templates/emails/_layout.html" %}
+{% from "templates/emails/_macros.html" import text_link %}
+{% block label %}{{ _("Join information") }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 12px;">{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p style="margin: 0 0 24px;">{{ _("Here is how to join the seminar online.") }}</p>
 {% include "templates/emails/_join_details.html" %}
-<p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>
-{% include "templates/emails/_contact.html" %}
+{% include "templates/emails/_details.html" %}
+{{ text_link(status_url, _("View your registration")) }}
+{% endblock %}

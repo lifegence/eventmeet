@@ -34,6 +34,7 @@ frappe.ui.form.on("Seminar", {
 		if (frm.doc.format !== "Offline" && !frm.doc.conference_session && frm.doc.status === "Draft") {
 			frm.set_intro(__("The Zoom session is created automatically when the status is set to Open."));
 		}
+		frm.add_custom_button(__("Preview"), () => preview_emails(frm), __("Emails"));
 		load_registrations(frm);
 	},
 	...Object.fromEntries(HELP_FIELDS.map((field) => [field, (frm) => render_help(frm)])),
@@ -204,4 +205,44 @@ function render_registrations(frm, { registrations, truncated }) {
 	$wrapper.find("[data-action=add]").on("click", () =>
 		frappe.new_doc("Seminar Registration", { seminar: frm.doc.name })
 	);
+}
+
+const EMAIL_KINDS = [
+	["confirmation", __("Confirmation")],
+	["join_info", __("Join Information")],
+	["reminder", __("Reminder")],
+	["cancellation", __("Cancellation")],
+	["feedback", __("Survey Request")],
+];
+
+// The attendee emails for a sample registrant, rendered by the server exactly as they would be sent now.
+function preview_emails(frm) {
+	const dialog = new frappe.ui.Dialog({
+		title: __("Email Preview"),
+		size: "large",
+		fields: [
+			{
+				fieldname: "kind",
+				fieldtype: "Select",
+				label: __("Email"),
+				options: EMAIL_KINDS.map(([value, label]) => ({ value, label })),
+				default: "confirmation",
+				change: () => show(dialog.get_value("kind")),
+			},
+			{ fieldname: "subject", fieldtype: "HTML" },
+			{ fieldname: "body", fieldtype: "HTML" },
+		],
+	});
+	const show = (kind) =>
+		frm.call("preview_email", { kind }).then(({ message }) => {
+			if (!message) return;
+			dialog.fields_dict.subject.$wrapper.html(
+				`<div class="text-muted small">${__("Subject")}</div><div class="mb-3"><strong>${frappe.utils.escape_html(message.subject)}</strong></div>`
+			);
+			const iframe = $('<iframe sandbox="" style="width: 100%; height: 640px; border: 1px solid var(--border-color); border-radius: 6px;"></iframe>');
+			iframe.attr("srcdoc", message.html);
+			dialog.fields_dict.body.$wrapper.empty().append(iframe);
+		});
+	dialog.show();
+	show("confirmation");
 }

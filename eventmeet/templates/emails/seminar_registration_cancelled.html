@@ -1,6 +1,11 @@
-<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
-<p>{{ _("Your registration has been cancelled.") }}</p>
-{% include "templates/emails/_seminar_details.html" %}
-{% if registration.status == "Refunded" %}
-<p>{{ _("A refund of {0} has been issued to your original payment method.").format(frappe.utils.fmt_money(registration.refunded_amount, currency=registration.currency)) }}</p>
-{% endif %}
+{% extends "templates/emails/_layout.html" %}
+{% from "templates/emails/_macros.html" import note %}
+{% block label %}{{ _("Registration cancelled") }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 12px;">{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p style="margin: 0 0 24px;">{{ _("Your registration has been cancelled.") }}</p>
+{% include "templates/emails/_details.html" %}
+{%- if registration.status == "Refunded" %}
+{{ note(_("A refund of {0} has been issued to your original payment method.").format(frappe.utils.fmt_money(registration.refunded_amount, currency=registration.currency))) }}
+{%- endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{#- Building blocks of the attendee emails. -#}
+
+{% macro button(url, label, accent) -%}
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 4px 0 12px;">
+	<tr>
+		<td style="border-radius: 6px; background-color: {{ accent }};">
+			<a class="btn" href="{{ url | e }}" target="_blank" style="display: inline-block; padding: 13px 28px; font-size: 15px; font-weight: 700; line-height: 1.2; color: #ffffff !important; text-decoration: none !important; border-radius: 6px;">{{ label }}</a>
+		</td>
+	</tr>
+</table>
+{%- endmacro %}
+
+{% macro note(text) -%}
+<div style="margin: 0 0 20px; padding: 14px 16px; background-color: #f6f7f9; border-radius: 6px; font-size: 14px; line-height: 1.7; color: #333333;">{{ text }}</div>
+{%- endmacro %}
+
+{% macro text_link(url, label) -%}
+<p style="margin: 20px 0 0; font-size: 14px;"><a href="{{ url | e }}" style="color: #333333; text-decoration: underline;">{{ label }} &rsaquo;</a></p>
+{%- endmacro %}

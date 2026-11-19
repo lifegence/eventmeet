@@ -7,6 +7,7 @@ from frappe.utils import add_to_date, now_datetime
 
 from eventmeet import tasks
 from eventmeet.api import public
+from eventmeet.services import notifications
 from eventmeet.services import registration as reg_service
 from eventmeet.tests.test_pages import render
 from eventmeet.tests.utils import (
@@ -176,7 +177,7 @@ class TestJoinInformation(SeminarTestCase):
 		doc = registration_for(seminar)
 		confirmation = self.mail[-1]["rendered"]
 		self.assertNotIn(doc.join_url, confirmation)
-		self.assertIn(frappe.utils.format_datetime(send_at, "yyyy-MM-dd HH:mm"), confirmation)
+		self.assertIn(notifications.format_moment(send_at), confirmation)
 		self.assertEqual(doc.join_info_sent, 0)
 
 		status, html = render("seminar-registration", token=doc.access_token)
@@ -318,3 +319,47 @@ class TestImmediateSending(SeminarTestCase):
 			result = reg_service.create_registration(seminar.name, "General", "Alice", "alice@example.com")
 		self.assertEqual(result["status"], "Confirmed")
 		self.assertEqual(registration_for(seminar).status, "Confirmed")
+
+
+class TestEmailDesign(SeminarTestCase):
+	def test_previews_render_every_email_with_the_brand(self):
+		set_settings(
+			self,
+			email_logo="/files/logo.png",
+			email_accent_color="#0017c1",
+			email_footer="Lifegence Corporation",
+		)
+		seminar = make_seminar(
+			fmt="Online",
+			status="Draft",
+			use_own_join_url=1,
+			own_join_url="https://meet.example.com/abc",
+			join_info_send_at=add_to_date(now_datetime(), days=3),
+		)
+		for kind in notifications.SEMINAR_EMAILS:
+			preview = notifications.render_preview(seminar.name, kind)
+			self.assertIn(seminar.title, preview["subject"])
+			self.assertIn("/files/logo.png", preview["html"])
+			self.assertIn("#0017c1", preview["html"])
+			self.assertIn("Lifegence Corporation", preview["html"])
+		self.assertIn(
+			"https://meet.example.com/abc", notifications.render_preview(seminar.name, "join_info")["html"]
+		)
+		confirmation = notifications.render_preview(seminar.name, "confirmation")["html"]
+		self.assertNotIn("https://meet.example.com/abc", confirmation, "not due yet")
+		self.assertFalse(frappe.db.exists("Seminar Registration", {"seminar": seminar.name}), "nothing saved")
+
+	def test_invalid_accent_falls_back(self):
+		for value in ("red; background:url(x)", "#a;b:cd"):
+			set_settings(self, email_accent_color=value)
+			self.assertEqual(notifications.email_brand()["accent"], notifications.DEFAULT_ACCENT)
+
+	def test_period_format(self):
+		from datetime import datetime
+
+		frappe.local.lang = "ja"
+		self.addCleanup(setattr, frappe.local, "lang", "en")
+		self.assertEqual(
+			notifications.format_period(datetime(2026, 11, 30, 12, 0), datetime(2026, 11, 30, 13, 0)),
+			"2026年11月30日（月）12:00〜13:00",
+		)
