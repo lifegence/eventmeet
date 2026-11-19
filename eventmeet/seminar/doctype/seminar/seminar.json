@@ -56,7 +56,8 @@
   "website_tab",
   "published",
   "route",
-  "feedback_enabled"
+  "feedback_enabled",
+  "feedback_form_url"
  ],
  "fields": [
   {
@@ -261,6 +262,13 @@
    "label": "Collect Feedback"
   },
   {
+   "depends_on": "feedback_enabled",
+   "description": "Survey form of another service (e.g. Google Forms). If set, the survey request email links to this form instead of the built-in survey.",
+   "fieldname": "feedback_form_url",
+   "fieldtype": "Small Text",
+   "label": "External Survey Form URL"
+  },
+  {
    "fieldname": "registration_form_section",
    "fieldtype": "Section Break",
    "label": "Registration Form"
@@ -370,7 +378,7 @@
  "index_web_pages_for_search": 0,
  "is_published_field": "published",
  "links": [],
- "modified": "2026-11-19 13:00:00.000000",
+ "modified": "2026-11-19 16:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar",

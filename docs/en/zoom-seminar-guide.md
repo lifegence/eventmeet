@@ -297,6 +297,13 @@ https://<site>/seminars/<route>?utm_source=mailmag&utm_medium=email&utm_campaign
 > [!NOTE]
 > Importing Zoom AI Companion meeting summaries is a feature of internal meetings only. It is not done for seminars.
 
+#### Survey after the seminar
+
+With "Send Feedback Request After Seminar" in the Seminar Settings and "Collect Feedback" on the seminar, every confirmed registrant receives a survey request within an hour after the end (once per person; not for seminars that ended more than 3 days ago).
+
+- The built-in survey (satisfaction, would recommend, comments) is answered once through the registrant's own link and stored as a Seminar Feedback. It cannot be created from the desk.
+- For your own questions, enter the URL of a Google Form or similar in "**External Survey Form URL**" on the seminar's "Website" tab. The request email and the registration status page then link to that form, and the answers are collected by that service (not as Seminar Feedback). Ask for the email address or similar in the form.
+
 ### 5.6 Changes and cancellation
 
 - **Changing date/time or title**: saving the seminar updates Zoom automatically. Personal join URLs stay the same. Notify registrants of the change separately if needed (Zoom does not notify them).

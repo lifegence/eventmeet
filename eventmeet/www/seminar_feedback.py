@@ -19,9 +19,13 @@ def get_context(context):
 	# Only echo the stored token (never raw query input) into the page script.
 	context.token = registration.access_token
 	seminar = frappe.db.get_value(
-		"Seminar", registration.seminar, ["title", "feedback_enabled", "starts_at"], as_dict=True
+		"Seminar",
+		registration.seminar,
+		["title", "feedback_enabled", "feedback_form_url", "starts_at"],
+		as_dict=True,
 	)
 	context.seminar_title = seminar.title
+	context.external_form_url = (seminar.feedback_form_url or "").strip()
 	context.submitted = frappe.db.exists("Seminar Feedback", {"registration": registration.name})
 	context.available = seminar.feedback_enabled and now_datetime() >= get_datetime(seminar.starts_at)
 	return website.apply(context, "feedback")
