@@ -112,7 +112,6 @@ REMINDER_LOOKAHEAD_DAYS = 14
 
 def send_seminar_reminders():
 	"""Remind confirmed registrants the seminar's (or the settings') number of hours before the start."""
-	default_hours = cint(frappe.db.get_single_value("Seminar Settings", "reminder_hours_before"))
 	now = now_datetime()
 	seminars = frappe.get_all(
 		"Seminar",
@@ -123,7 +122,7 @@ def send_seminar_reminders():
 		fields=["name", "starts_at", "reminder_hours_before"],
 	)
 	for seminar in seminars:
-		hours = cint(seminar.reminder_hours_before) or default_hours
+		hours = registration.reminder_hours(seminar)
 		if hours <= 0 or get_datetime(seminar.starts_at) > add_to_date(now, hours=hours):
 			continue
 		names = frappe.get_all(

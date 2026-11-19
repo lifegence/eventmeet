@@ -32,6 +32,8 @@
   Hours Before" (e.g. 2 hours). The reminder includes "How to Join".
 - Confirmation, join information, reminder and cancellation emails are sent from a background job right
   after the commit instead of waiting for the scheduler's email queue flush (up to a few minutes).
+- Registrants confirmed after the reminder time do not receive the reminder minutes after the confirmation
+  (online seminars: when the confirmation gave the join link).
 - When a delayed Zoom registration succeeds, the registrant receives the join information instead of a second
   confirmation email.
 

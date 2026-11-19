@@ -227,7 +227,7 @@
    "fieldtype": "Column Break"
   },
   {
-   "description": "Buttons and the line above the card. Default: near-black.",
+   "description": "Buttons and the label above the title. Default: near-black.",
    "fieldname": "email_accent_color",
    "fieldtype": "Color",
    "label": "Accent Color"
@@ -242,7 +242,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-19 14:00:00.000000",
+ "modified": "2026-11-19 15:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",
