@@ -68,13 +68,17 @@ def _send(
 	reference,
 	attachments=None,
 	raise_on_error: bool = False,
+	immediate: bool = False,
 ) -> bool:
 	"""Queue an email. Attendee notifications must never roll back payments or
 	registrations (e.g. inside the Stripe webhook), so failures are logged unless
-	the caller is an interactive action that should surface the error."""
+	the caller is an interactive action that should surface the error.
+
+	`immediate`: send it from a background job right after the commit instead of waiting for the
+	scheduler's queue flush (which runs every few minutes)."""
 	message_count = len(frappe.local.message_log or [])
 	try:
-		frappe.sendmail(
+		queue = frappe.sendmail(
 			recipients=recipients,
 			subject=subject,
 			template=template,
@@ -83,6 +87,8 @@ def _send(
 			reference_name=reference.name,
 			attachments=attachments or [],
 		)
+		if immediate:
+			_send_after_commit(queue)
 		return True
 	except Exception:
 		if raise_on_error:
@@ -93,6 +99,22 @@ def _send(
 			title=f"Email '{template}' failed for {reference.name}", message=frappe.get_traceback()
 		)
 		return False
+
+
+def _send_after_commit(queue) -> None:
+	name = getattr(queue, "name", None)
+	if not name:
+		return
+	try:
+		frappe.enqueue(
+			"frappe.email.doctype.email_queue.email_queue.send_now",
+			name=name,
+			queue="short",
+			enqueue_after_commit=True,
+		)
+	except Exception:
+		# The scheduler's queue flush still sends it.
+		frappe.log_error(title=f"Could not send email {name} immediately", message=frappe.get_traceback())
 
 
 def send_registration_confirmed(registration, include_join: bool | None = None) -> bool:
@@ -107,6 +129,7 @@ def send_registration_confirmed(registration, include_join: bool | None = None) 
 		context,
 		registration,
 		attachments,
+		immediate=True,
 	)
 
 
@@ -118,6 +141,7 @@ def send_join_info(registration) -> bool:
 		"seminar_join_info",
 		context,
 		registration,
+		immediate=True,
 	)
 
 
@@ -129,6 +153,7 @@ def send_seminar_reminder(registration) -> bool:
 		"seminar_reminder",
 		context,
 		registration,
+		immediate=True,
 	)
 
 
@@ -151,6 +176,7 @@ def send_registration_cancelled(registration) -> bool:
 		"seminar_registration_cancelled",
 		context,
 		registration,
+		immediate=True,
 	)
 
 
