@@ -386,3 +386,11 @@ class TestEmailDesign(SeminarTestCase):
 			notifications.format_period(datetime(2026, 11, 30, 12, 0), datetime(2026, 11, 30, 13, 0)),
 			"2026年11月30日（月）12:00〜13:00",
 		)
+
+
+class TestSeminarFeedbackPermissions(SeminarTestCase):
+	def test_feedback_is_not_created_from_the_desk(self):
+		# Every field is read-only (answers come from the survey link), so a new form would be empty.
+		for role in ("System Manager", "Seminar Manager", "Seminar Staff"):
+			perms = [p for p in frappe.get_meta("Seminar Feedback").permissions if p.role == role]
+			self.assertFalse(any(p.create for p in perms), role)
