@@ -1,6 +1,6 @@
 {#- The join link and how to join. Context: join_url, joining_instructions, seminar, brand. -#}
 {%- from "templates/emails/_macros.html" import button -%}
-<div style="margin: 0 0 24px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 8px;">
+<div style="margin: 0 0 24px; padding: 20px; background-color: #f6f7f9; border-radius: 8px;">
 	<p style="margin: 0 0 12px; font-size: 15px; font-weight: 700; color: #1a1a1a;">{{ _("Online participation") }}</p>
 	{{ button(join_url, _("Join online"), brand.accent) }}
 	<p style="margin: 0; font-size: 12px; line-height: 1.7; color: #6b7280;">

@@ -268,33 +268,56 @@ class TestReminders(SeminarTestCase):
 		keep_in_test_transaction(self)
 		set_settings(self, reminder_hours_before=24)
 
-	def test_seminar_hours_override_the_settings(self):
-		seminar = make_seminar(
+	def reminders_to(self, email):
+		# Seminars of earlier tests in this class stay in the transaction: count per recipient.
+		return [m for m in self.mail if m["recipients"] == [email] and m["template"] == "seminar_reminder"]
+
+	def online_seminar(self, starts_in_minutes, join_url="https://meet.example.com/abc"):
+		return make_seminar(
 			fmt="Online",
 			use_own_join_url=1,
-			own_join_url="https://meet.example.com/abc",
+			own_join_url=join_url,
 			reminder_hours_before=2,
-			starts_at=add_to_date(now_datetime(), hours=3),
+			starts_at=add_to_date(now_datetime(), minutes=starts_in_minutes),
 		)
-		reg_service.create_registration(seminar.name, "General", "Alice", "alice@example.com")
-		sent = len(self.mail)
+
+	def test_seminar_hours_override_the_settings(self):
+		seminar = self.online_seminar(180)
+		reg_service.create_registration(seminar.name, "General", "Alice", "early@example.com")
 		tasks.send_seminar_reminders()
-		self.assertEqual(len(self.mail), sent, "3 hours before: not yet")
+		self.assertFalse(self.reminders_to("early@example.com"), "3 hours before: not yet")
 
 		frappe.db.set_value("Seminar", seminar.name, "starts_at", add_to_date(now_datetime(), minutes=100))
 		tasks.send_seminar_reminders()
-		self.assertEqual(len(self.mail), sent + 1)
-		self.assertIn("Reminder", self.mail[-1]["subject"])
-		self.assertIn("https://meet.example.com/abc", self.mail[-1]["rendered"])
+		reminders = self.reminders_to("early@example.com")
+		self.assertEqual(len(reminders), 1)
+		self.assertIn("Reminder", reminders[0]["subject"])
+		self.assertIn("https://meet.example.com/abc", reminders[0]["rendered"])
 		tasks.send_seminar_reminders()
-		self.assertEqual(len(self.mail), sent + 1, "sent once")
+		self.assertEqual(len(self.reminders_to("early@example.com")), 1, "sent once")
+
+	def test_registrant_after_the_reminder_time_gets_no_second_email(self):
+		seminar = self.online_seminar(90)
+		reg_service.create_registration(seminar.name, "General", "Late", "late@example.com")
+		doc = registration_for(seminar, "late@example.com")
+		self.assertIn(
+			"https://meet.example.com/abc", self.mail[-1]["rendered"], "the confirmation has the link"
+		)
+		self.assertEqual((doc.join_info_sent, doc.reminder_sent), (1, 1))
+		tasks.send_seminar_reminders()
+		self.assertFalse(self.reminders_to("late@example.com"))
+
+	def test_registrant_without_a_link_yet_still_gets_the_reminder(self):
+		seminar = self.online_seminar(90, join_url="")
+		reg_service.create_registration(seminar.name, "General", "Late", "nolink@example.com")
+		self.assertEqual(registration_for(seminar, "nolink@example.com").reminder_sent, 0)
 
 	def test_settings_hours_apply_by_default(self):
-		seminar = make_seminar(starts_at=add_to_date(now_datetime(), hours=20))
-		reg_service.create_registration(seminar.name, "General", "Alice", "alice@example.com")
-		sent = len(self.mail)
+		seminar = make_seminar(starts_at=add_to_date(now_datetime(), hours=30))
+		reg_service.create_registration(seminar.name, "General", "Alice", "default@example.com")
+		frappe.db.set_value("Seminar", seminar.name, "starts_at", add_to_date(now_datetime(), hours=20))
 		tasks.send_seminar_reminders()
-		self.assertEqual(len(self.mail), sent + 1)
+		self.assertEqual(len(self.reminders_to("default@example.com")), 1)
 
 
 class TestImmediateSending(SeminarTestCase):

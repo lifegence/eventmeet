@@ -509,6 +509,6 @@ Logo Width (px),ロゴの幅（px）
 Brand Name,ブランド名
 Used as the logo's alternative text and when there is no logo.,ロゴの代替テキストと、ロゴがない場合の表示に使います。
 Accent Color,アクセントカラー
-Buttons and the line above the card. Default: near-black.,ボタンとカード上部の線の色です。空欄の場合は黒に近い色を使います。
+Buttons and the label above the title. Default: near-black.,ボタンと見出し上のラベルの色です。空欄の場合は黒に近い色を使います。
 Email Footer,メールのフッター
 "Shown below the card, e.g. the organizer and address.",カードの下に表示します（主催者名、住所など）。

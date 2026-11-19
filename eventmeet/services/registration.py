@@ -5,6 +5,7 @@ from __future__ import annotations
 import frappe
 from frappe import _
 from frappe.utils import (
+	add_to_date,
 	cint,
 	flt,
 	get_datetime,
@@ -245,9 +246,31 @@ def confirm_registration(name: str, payment_intent: str | None = None):
 	ensure_conference_registration(registration)
 	seminar = frappe.get_doc("Seminar", registration.seminar)
 	include_join = join_info_ready(registration, seminar)
-	if notifications.send_registration_confirmed(registration, include_join=include_join) and include_join:
-		registration.db_set("join_info_sent", 1, update_modified=False)
+	if notifications.send_registration_confirmed(registration, include_join=include_join):
+		updates = {}
+		if include_join:
+			updates["join_info_sent"] = 1
+		# Confirmed after the reminder time: the confirmation already says everything the reminder
+		# would (online: only if it gave the join link), so do not send a second email minutes later.
+		if in_reminder_window(seminar) and (include_join or seminar.format == "Offline"):
+			updates["reminder_sent"] = 1
+		if updates:
+			registration.db_set(updates, update_modified=False)
 	return registration
+
+
+def reminder_hours(seminar) -> int:
+	"""Hours before the start when the reminder goes out (0 = no reminder)."""
+	return cint(seminar.get("reminder_hours_before")) or cint(
+		frappe.db.get_single_value("Seminar Settings", "reminder_hours_before")
+	)
+
+
+def in_reminder_window(seminar, now=None) -> bool:
+	hours = reminder_hours(seminar)
+	if hours <= 0:
+		return False
+	return (now or now_datetime()) >= add_to_date(get_datetime(seminar.starts_at), hours=-hours)
 
 
 # ------------------------------------------------------------- join information

@@ -262,7 +262,7 @@ To announce the join link on a set day (e.g. three days before), set "Send Join 
 | At that time | The "Join information" email with the join URL and "How to Join" (sent within 10 minutes) |
 | After that time | The confirmation email includes the join information; no second email |
 
-Each registration records "Join Information Sent", so nobody receives it twice. The reminder (e.g. 2 hours before) repeats the join URL. Without "Send Join Information At", the confirmation email includes the join URL as before.
+Each registration records "Join Information Sent", so nobody receives it twice. The reminder (e.g. 2 hours before) repeats the join URL; registrants confirmed after the reminder time do not get it, as their confirmation already has the link. Without "Send Join Information At", the confirmation email includes the join URL as before.
 
 #### Using your own join URL
 
