@@ -1,3 +1,8 @@
-<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
-<p>{{ _("Thank you for attending {0}. Please take a minute to answer our survey.").format(seminar.title | e) }}</p>
-<p><a href="{{ feedback_url }}">{{ _("Answer the survey") }}</a></p>
+{% extends "templates/emails/_layout.html" %}
+{% from "templates/emails/_macros.html" import button %}
+{% block label %}{{ _("Thank you for attending") }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 12px;">{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p style="margin: 0 0 20px;">{{ _("Thank you for attending {0}. Please take a minute to answer our survey.").format(seminar.title | e) }}</p>
+{{ button(feedback_url, _("Answer the survey"), brand.accent) }}
+{% endblock %}

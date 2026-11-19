@@ -478,3 +478,37 @@ Join information: on {0} to registrants confirmed by then (within 10 minutes). L
 Reminder: {0} hours before the start{1} to confirmed registrants (within 10 minutes).,リマインド：開始の {0} 時間前{1}に、確定している申込者へ送信（10 分以内）。
 Reminder: not sent (0 hours in the Seminar Settings).,リマインド：送信しません（セミナー設定が 0 時間）。
 "Before announcing the seminar, register with your own address to check the emails.",告知を始める前に、ご自身のメールアドレスで申し込んで、メールの内容を確認してください。
+Registration received,お申し込み受付
+Join information,視聴のご案内
+Starting soon,まもなく開催
+Registration cancelled,お申し込みのキャンセル
+Thank you for attending,ご参加ありがとうございました
+Date and time,日時
+Format,形式
+Map,地図
+"If the button does not work, open this URL:",ボタンが開かない場合は、次の URL を開いてください：
+You are receiving this email because you registered for {0}.,このメールは「{0}」にお申し込みいただいた方にお送りしています。
+Please join from the link below at the start time.,お時間になりましたら、下記のボタンからご参加ください。
+"On the day, please show the attached QR code at the reception. You can also open it from the link below.",当日は、添付の QR コードを受付でご提示ください。下記のリンクからも表示できます。
+Taro Yamada,山田 太郎
+Unknown email: {0},不明なメールの種類です: {0}
+Preview,プレビュー
+Emails,メール
+Confirmation,受付完了
+Join Information,視聴案内
+Reminder,リマインド
+Cancellation,キャンセル
+Survey Request,アンケート依頼
+Email Preview,メールのプレビュー
+Subject,件名
+Email Design,メールのデザイン
+"Attendee emails (confirmation, join information, reminder, cancellation, survey). Preview them from a seminar: Emails > Preview.",申込者へのメール（受付完了・視聴案内・リマインド・キャンセル・アンケート依頼）のデザインです。セミナー画面の「メール」>「プレビュー」で確認できます。
+Email Logo,メールのロゴ
+Shown at the top of the emails. Defaults to the Website Settings app logo.,メールの上部に表示します。空欄の場合は Web サイト設定のアプリロゴを使います。
+Logo Width (px),ロゴの幅（px）
+Brand Name,ブランド名
+Used as the logo's alternative text and when there is no logo.,ロゴの代替テキストと、ロゴがない場合の表示に使います。
+Accent Color,アクセントカラー
+Buttons and the line above the card. Default: near-black.,ボタンとカード上部の線の色です。空欄の場合は黒に近い色を使います。
+Email Footer,メールのフッター
+"Shown below the card, e.g. the organizer and address.",カードの下に表示します（主催者名、住所など）。

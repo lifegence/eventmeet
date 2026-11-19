@@ -207,6 +207,14 @@ class Seminar(WebsiteGenerator):
 			"truncated": len(registrations) > REGISTRATION_LIST_LIMIT,
 		}
 
+	@frappe.whitelist()
+	def preview_email(self, kind: str) -> dict:
+		"""An attendee email of this seminar for a sample registrant (nothing is sent or saved)."""
+		from eventmeet.services.notifications import render_preview
+
+		self.check_permission("read")
+		return render_preview(self.name, kind)
+
 	# ----------------------------------------------------------------- website
 	def get_context(self, context):
 		from eventmeet.services.registration import count_active, interest_options

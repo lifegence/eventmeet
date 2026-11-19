@@ -1,9 +1,12 @@
-<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
-<p>{{ _("This is a reminder that the seminar is coming up soon.") }}</p>
-{% include "templates/emails/_seminar_details.html" %}
-{% if is_online and join_url %}
+{% extends "templates/emails/_layout.html" %}
+{% from "templates/emails/_macros.html" import text_link %}
+{% block label %}{{ _("Starting soon") }}{% endblock %}
+{% block content %}
+<p style="margin: 0 0 12px;">{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p style="margin: 0 0 24px;">{{ _("This is a reminder that the seminar is coming up soon.") }}{% if is_online and join_url %}<br>{{ _("Please join from the link below at the start time.") }}{% endif %}</p>
+{% include "templates/emails/_details.html" %}
+{%- if is_online and join_url %}
 {% include "templates/emails/_join_details.html" %}
-<p>{{ _("Please join from the link above at the start time.") }}</p>
-{% endif %}
-<p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>
-{% include "templates/emails/_contact.html" %}
+{%- endif %}
+{{ text_link(status_url, _("View your registration")) }}
+{% endblock %}

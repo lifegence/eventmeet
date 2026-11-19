@@ -17,6 +17,13 @@
   "column_break_registration_form",
   "ask_marketing_opt_in",
   "marketing_opt_in_label",
+  "email_design_section",
+  "email_logo",
+  "email_logo_width",
+  "email_brand_name",
+  "column_break_email_design",
+  "email_accent_color",
+  "email_footer",
   "stripe_section",
   "stripe_enabled",
   "stripe_secret_key",
@@ -189,12 +196,53 @@
    "fieldname": "marketing_opt_in_label",
    "fieldtype": "Small Text",
    "label": "Further Information Text"
+  },
+  {
+   "fieldname": "email_design_section",
+   "fieldtype": "Section Break",
+   "label": "Email Design",
+   "collapsible": 1,
+   "description": "Attendee emails (confirmation, join information, reminder, cancellation, survey). Preview them from a seminar: Emails > Preview."
+  },
+  {
+   "description": "Shown at the top of the emails. Defaults to the Website Settings app logo.",
+   "fieldname": "email_logo",
+   "fieldtype": "Attach Image",
+   "label": "Email Logo"
+  },
+  {
+   "default": "120",
+   "fieldname": "email_logo_width",
+   "fieldtype": "Int",
+   "label": "Logo Width (px)"
+  },
+  {
+   "description": "Used as the logo's alternative text and when there is no logo.",
+   "fieldname": "email_brand_name",
+   "fieldtype": "Data",
+   "label": "Brand Name"
+  },
+  {
+   "fieldname": "column_break_email_design",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "Buttons and the line above the card. Default: near-black.",
+   "fieldname": "email_accent_color",
+   "fieldtype": "Color",
+   "label": "Accent Color"
+  },
+  {
+   "description": "Shown below the card, e.g. the organizer and address.",
+   "fieldname": "email_footer",
+   "fieldtype": "Small Text",
+   "label": "Email Footer"
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-19 12:00:00.000000",
+ "modified": "2026-11-19 14:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",

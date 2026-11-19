@@ -22,6 +22,10 @@
   set (Zoom host settings, webinar, own join URL) and what saving sends to Zoom; "Attendee Emails" lists when
   each email is sent, computed from the seminar's times.
 
+- Email design: the attendee emails share a card layout with a logo, an accent colour (buttons) and a footer,
+  set in Seminar Settings > Email Design. Dates read "2026年11月30日（月）12:00〜13:00" in Japanese.
+  "Emails > Preview" on a seminar shows each email for a sample registrant without sending anything.
+
 ### Changed
 
 - Reminders are checked every 10 minutes instead of hourly, and a seminar can set its own "Send Reminder

@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 import io
+import re
 from zoneinfo import ZoneInfo
 
 import frappe
 from frappe import _
-from frappe.utils import format_datetime, get_datetime, get_system_timezone, get_url
+from frappe.utils import cint, format_datetime, get_datetime, get_system_timezone, get_url
 
 
 def qr_png(data: str) -> bytes:
@@ -22,6 +23,49 @@ def contact_email(seminar) -> str:
 	return (
 		seminar.get("contact_email") or frappe.db.get_single_value("Seminar Settings", "contact_email") or ""
 	)
+
+
+WEEKDAYS_JA = "月火水木金土日"
+DEFAULT_ACCENT = "#1a1a1a"
+
+
+def format_moment(value, with_date: bool = True) -> str:
+	"""A date and time for attendees: "2026年11月30日（月）12:00" in Japanese, "Mon, Nov 30, 2026 12:00" otherwise."""
+	if not value:
+		return ""
+	value = get_datetime(value)
+	time = value.strftime("%H:%M")
+	if not with_date:
+		return time
+	if (frappe.local.lang or "").startswith("ja"):
+		return f"{value.year}年{value.month}月{value.day}日（{WEEKDAYS_JA[value.weekday()]}）{time}"
+	return f"{value.strftime('%a, %b')} {value.day}, {value.year} {time}"
+
+
+def format_period(starts_at, ends_at) -> str:
+	starts, ends = get_datetime(starts_at), get_datetime(ends_at)
+	end = format_moment(ends, with_date=starts.date() != ends.date())
+	separator = "〜" if (frappe.local.lang or "").startswith("ja") else " – "
+	return f"{format_moment(starts)}{separator}{end}"
+
+
+def email_brand() -> dict:
+	"""Logo, accent colour and footer of the attendee emails (Seminar Settings > Email Design)."""
+	settings = frappe.get_cached_doc("Seminar Settings")
+	logo = settings.get("email_logo") or frappe.db.get_single_value("Website Settings", "app_logo") or ""
+	accent = (settings.get("email_accent_color") or "").strip()
+	if not re.fullmatch(r"#[0-9a-fA-F]{3}(?:[0-9a-fA-F]{3})?", accent):
+		accent = DEFAULT_ACCENT
+	return {
+		"name": settings.get("email_brand_name")
+		or frappe.db.get_single_value("Website Settings", "app_name")
+		or frappe.db.get_single_value("System Settings", "app_name")
+		or "",
+		"logo_url": get_url(logo) if logo else "",
+		"logo_width": cint(settings.get("email_logo_width")) or 120,
+		"accent": accent,
+		"footer": settings.get("email_footer") or "",
+	}
 
 
 def _seminar_context(registration, include_join: bool | None = None) -> dict:
@@ -39,17 +83,15 @@ def _seminar_context(registration, include_join: bool | None = None) -> dict:
 	if include_join is None:
 		include_join = join_info_ready(registration, seminar)
 	return {
+		"brand": email_brand(),
 		"join_url": join_url_for(registration, seminar) if include_join else "",
 		"joining_instructions": seminar.get("joining_instructions") or "",
-		"join_info_send_at": (
-			format_datetime(seminar.join_info_send_at, "yyyy-MM-dd HH:mm")
-			if seminar.get("join_info_send_at")
-			else ""
-		),
+		"join_info_send_at": format_moment(seminar.get("join_info_send_at")),
 		"contact_email": contact_email(seminar),
 		"registration": registration,
 		"seminar": seminar,
 		"venue": venue,
+		"when": format_period(seminar.starts_at, seminar.ends_at),
 		"starts_at": format_datetime(seminar.starts_at, "yyyy-MM-dd HH:mm"),
 		"ends_at": format_datetime(seminar.ends_at, "HH:mm"),
 		"status_url": status_url(registration),
@@ -117,6 +159,46 @@ def _send_after_commit(queue) -> None:
 		frappe.log_error(title=f"Could not send email {name} immediately", message=frappe.get_traceback())
 
 
+SEMINAR_EMAILS = {
+	"confirmation": ("Registration confirmed: {0}", "seminar_registration_confirmed"),
+	"join_info": ("Join information: {0}", "seminar_join_info"),
+	"reminder": ("Reminder: {0}", "seminar_reminder"),
+	"cancellation": ("Registration cancelled: {0}", "seminar_registration_cancelled"),
+	"feedback": ("Thank you for attending {0}", "seminar_feedback_request"),
+}
+
+
+def seminar_email_subject(kind: str, seminar) -> str:
+	return _(SEMINAR_EMAILS[kind][0]).format(seminar.title)
+
+
+def render_preview(seminar_name: str, kind: str) -> dict:
+	"""The email `kind` of a seminar for a sample registrant, as it would be sent now (nothing is saved)."""
+	if kind not in SEMINAR_EMAILS:
+		frappe.throw(_("Unknown email: {0}").format(kind))
+	seminar = frappe.get_doc("Seminar", seminar_name)
+	ticket = next((t for t in seminar.ticket_types if t.enabled), None)
+	registration = frappe.get_doc(
+		{
+			"doctype": "Seminar Registration",
+			"name": "PREVIEW",
+			"seminar": seminar.name,
+			"ticket_type": ticket.ticket_name if ticket else "",
+			"attendee_name": _("Taro Yamada"),
+			"email": "taro@example.com",
+			"status": "Cancelled" if kind == "cancellation" else "Confirmed",
+			"access_token": "preview",
+			"join_url": "https://zoom.us/j/0000000000?tk=preview" if seminar.format != "Offline" else "",
+		}
+	)
+	include_join = kind in ("join_info", "reminder") or None
+	context = _seminar_context(registration, include_join)
+	if kind in ("join_info", "reminder") and not context["join_url"]:
+		context["join_url"] = seminar.get("own_join_url") or registration.join_url
+	html = frappe.get_template(f"templates/emails/{SEMINAR_EMAILS[kind][1]}.html").render(context)
+	return {"subject": seminar_email_subject(kind, seminar), "html": html}
+
+
 def send_registration_confirmed(registration, include_join: bool | None = None) -> bool:
 	context = _seminar_context(registration, include_join)
 	attachments = []
@@ -124,7 +206,7 @@ def send_registration_confirmed(registration, include_join: bool | None = None) 
 		attachments.append({"fname": "checkin-qr.png", "fcontent": qr_png(context["checkin_url"])})
 	return _send(
 		[registration.email],
-		_("Registration confirmed: {0}").format(context["seminar"].title),
+		seminar_email_subject("confirmation", context["seminar"]),
 		"seminar_registration_confirmed",
 		context,
 		registration,
@@ -137,7 +219,7 @@ def send_join_info(registration) -> bool:
 	context = _seminar_context(registration, include_join=True)
 	return _send(
 		[registration.email],
-		_("Join information: {0}").format(context["seminar"].title),
+		seminar_email_subject("join_info", context["seminar"]),
 		"seminar_join_info",
 		context,
 		registration,
@@ -149,7 +231,7 @@ def send_seminar_reminder(registration) -> bool:
 	context = _seminar_context(registration)
 	return _send(
 		[registration.email],
-		_("Reminder: {0}").format(context["seminar"].title),
+		seminar_email_subject("reminder", context["seminar"]),
 		"seminar_reminder",
 		context,
 		registration,
@@ -161,7 +243,7 @@ def send_feedback_request(registration) -> bool:
 	context = _seminar_context(registration)
 	return _send(
 		[registration.email],
-		_("Thank you for attending {0}").format(context["seminar"].title),
+		seminar_email_subject("feedback", context["seminar"]),
 		"seminar_feedback_request",
 		context,
 		registration,
@@ -172,7 +254,7 @@ def send_registration_cancelled(registration) -> bool:
 	context = _seminar_context(registration)
 	return _send(
 		[registration.email],
-		_("Registration cancelled: {0}").format(context["seminar"].title),
+		seminar_email_subject("cancellation", context["seminar"]),
 		"seminar_registration_cancelled",
 		context,
 		registration,
