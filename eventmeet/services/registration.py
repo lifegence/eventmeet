@@ -29,7 +29,14 @@ def checkin_url(registration) -> str:
 	return get_url(f"/seminar-checkin?token={registration.access_token}")
 
 
-def feedback_url(registration) -> str:
+def feedback_url(registration, seminar=None) -> str:
+	"""The survey for the registrant: the seminar's external form, or the built-in survey page."""
+	if seminar:
+		external = seminar.get("feedback_form_url")
+	else:
+		external = frappe.db.get_value("Seminar", registration.seminar, "feedback_form_url")
+	if external:
+		return external.strip()
 	return get_url(f"/seminar-feedback?token={registration.access_token}")
 
 
@@ -454,9 +461,9 @@ def submit_feedback(token: str, rating, comments: str | None = None, would_recom
 	if not registration or registration.status != "Confirmed":
 		frappe.throw(_("Invalid feedback link."), frappe.DoesNotExistError)
 	seminar = frappe.db.get_value(
-		"Seminar", registration.seminar, ["feedback_enabled", "starts_at"], as_dict=True
+		"Seminar", registration.seminar, ["feedback_enabled", "feedback_form_url", "starts_at"], as_dict=True
 	)
-	if not seminar.feedback_enabled:
+	if not seminar.feedback_enabled or seminar.feedback_form_url:
 		frappe.throw(_("Feedback is not collected for this seminar."))
 	if now_datetime() < get_datetime(seminar.starts_at):
 		frappe.throw(_("Feedback opens after the seminar starts."))

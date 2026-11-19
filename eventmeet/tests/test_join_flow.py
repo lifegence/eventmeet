@@ -394,3 +394,42 @@ class TestSeminarFeedbackPermissions(SeminarTestCase):
 		for role in ("System Manager", "Seminar Manager", "Seminar Staff"):
 			perms = [p for p in frappe.get_meta("Seminar Feedback").permissions if p.role == role]
 			self.assertFalse(any(p.create for p in perms), role)
+
+
+class TestExternalSurveyForm(SeminarTestCase):
+	FORM = "https://forms.example.com/survey?id=1&lang=ja"
+
+	def setUp(self):
+		with patch("frappe.sendmail"):
+			self.seminar = make_seminar(title="External Survey")
+			reg_service.create_registration(self.seminar.name, "General", "Hanako", "hanako@example.com")
+		self.registration = registration_for(self.seminar, "hanako@example.com")
+
+	def use_form(self, url=FORM):
+		self.seminar.reload()
+		self.seminar.feedback_form_url = url
+		self.seminar.save()
+
+	def test_request_links_to_the_external_form(self):
+		self.assertIn("/seminar-feedback?token=", reg_service.feedback_url(self.registration))
+		self.use_form(f"  {self.FORM} ")
+		self.assertEqual(self.seminar.feedback_form_url, self.FORM, "trimmed when saved")
+		self.assertEqual(reg_service.feedback_url(self.registration), self.FORM)
+		html = notifications.render_preview(self.seminar.name, "feedback")["html"]
+		self.assertIn("https://forms.example.com/survey?id=1&amp;lang=ja", html)
+		self.assertNotIn("/seminar-feedback?token=", html)
+
+	def test_survey_page_points_to_the_external_form(self):
+		self.use_form()
+		frappe.db.set_value("Seminar", self.seminar.name, "starts_at", add_to_date(now_datetime(), hours=-1))
+		status, html = render("seminar-feedback", token=self.registration.access_token)
+		frappe.local.request = None
+		self.assertEqual(status, 200)
+		self.assertIn("https://forms.example.com/survey?id=1&amp;lang=ja", html)
+		self.assertNotIn('id="ls-feedback-form"', html)
+		with self.assertRaises(frappe.ValidationError):
+			reg_service.submit_feedback(self.registration.access_token, 5)
+
+	def test_only_web_addresses(self):
+		with self.assertRaises(frappe.ValidationError):
+			self.use_form("javascript:alert(1)")

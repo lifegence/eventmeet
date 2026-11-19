@@ -512,3 +512,10 @@ Accent Color,アクセントカラー
 Buttons and the label above the title. Default: near-black.,ボタンと見出し上のラベルの色です。空欄の場合は黒に近い色を使います。
 Email Footer,メールのフッター
 "Shown below the card, e.g. the organizer and address.",カードの下に表示します（主催者名、住所など）。
+External Survey Form URL,外部アンケートフォームの URL
+"Survey form of another service (e.g. Google Forms). If set, the survey request email links to this form instead of the built-in survey.",他サービスのアンケートフォーム（Google フォームなど）の URL です。入力すると、アンケート依頼メールのリンク先が標準のアンケートではなくこのフォームになります。
+External Survey Form URL must start with https:// or http://.,外部アンケートフォームの URL は https:// または http:// で始めてください。
+Please answer the survey on the following form.,以下のフォームからアンケートにご回答ください。
+Survey request: not sent.,アンケート依頼：送信しません。
+"Survey request: within an hour after the end, to confirmed registrants, with the link to the external survey form.",アンケート依頼：終了後1時間以内に、申込確定の方へ外部アンケートフォームのリンクを送ります。
+"Survey request: within an hour after the end, to confirmed registrants, with the link to the built-in survey.",アンケート依頼：終了後1時間以内に、申込確定の方へ標準アンケートのリンクを送ります。

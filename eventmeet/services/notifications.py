@@ -96,7 +96,7 @@ def _seminar_context(registration, include_join: bool | None = None) -> dict:
 		"ends_at": format_datetime(seminar.ends_at, "HH:mm"),
 		"status_url": status_url(registration),
 		"checkin_url": checkin_url(registration),
-		"feedback_url": feedback_url(registration),
+		"feedback_url": feedback_url(registration, seminar),
 		"is_online": seminar.format in ("Online", "Hybrid"),
 		"is_onsite": seminar.format in ("Offline", "Hybrid"),
 	}

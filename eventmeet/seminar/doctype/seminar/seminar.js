@@ -8,14 +8,19 @@ const HELP_FIELDS = [
 	"use_own_join_url",
 	"join_info_send_at",
 	"reminder_hours_before",
+	"feedback_enabled",
+	"feedback_form_url",
 ];
 
 frappe.ui.form.on("Seminar", {
 	onload(frm) {
-		frappe.db.get_single_value("Seminar Settings", "reminder_hours_before").then((hours) => {
-			frm.__default_reminder_hours = hours || 0;
-			render_help(frm);
-		});
+		frappe.db
+			.get_value("Seminar Settings", "Seminar Settings", ["reminder_hours_before", "send_feedback_request"])
+			.then(({ message }) => {
+				frm.__default_reminder_hours = (message && message.reminder_hours_before) || 0;
+				frm.__send_feedback_request = cint(message && message.send_feedback_request);
+				render_help(frm);
+			});
 	},
 	refresh(frm) {
 		render_help(frm);
@@ -111,6 +116,13 @@ function render_attendee_emails_help(frm) {
 		);
 	} else {
 		items.push(__("Reminder: not sent (0 hours in the Seminar Settings)."));
+	}
+	if (!doc.feedback_enabled || !frm.__send_feedback_request) {
+		items.push(__("Survey request: not sent."));
+	} else if (doc.feedback_form_url) {
+		items.push(__("Survey request: within an hour after the end, to confirmed registrants, with the link to the external survey form."));
+	} else {
+		items.push(__("Survey request: within an hour after the end, to confirmed registrants, with the link to the built-in survey."));
 	}
 	items.push(__("Before announcing the seminar, register with your own address to check the emails."));
 	field.$wrapper.html(help_box(items));

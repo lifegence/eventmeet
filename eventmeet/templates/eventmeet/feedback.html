@@ -1,6 +1,6 @@
 {% extends "eventmeet/templates/eventmeet/layout.html" %}
 {#- Survey (/seminar-feedback?token=...). Context: registration (or None), submitted, available,
-    seminar_title. The page script submits the form with id "ls-feedback-form" (fields rating,
+    seminar_title, external_form_url (the seminar's external survey form, if any). The page script submits the form with id "ls-feedback-form" (fields rating,
     would_recommend, comments) and then shows "ls-feedback-done"; keep these ids when you override em_form. -#}
 
 {% block em_content %}
@@ -14,6 +14,12 @@
 	<div class="ls-box">{{ _("Feedback has already been submitted. Thank you!") }}</div>
 	{% elif not available %}
 	<div class="ls-box">{{ _("The survey is not open yet.") }}</div>
+	{% elif external_form_url %}
+	<p>{{ seminar_title | e }}</p>
+	<div class="ls-box">
+		<p>{{ _("Please answer the survey on the following form.") }}</p>
+		<a class="btn btn-primary" href="{{ external_form_url | e }}" target="_blank" rel="noopener noreferrer">{{ _("Answer the survey") }}</a>
+	</div>
 	{% else %}
 	<p>{{ seminar_title | e }}</p>
 	<form class="ls-form ls-box" id="ls-feedback-form">

@@ -68,6 +68,9 @@ class Seminar(WebsiteGenerator):
 		self.own_join_url = (self.own_join_url or "").strip()
 		if self.own_join_url and not self.own_join_url.lower().startswith(("https://", "http://")):
 			frappe.throw(_("Own Join URL must start with https:// or http://."))
+		self.feedback_form_url = (self.feedback_form_url or "").strip()
+		if self.feedback_form_url and not self.feedback_form_url.lower().startswith(("https://", "http://")):
+			frappe.throw(_("External Survey Form URL must start with https:// or http://."))
 		if self.join_info_send_at and get_datetime(self.join_info_send_at) >= get_datetime(self.starts_at):
 			frappe.throw(_("Send Join Information At must be before the start time."))
 		if cint(self.reminder_hours_before) < 0:

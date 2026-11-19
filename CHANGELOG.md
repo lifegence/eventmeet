@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.2 - 2026-11-19
+
+### Added
+
+- External survey form per seminar ("Website" > "External Survey Form URL"): the survey request email and the
+  registration status page link to it (e.g. Google Forms) instead of the built-in survey.
+- The attendee email notes on the seminar form also say when the survey request is sent and where it links.
+
 ## 0.5.1 - 2026-11-19
 
 ### Fixed
