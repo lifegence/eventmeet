@@ -294,3 +294,27 @@ class TestReminders(SeminarTestCase):
 		sent = len(self.mail)
 		tasks.send_seminar_reminders()
 		self.assertEqual(len(self.mail), sent + 1)
+
+
+class TestImmediateSending(SeminarTestCase):
+	def test_confirmation_is_sent_right_after_the_commit(self):
+		seminar = make_seminar()
+		with (
+			patch("frappe.sendmail", return_value=frappe._dict(name="EQ-TEST")),
+			patch("frappe.enqueue") as enqueue,
+		):
+			reg_service.create_registration(seminar.name, "General", "Alice", "alice@example.com")
+		enqueue.assert_called_once()
+		self.assertEqual(enqueue.call_args.args[0], "frappe.email.doctype.email_queue.email_queue.send_now")
+		self.assertEqual(enqueue.call_args.kwargs["name"], "EQ-TEST")
+		self.assertTrue(enqueue.call_args.kwargs["enqueue_after_commit"])
+
+	def test_registration_survives_a_failing_enqueue(self):
+		seminar = make_seminar()
+		with (
+			patch("frappe.sendmail", return_value=frappe._dict(name="EQ-TEST")),
+			patch("frappe.enqueue", side_effect=RuntimeError("redis down")),
+		):
+			result = reg_service.create_registration(seminar.name, "General", "Alice", "alice@example.com")
+		self.assertEqual(result["status"], "Confirmed")
+		self.assertEqual(registration_for(seminar).status, "Confirmed")
