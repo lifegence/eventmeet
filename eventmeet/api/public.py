@@ -23,6 +23,13 @@ def register(
 	utm_term: str | None = None,
 	utm_content: str | None = None,
 	referrer: str | None = None,
+	department: str | None = None,
+	job_title: str | None = None,
+	interests: str | list | None = None,
+	question: str | None = None,
+	consultation_requested: str | int | None = None,
+	privacy_consent: str | int | None = None,
+	marketing_opt_in: str | int | None = None,
 ):
 	if website:
 		# Honeypot field that is hidden from humans.
@@ -35,8 +42,17 @@ def register(
 		"utm_content": utm_content,
 		"referrer": referrer,
 	}
+	answers = {
+		"department": department,
+		"job_title": job_title,
+		"interests": interests,
+		"question": question,
+		"consultation_requested": consultation_requested,
+		"privacy_consent": privacy_consent,
+		"marketing_opt_in": marketing_opt_in,
+	}
 	return registration.create_registration(
-		seminar, ticket_type, attendee_name, email, company, phone, tracking=tracking
+		seminar, ticket_type, attendee_name, email, company, phone, tracking=tracking, answers=answers
 	)
 
 

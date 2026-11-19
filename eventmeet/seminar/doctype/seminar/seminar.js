@@ -69,6 +69,7 @@ function render_registrations(frm, { registrations, truncated }) {
 				<td><span class="indicator-pill ${STATUS_COLORS[r.status] || "gray"}">${esc(__(r.status, null, "Seminar Registration"))}</span></td>
 				<td class="text-center">${check(r.checked_in)}</td>
 				<td class="text-center">${check(r.attended_online)}</td>
+				<td class="text-center">${check(r.consultation_requested)}</td>
 			</tr>`
 		)
 		.join("");
@@ -89,6 +90,7 @@ function render_registrations(frm, { registrations, truncated }) {
 						<th>${__("Status")}</th>
 						<th class="text-center">${__("Checked In")}</th>
 						<th class="text-center">${__("Attended Online")}</th>
+						<th class="text-center">${__("Consultation")}</th>
 					</tr></thead>
 					<tbody>${rows}</tbody>
 				</table></div>`

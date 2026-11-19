@@ -1,7 +1,7 @@
 """Scheduled jobs (see hooks.scheduler_events)."""
 
 import frappe
-from frappe.utils import add_to_date, cint, now_datetime
+from frappe.utils import add_to_date, cint, get_datetime, now_datetime
 
 from eventmeet.services import conference, notifications, registration, stripe_api
 
@@ -54,6 +54,7 @@ def retry_missing_conference_registrations():
 			and ifnull(r.join_url, '') = ''
 			and s.format in ('Online', 'Hybrid')
 			and ifnull(s.conference_session, '') != ''
+			and ifnull(s.use_own_join_url, 0) = 0
 			and s.ends_at > %(now)s
 		limit %(limit)s
 		""",
@@ -64,7 +65,9 @@ def retry_missing_conference_registrations():
 	def retry(name):
 		doc = frappe.get_doc("Seminar Registration", name)
 		if registration.ensure_conference_registration(doc) and doc.join_url:
-			notifications.send_registration_confirmed(doc)
+			# The confirmation said the link follows; send it now unless it is not due yet
+			# (then send_join_information sends it at the seminar's time).
+			registration.send_join_info_if_ready(doc, frappe.get_doc("Seminar", doc.seminar))
 
 	_each(rows, retry, "Conference registration retry")
 
@@ -73,23 +76,59 @@ def process_ended_conference_sessions():
 	conference.process_ended_sessions()
 
 
-def send_seminar_reminders():
-	hours = cint(frappe.db.get_single_value("Seminar Settings", "reminder_hours_before"))
-	if hours <= 0:
-		return
+def send_join_information():
+	"""Send the join information of seminars whose "Send Join Information At" has come to the
+	registrants who have not received it. Registrants without a join link yet are retried by
+	retry_missing_conference_registrations."""
 	now = now_datetime()
 	seminars = frappe.get_all(
 		"Seminar",
 		filters={
 			"status": ["in", ["Open", "Closed"]],
-			"starts_at": ["between", [now, add_to_date(now, hours=hours)]],
+			"format": ["in", ["Online", "Hybrid"]],
+			"join_info_send_at": ["<=", now],
+			"ends_at": [">", now],
 		},
 		pluck="name",
 	)
-	for seminar in seminars:
+	for seminar_name in seminars:
+		seminar = frappe.get_doc("Seminar", seminar_name)
 		names = frappe.get_all(
 			"Seminar Registration",
-			filters={"seminar": seminar, "status": "Confirmed", "reminder_sent": 0},
+			filters={"seminar": seminar_name, "status": "Confirmed", "join_info_sent": 0},
+			pluck="name",
+			order_by="creation asc",
+			limit=500,
+		)
+
+		def send(name, seminar=seminar):
+			registration.send_join_info_if_ready(frappe.get_doc("Seminar Registration", name), seminar)
+
+		_each(names, send, "Join information")
+
+
+REMINDER_LOOKAHEAD_DAYS = 14
+
+
+def send_seminar_reminders():
+	"""Remind confirmed registrants the seminar's (or the settings') number of hours before the start."""
+	default_hours = cint(frappe.db.get_single_value("Seminar Settings", "reminder_hours_before"))
+	now = now_datetime()
+	seminars = frappe.get_all(
+		"Seminar",
+		filters={
+			"status": ["in", ["Open", "Closed"]],
+			"starts_at": ["between", [now, add_to_date(now, days=REMINDER_LOOKAHEAD_DAYS)]],
+		},
+		fields=["name", "starts_at", "reminder_hours_before"],
+	)
+	for seminar in seminars:
+		hours = cint(seminar.reminder_hours_before) or default_hours
+		if hours <= 0 or get_datetime(seminar.starts_at) > add_to_date(now, hours=hours):
+			continue
+		names = frappe.get_all(
+			"Seminar Registration",
+			filters={"seminar": seminar.name, "status": "Confirmed", "reminder_sent": 0},
 			pluck="name",
 			limit=500,
 		)

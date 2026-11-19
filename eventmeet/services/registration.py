@@ -85,6 +85,57 @@ def clean_tracking(tracking: dict | None) -> dict:
 	return cleaned
 
 
+def _checked(value) -> bool:
+	"""A checkbox value from the public form ("1", "on", "true", True)."""
+	if isinstance(value, str):
+		return value.strip().lower() in ("1", "on", "true", "yes")
+	return bool(value)
+
+
+def interest_options(seminar) -> list[str]:
+	options = []
+	for line in (seminar.get("interest_options") or "").splitlines():
+		line = line.strip()
+		if line and line not in options:
+			options.append(line)
+	return options
+
+
+QUESTION_MAX_LENGTH = 2000
+
+
+def clean_answers(seminar, answers: dict | None) -> dict:
+	"""The optional questions of the registration form. Only questions the seminar asks are kept;
+	topics of interest are limited to the seminar's options."""
+	answers = answers or {}
+	cleaned = {}
+	if seminar.get("ask_department"):
+		cleaned["department"] = _clean_text(answers.get("department"), "Department", 140)
+		cleaned["job_title"] = _clean_text(answers.get("job_title"), "Job Title", 140)
+	options = interest_options(seminar)
+	if options:
+		chosen = answers.get("interests") or []
+		if isinstance(chosen, str):
+			chosen = chosen.splitlines()
+		chosen = {value.strip() for value in chosen if isinstance(value, str)}
+		cleaned["interests"] = "\n".join(option for option in options if option in chosen)
+	if seminar.get("ask_question"):
+		cleaned["question"] = _clean_text(
+			answers.get("question"), "Questions for the Speakers", QUESTION_MAX_LENGTH
+		)
+	if seminar.get("ask_consultation"):
+		cleaned["consultation_requested"] = 1 if _checked(answers.get("consultation_requested")) else 0
+
+	settings = frappe.get_cached_doc("Seminar Settings")
+	if settings.require_privacy_consent:
+		if not _checked(answers.get("privacy_consent")):
+			frappe.throw(_("Please agree to the handling of personal information."))
+		cleaned["privacy_consent_at"] = now_datetime()
+	if settings.ask_marketing_opt_in:
+		cleaned["marketing_opt_in"] = 1 if _checked(answers.get("marketing_opt_in")) else 0
+	return cleaned
+
+
 def create_registration(
 	seminar: str,
 	ticket_type: str,
@@ -93,11 +144,10 @@ def create_registration(
 	company: str | None = None,
 	phone: str | None = None,
 	tracking: dict | None = None,
+	answers: dict | None = None,
 ) -> dict:
 	attendee_name = _clean_text(attendee_name, "Attendee Name", 140, required=True)
 	email = validate_email_address(_clean_text(email, "Email", 140, required=True), throw=True).lower()
-	company = _clean_text(company, "Company", 140)
-	phone = _clean_text(phone, "Phone", 40)
 
 	# Lock the seminar row: capacity checks below must not race with parallel registrations.
 	if not frappe.db.get_value("Seminar", seminar, "name", for_update=True):
@@ -105,6 +155,10 @@ def create_registration(
 	seminar_doc = frappe.get_doc("Seminar", seminar)
 	seminar_doc.validate_open_for_registration()
 	ticket = seminar_doc.get_ticket(ticket_type)
+
+	company = _clean_text(company, "Company", 140, required=bool(seminar_doc.require_company))
+	phone = _clean_text(phone, "Phone", 40) if seminar_doc.ask_phone else ""
+	answers = clean_answers(seminar_doc, answers)
 
 	_release_previous_pending(seminar, email)
 	if frappe.db.exists("Seminar Registration", {"seminar": seminar, "email": email, "status": "Confirmed"}):
@@ -128,6 +182,7 @@ def create_registration(
 			"amount": flt(ticket.price),
 			"currency": ticket.currency or seminar_doc.get_default_currency(),
 			"access_token": frappe.generate_hash(length=40),
+			**answers,
 			**clean_tracking(tracking),
 		}
 	)
@@ -188,8 +243,49 @@ def confirm_registration(name: str, payment_intent: str | None = None):
 	registration.save(ignore_permissions=True)
 
 	ensure_conference_registration(registration)
-	notifications.send_registration_confirmed(registration)
+	seminar = frappe.get_doc("Seminar", registration.seminar)
+	include_join = join_info_ready(registration, seminar)
+	if notifications.send_registration_confirmed(registration, include_join=include_join) and include_join:
+		registration.db_set("join_info_sent", 1, update_modified=False)
 	return registration
+
+
+# ------------------------------------------------------------- join information
+# The join link is announced separately from the confirmation when the seminar has a "Send Join
+# Information At" time: registrants confirmed by then get it in one batch (tasks.send_join_information),
+# later registrants with their confirmation. Without that time the confirmation includes it.
+
+
+def join_url_for(registration, seminar) -> str:
+	"""The seminar's own URL for everyone, otherwise the registrant's personal (Zoom) link."""
+	if seminar.get("use_own_join_url"):
+		return (seminar.get("own_join_url") or "").strip()
+	return registration.get("join_url") or ""
+
+
+def join_info_due(seminar, now=None) -> bool:
+	send_at = seminar.get("join_info_send_at")
+	return not send_at or (now or now_datetime()) >= get_datetime(send_at)
+
+
+def join_info_ready(registration, seminar) -> bool:
+	"""Whether the join link can be given to this registrant now."""
+	return (
+		registration.status == "Confirmed"
+		and seminar.format in ("Online", "Hybrid")
+		and join_info_due(seminar)
+		and bool(join_url_for(registration, seminar))
+	)
+
+
+def send_join_info_if_ready(registration, seminar) -> bool:
+	"""Send the join information once; returns True if it was sent now."""
+	if registration.get("join_info_sent") or not join_info_ready(registration, seminar):
+		return False
+	if notifications.send_join_info(registration):
+		registration.db_set("join_info_sent", 1, update_modified=False)
+		return True
+	return False
 
 
 def confirm_manually(name: str):
@@ -210,9 +306,14 @@ def ensure_conference_registration(registration) -> bool:
 	if registration.status != "Confirmed" or registration.join_url:
 		return True
 	seminar = frappe.db.get_value(
-		"Seminar", registration.seminar, ["format", "conference_session"], as_dict=True
+		"Seminar", registration.seminar, ["format", "conference_session", "use_own_join_url"], as_dict=True
 	)
-	if not seminar or seminar.format == "Offline" or not seminar.conference_session:
+	if (
+		not seminar
+		or seminar.format == "Offline"
+		or seminar.use_own_join_url
+		or not seminar.conference_session
+	):
 		return True
 	try:
 		registrant_id, join_url = register_participant(

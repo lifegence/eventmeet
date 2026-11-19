@@ -13,6 +13,15 @@
   "email",
   "company",
   "phone",
+  "answers_section",
+  "department",
+  "job_title",
+  "interests",
+  "question",
+  "column_break_answers",
+  "consultation_requested",
+  "marketing_opt_in",
+  "privacy_consent_at",
   "payment_section",
   "amount",
   "currency",
@@ -34,6 +43,7 @@
   "column_break_onsite",
   "access_token",
   "reminder_sent",
+  "join_info_sent",
   "feedback_requested",
   "source_section",
   "utm_source",
@@ -280,11 +290,68 @@
    "fieldtype": "Small Text",
    "label": "Referrer",
    "read_only": 1
+  },
+  {
+   "fieldname": "answers_section",
+   "fieldtype": "Section Break",
+   "label": "Answers",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fieldname": "job_title",
+   "fieldtype": "Data",
+   "label": "Job Title"
+  },
+  {
+   "fieldname": "interests",
+   "fieldtype": "Small Text",
+   "label": "Topics of Interest"
+  },
+  {
+   "fieldname": "question",
+   "fieldtype": "Small Text",
+   "label": "Questions for the Speakers"
+  },
+  {
+   "fieldname": "column_break_answers",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "consultation_requested",
+   "fieldtype": "Check",
+   "label": "Individual Consultation Requested",
+   "in_standard_filter": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "marketing_opt_in",
+   "fieldtype": "Check",
+   "label": "Wants Further Information",
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "privacy_consent_at",
+   "fieldtype": "Datetime",
+   "label": "Privacy Consent At",
+   "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "join_info_sent",
+   "fieldtype": "Check",
+   "label": "Join Information Sent",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 0,
  "links": [],
- "modified": "2026-11-18 18:00:00.000000",
+ "modified": "2026-11-19 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Registration",

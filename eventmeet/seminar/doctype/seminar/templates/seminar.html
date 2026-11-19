@@ -16,7 +16,10 @@
 			const button = form.querySelector("button[type=submit]");
 			const message = document.getElementById("ls-register-message");
 			const source = window.eventmeetSource ? window.eventmeetSource() : {};
-			const data = Object.assign({}, source, Object.fromEntries(new FormData(form).entries()));
+			const formData = new FormData(form);
+			const data = Object.assign({}, source, Object.fromEntries(formData.entries()));
+			// Several checkboxes share the name "interests": send all the chosen topics.
+			data.interests = formData.getAll("interests").join("\n");
 			data.seminar = {{ (doc.name) | tojson }};
 			button.disabled = true;
 			message.textContent = {{ (_("Processing...")) | tojson }};

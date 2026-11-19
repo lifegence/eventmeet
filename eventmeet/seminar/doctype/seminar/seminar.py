@@ -26,6 +26,7 @@ class Seminar(WebsiteGenerator):
 		super().validate()
 		self.validate_schedule()
 		self.validate_tickets()
+		self.validate_online_details()
 		if self.format == "Offline" and self.conference_session and self.is_new():
 			self.conference_session = None
 		if self.status == "Open" and not self.published:
@@ -63,6 +64,15 @@ class Seminar(WebsiteGenerator):
 		if self.status == "Open" and not any(t.enabled for t in self.ticket_types):
 			frappe.throw(_("Add at least one enabled ticket type before opening registration."))
 
+	def validate_online_details(self):
+		self.own_join_url = (self.own_join_url or "").strip()
+		if self.own_join_url and not self.own_join_url.lower().startswith(("https://", "http://")):
+			frappe.throw(_("Own Join URL must start with https:// or http://."))
+		if self.join_info_send_at and get_datetime(self.join_info_send_at) >= get_datetime(self.starts_at):
+			frappe.throw(_("Send Join Information At must be before the start time."))
+		if cint(self.reminder_hours_before) < 0:
+			frappe.throw(_("Send Reminder Hours Before cannot be negative."))
+
 	def get_default_currency(self) -> str:
 		return frappe.db.get_single_value("Seminar Settings", "default_currency") or "JPY"
 
@@ -78,7 +88,11 @@ class Seminar(WebsiteGenerator):
 
 	# ------------------------------------------------------------------ online
 	def needs_conference(self) -> bool:
-		return self.format in ("Online", "Hybrid") and self.status in ONLINE_ACTIVE_STATUSES
+		return (
+			self.format in ("Online", "Hybrid")
+			and self.status in ONLINE_ACTIVE_STATUSES
+			and not self.use_own_join_url
+		)
 
 	def sync_conference_session(self):
 		session_status = (
@@ -88,7 +102,9 @@ class Seminar(WebsiteGenerator):
 		)
 		wants_session = self.needs_conference()
 
-		if session_status == "Scheduled" and (self.status == "Cancelled" or self.format == "Offline"):
+		if session_status == "Scheduled" and (
+			self.status == "Cancelled" or self.format == "Offline" or self.use_own_join_url
+		):
 			conference.cancel_session(self.conference_session)
 			self.db_set("join_url", "")
 			return
@@ -147,7 +163,7 @@ class Seminar(WebsiteGenerator):
 			return _("Registration for this seminar is not open.")
 		if now_datetime() > get_datetime(self.registration_closes_at or self.starts_at):
 			return _("Registration for this seminar has closed.")
-		if self.format in ("Online", "Hybrid") and not self.conference_session:
+		if self.format in ("Online", "Hybrid") and not self.use_own_join_url and not self.conference_session:
 			return _("The online session is not ready yet. Please try again later.")
 		return None
 
@@ -175,6 +191,7 @@ class Seminar(WebsiteGenerator):
 				"attended_online",
 				"utm_source",
 				"utm_campaign",
+				"consultation_requested",
 			],
 			order_by="creation asc",
 			limit_page_length=0,
@@ -192,7 +209,7 @@ class Seminar(WebsiteGenerator):
 
 	# ----------------------------------------------------------------- website
 	def get_context(self, context):
-		from eventmeet.services.registration import count_active
+		from eventmeet.services.registration import count_active, interest_options
 
 		context.no_cache = 1
 		context.show_sidebar = False
@@ -231,5 +248,17 @@ class Seminar(WebsiteGenerator):
 		context.registration_open = not context.registration_block_reason and any(
 			not t["sold_out"] for t in tickets
 		)
+		context.interest_options = interest_options(self)
+		settings = frappe.get_cached_doc("Seminar Settings")
+		context.privacy_consent = {
+			"required": bool(settings.require_privacy_consent),
+			"url": settings.privacy_policy_url,
+			"label": settings.privacy_consent_label or _("I agree to the handling of personal information."),
+		}
+		context.marketing_opt_in = {
+			"ask": bool(settings.ask_marketing_opt_in),
+			"label": settings.marketing_opt_in_label
+			or _("I would like to receive information about future events."),
+		}
 		context.csrf_token = frappe.sessions.get_csrf_token() if frappe.session.user != "Guest" else ""
 		website.apply(context, "seminar_detail")

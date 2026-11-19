@@ -1,0 +1,6 @@
+<p>{{ _("Dear {0},").format(registration.attendee_name | e) }}</p>
+<p>{{ _("Here is how to join the seminar online.") }}</p>
+{% include "templates/emails/_seminar_details.html" %}
+{% include "templates/emails/_join_details.html" %}
+<p><a href="{{ status_url }}">{{ _("View your registration") }}</a></p>
+{% include "templates/emails/_contact.html" %}

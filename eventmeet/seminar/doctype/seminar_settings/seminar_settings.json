@@ -9,6 +9,14 @@
   "reminder_hours_before",
   "column_break_general",
   "send_feedback_request",
+  "contact_email",
+  "registration_form_section",
+  "require_privacy_consent",
+  "privacy_policy_url",
+  "privacy_consent_label",
+  "column_break_registration_form",
+  "ask_marketing_opt_in",
+  "marketing_opt_in_label",
   "stripe_section",
   "stripe_enabled",
   "stripe_secret_key",
@@ -132,12 +140,61 @@
    "fieldtype": "HTML Editor",
    "label": "Footer HTML",
    "description": "Shown below the seminar pages. Scripts and event handlers are removed."
+  },
+  {
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Contact Email",
+   "options": "Email",
+   "description": "Shown on the registration page and in the emails unless the seminar has its own."
+  },
+  {
+   "fieldname": "registration_form_section",
+   "fieldtype": "Section Break",
+   "label": "Registration Form"
+  },
+  {
+   "default": "0",
+   "fieldname": "require_privacy_consent",
+   "fieldtype": "Check",
+   "label": "Require Privacy Consent"
+  },
+  {
+   "depends_on": "require_privacy_consent",
+   "fieldname": "privacy_policy_url",
+   "fieldtype": "Data",
+   "label": "Privacy Policy URL"
+  },
+  {
+   "depends_on": "require_privacy_consent",
+   "description": "Leave empty for the default text.",
+   "fieldname": "privacy_consent_label",
+   "fieldtype": "Small Text",
+   "label": "Privacy Consent Text"
+  },
+  {
+   "fieldname": "column_break_registration_form",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "description": "An optional checkbox, unchecked by default.",
+   "fieldname": "ask_marketing_opt_in",
+   "fieldtype": "Check",
+   "label": "Ask for Consent to Further Information"
+  },
+  {
+   "depends_on": "ask_marketing_opt_in",
+   "description": "Leave empty for the default text.",
+   "fieldname": "marketing_opt_in_label",
+   "fieldtype": "Small Text",
+   "label": "Further Information Text"
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-10-06 20:00:00.000000",
+ "modified": "2026-11-19 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",

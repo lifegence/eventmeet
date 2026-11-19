@@ -25,9 +25,25 @@
   "sessions",
   "tickets_tab",
   "ticket_types",
+  "registration_form_section",
+  "require_company",
+  "ask_phone",
+  "ask_department",
+  "ask_question",
+  "ask_consultation",
+  "column_break_registration_form",
+  "interest_options",
+  "attendee_emails_section",
+  "contact_email",
+  "reminder_hours_before",
+  "column_break_attendee_emails",
+  "join_info_send_at",
+  "joining_instructions",
   "registrations_tab",
   "registrations_html",
   "online_tab",
+  "use_own_join_url",
+  "own_join_url",
   "conference_kind",
   "conference_session",
   "column_break_online",
@@ -180,14 +196,16 @@
    "fieldname": "conference_kind",
    "fieldtype": "Select",
    "label": "Conference Kind",
-   "options": "Meeting\nWebinar"
+   "options": "Meeting\nWebinar",
+   "depends_on": "eval:!doc.use_own_join_url"
   },
   {
    "fieldname": "conference_session",
    "fieldtype": "Link",
    "label": "Conference Session",
    "options": "Conference Session",
-   "read_only": 1
+   "read_only": 1,
+   "depends_on": "eval:!doc.use_own_join_url"
   },
   {
    "fieldname": "column_break_online",
@@ -198,7 +216,8 @@
    "fieldname": "join_url",
    "fieldtype": "Small Text",
    "label": "Join URL (Generic)",
-   "read_only": 1
+   "read_only": 1,
+   "depends_on": "eval:!doc.use_own_join_url"
   },
   {
    "fieldname": "planning_tab",
@@ -238,6 +257,100 @@
    "fieldname": "feedback_enabled",
    "fieldtype": "Check",
    "label": "Collect Feedback"
+  },
+  {
+   "fieldname": "registration_form_section",
+   "fieldtype": "Section Break",
+   "label": "Registration Form"
+  },
+  {
+   "default": "0",
+   "fieldname": "require_company",
+   "fieldtype": "Check",
+   "label": "Require Company"
+  },
+  {
+   "default": "1",
+   "fieldname": "ask_phone",
+   "fieldtype": "Check",
+   "label": "Ask Phone"
+  },
+  {
+   "default": "0",
+   "fieldname": "ask_department",
+   "fieldtype": "Check",
+   "label": "Ask Department and Job Title"
+  },
+  {
+   "default": "0",
+   "fieldname": "ask_question",
+   "fieldtype": "Check",
+   "label": "Ask Questions for the Speakers"
+  },
+  {
+   "default": "0",
+   "fieldname": "ask_consultation",
+   "fieldtype": "Check",
+   "label": "Ask About Individual Consultation"
+  },
+  {
+   "fieldname": "column_break_registration_form",
+   "fieldtype": "Column Break"
+  },
+  {
+   "description": "One topic per line. Registrants can choose several. Leave empty to hide the question.",
+   "fieldname": "interest_options",
+   "fieldtype": "Small Text",
+   "label": "Topics of Interest"
+  },
+  {
+   "fieldname": "attendee_emails_section",
+   "fieldtype": "Section Break",
+   "label": "Attendee Emails"
+  },
+  {
+   "description": "Shown on the registration page and in the emails. Defaults to the Seminar Settings.",
+   "fieldname": "contact_email",
+   "fieldtype": "Data",
+   "label": "Contact Email",
+   "options": "Email"
+  },
+  {
+   "description": "0 = use the Seminar Settings.",
+   "fieldname": "reminder_hours_before",
+   "fieldtype": "Int",
+   "label": "Send Reminder Hours Before"
+  },
+  {
+   "fieldname": "column_break_attendee_emails",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.format!='Offline'",
+   "description": "Registrants confirmed by then receive the join information at this time; later registrants receive it with their confirmation. Empty = the confirmation email includes it.",
+   "fieldname": "join_info_send_at",
+   "fieldtype": "Datetime",
+   "label": "Send Join Information At"
+  },
+  {
+   "depends_on": "eval:doc.format!='Offline'",
+   "description": "Included in the join information and the reminder (e.g. how to join, what to prepare).",
+   "fieldname": "joining_instructions",
+   "fieldtype": "Small Text",
+   "label": "How to Join"
+  },
+  {
+   "default": "0",
+   "description": "Do not create a Zoom session; every registrant receives this URL.",
+   "fieldname": "use_own_join_url",
+   "fieldtype": "Check",
+   "label": "Use Own Join URL"
+  },
+  {
+   "depends_on": "use_own_join_url",
+   "fieldname": "own_join_url",
+   "fieldtype": "Small Text",
+   "label": "Own Join URL"
   }
  ],
  "has_web_view": 1,
@@ -245,7 +358,7 @@
  "index_web_pages_for_search": 0,
  "is_published_field": "published",
  "links": [],
- "modified": "2026-10-07 12:00:00.000000",
+ "modified": "2026-11-19 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar",

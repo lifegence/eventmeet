@@ -1,7 +1,9 @@
 {% extends "eventmeet/templates/eventmeet/layout.html" %}
 {#- Seminar page. Context: doc (Seminar), venue, speakers (dict), tickets, registration_open,
-    registration_block_reason. The page script submits the form with id "ls-register-form"
-    (fields ticket_type, attendee_name, email, company, phone, website) and shows messages in
+    registration_block_reason, interest_options, privacy_consent, marketing_opt_in. The page script submits the form with id "ls-register-form"
+    (fields ticket_type, attendee_name, email, company, phone, department, job_title, interests
+    (checkboxes), question, consultation_requested, privacy_consent, marketing_opt_in, website) and shows
+    messages in
     "ls-register-message"; keep these ids when you override em_registration. -#}
 
 {% block em_content %}
@@ -20,7 +22,7 @@
 				{% if venue.map_url %}<br><a href="{{ venue.map_url | e }}" target="_blank" rel="noopener">{{ _("Map") }}</a>{% endif %}</td></tr>
 		{% endif %}
 		{% if doc.format != "Offline" %}
-		<tr><th>{{ _("Online") }}</th><td>{{ _("Zoom (the join link is emailed after registration)") }}</td></tr>
+		<tr><th>{{ _("Online") }}</th><td>{% if doc.join_info_send_at %}{{ _("The join link is emailed on {0}").format(frappe.utils.format_datetime(doc.join_info_send_at, "yyyy-MM-dd HH:mm")) }}{% else %}{{ _("The join link is emailed after registration") }}{% endif %}</td></tr>
 		{% endif %}
 		<tr><th>{{ _("Registration closes") }}</th>
 			<td>{{ frappe.utils.format_datetime(doc.registration_closes_at, "yyyy-MM-dd HH:mm") }}</td></tr>
@@ -87,14 +89,45 @@
 				<option value="{{ t.ticket.ticket_name | e }}">{{ t.ticket.ticket_name | e }}</option>
 				{% endif %}{% endfor %}
 			</select>
-			<label for="ls-name">{{ _("Name") }}</label>
+			<label for="ls-name">{{ _("Name") }} <span class="ls-required">{{ _("Required") }}</span></label>
 			<input class="form-control" id="ls-name" name="attendee_name" maxlength="140" required autocomplete="name">
-			<label for="ls-email">{{ _("Email") }}</label>
+			<label for="ls-company">{{ _("Company") }}{% if doc.require_company %} <span class="ls-required">{{ _("Required") }}</span>{% endif %}</label>
+			<input class="form-control" id="ls-company" name="company" maxlength="140" autocomplete="organization"{% if doc.require_company %} required{% endif %}>
+			<label for="ls-email">{{ _("Email") }} <span class="ls-required">{{ _("Required") }}</span></label>
 			<input class="form-control" id="ls-email" name="email" type="email" maxlength="140" required autocomplete="email">
-			<label for="ls-company">{{ _("Company") }}</label>
-			<input class="form-control" id="ls-company" name="company" maxlength="140" autocomplete="organization">
+			{% if doc.ask_department %}
+			<label for="ls-department">{{ _("Department") }}</label>
+			<input class="form-control" id="ls-department" name="department" maxlength="140">
+			<label for="ls-job-title">{{ _("Job Title") }}</label>
+			<input class="form-control" id="ls-job-title" name="job_title" maxlength="140" autocomplete="organization-title">
+			{% endif %}
+			{% if doc.ask_phone %}
 			<label for="ls-phone">{{ _("Phone") }}</label>
 			<input class="form-control" id="ls-phone" name="phone" maxlength="40" autocomplete="tel">
+			{% endif %}
+			{% if interest_options %}
+			<fieldset class="ls-fieldset">
+				<legend>{{ _("Topics of Interest") }}</legend>
+				{% for option in interest_options %}
+				<label class="ls-check"><input type="checkbox" name="interests" value="{{ option | e }}"> {{ option | e }}</label>
+				{% endfor %}
+			</fieldset>
+			{% endif %}
+			{% if doc.ask_question %}
+			<label for="ls-question">{{ _("Questions for the Speakers") }}</label>
+			<textarea class="form-control" id="ls-question" name="question" maxlength="2000" rows="3"></textarea>
+			{% endif %}
+			{% if doc.ask_consultation %}
+			<label class="ls-check"><input type="checkbox" name="consultation_requested" value="1"> {{ _("I would like an individual consultation") }}</label>
+			{% endif %}
+			{% if privacy_consent.required %}
+			<label class="ls-check"><input type="checkbox" name="privacy_consent" value="1" required>
+				{{ privacy_consent.label | e }}{% if privacy_consent.url %} (<a href="{{ privacy_consent.url | e }}" target="_blank" rel="noopener">{{ _("Privacy Policy") }}</a>){% endif %}
+				<span class="ls-required">{{ _("Required") }}</span></label>
+			{% endif %}
+			{% if marketing_opt_in.ask %}
+			<label class="ls-check"><input type="checkbox" name="marketing_opt_in" value="1"> {{ marketing_opt_in.label | e }}</label>
+			{% endif %}
 			<div class="ls-honeypot" aria-hidden="true">
 				<label for="ls-website">Website</label>
 				<input id="ls-website" name="website" tabindex="-1" autocomplete="off">

@@ -214,7 +214,7 @@ Registration Required,登録制
 Registration cancelled: {0},申込キャンセル: {0}
 Registration closed,受付終了
 Registration closes,申込締切
-Registration confirmed: {0},お申し込み確定: {0}
+Registration confirmed: {0},【申込受付】{0}
 Registration could not be completed.,申込を完了できませんでした。
 Registration for this seminar has closed.,このセミナーの申込受付は終了しました。
 Registration for this seminar is not open.,このセミナーは申込を受け付けていません。
@@ -333,7 +333,7 @@ You are invited to the following meeting.,以下のミーティングにご招�
 You can only create meetings that you organize.,自分が主催するミーティングのみ作成できます。
 Your Registration,お申し込み内容
 Your registration has been cancelled.,お申し込みはキャンセルされました。
-Your registration is confirmed.,お申し込みは確定しています。
+Your registration is confirmed.,お申し込みを受け付けました。
 Zoom (the join link is emailed after registration),Zoom（参加リンクはお申し込み後にメールでお送りします）
 Zoom AI Companion meeting summary must be enabled.,Zoom の AI Companion 会議要約が有効になっている必要があります。
 Zoom Host Account,Zoom ホストアカウント
@@ -408,3 +408,59 @@ Weekly,毎週
 {0} meetings cancelled,{0} 件のミーティングを中止しました
 {0} meetings created,{0} 件のミーティングを作成しました
 {0} meetings updated,{0} 件のミーティングを更新しました
+0 = use the Seminar Settings.,0 = セミナー設定の値を使う
+"An optional checkbox, unchecked by default.",任意のチェック項目です（初期状態は未選択）。
+Answers,回答
+Ask About Individual Consultation,個別相談の希望を尋ねる
+Ask Department and Job Title,部署・役職を尋ねる
+Ask for Consent to Further Information,今後の情報提供の希望を尋ねる
+Ask Phone,電話番号を尋ねる
+Ask Questions for the Speakers,登壇者への質問を尋ねる
+Attendee Emails,申込者へのメール
+Consultation,個別相談
+Contact,お問い合わせ
+Contact Email,お問い合わせ先メールアドレス
+Department,部署
+Do not create a Zoom session; every registrant receives this URL.,Zoom の会議を作成せず、すべての申込者にこの URL を案内します。
+Further Information Text,情報提供の文言
+Here is how to join the seminar online.,セミナーの視聴 URL をご案内します。
+How to Join,参加方法
+How to join,参加方法
+I agree to the handling of personal information.,個人情報の取り扱いに同意する
+I would like an individual consultation,個別相談を希望する
+I would like to receive information about future events.,今後の情報提供を希望する
+"If the email does not arrive, please check your spam folder.",メールが届かない場合は、迷惑メールフォルダもご確認ください。
+"Included in the join information and the reminder (e.g. how to join, what to prepare).",視聴案内とリマインドに記載します（参加手順、事前の準備など）。
+Individual Consultation Requested,個別相談希望
+Join Information Sent,視聴案内送信済
+Join information: {0},【視聴 URL のご案内】{0}
+Join online,オンラインで参加する
+Join with this link:,以下のリンクから参加してください：
+Leave empty for the default text.,空欄の場合は既定の文言を使います。
+One topic per line. Registrants can choose several. Leave empty to hide the question.,1 行に 1 テーマ。申込者は複数選択できます。空欄の場合は表示しません。
+Own Join URL,自前の視聴 URL
+Own Join URL must start with https:// or http://.,自前の視聴 URL は https:// または http:// で始めてください。
+Please agree to the handling of personal information.,個人情報の取り扱いに同意してください。
+Please join from the link above at the start time.,お時間になりましたら、上記のリンクよりご参加ください。
+Privacy Consent At,個人情報同意日時
+Privacy Consent Text,同意の文言
+Privacy Policy,プライバシーポリシー
+Privacy Policy URL,プライバシーポリシー URL
+Questions for the Speakers,登壇者に聞きたい内容
+Registrants confirmed by then receive the join information at this time; later registrants receive it with their confirmation. Empty = the confirmation email includes it.,この日時までに申込が確定した方へ、この日時に視聴案内を送ります。以降の申込者には受付完了メールで案内します。空欄の場合は受付完了メールに含めます。
+Registration Form,申込フォーム
+Require Company,会社名を必須にする
+Require Privacy Consent,個人情報の取り扱いへの同意を必須にする
+Required,必須
+Send Join Information At,視聴案内の送信日時
+Send Join Information At must be before the start time.,視聴案内の送信日時は開始日時より前にしてください。
+Send Reminder Hours Before cannot be negative.,リマインド送信（開始の何時間前）に負の値は指定できません。
+Shown on the registration page and in the emails unless the seminar has its own.,セミナーで指定がない場合に、申込完了画面とメールに表示します。
+Shown on the registration page and in the emails. Defaults to the Seminar Settings.,申込完了画面とメールに表示します。空欄の場合はセミナー設定の値を使います。
+The join link is emailed after registration,視聴 URL はお申し込み後にメールでご案内します
+The join link is emailed on {0},視聴 URL は {0} にメールでご案内します
+The online join link will be emailed on {0}.,視聴 URL は {0} にメールでご案内します。
+Topics of Interest,関心のあるテーマ
+Use Own Join URL,自前の視聴 URL を使う
+Wants Further Information,情報提供希望
+We have sent a confirmation email to {0}. Please check it.,受付完了メールを {0} にお送りしました。ご確認ください。
