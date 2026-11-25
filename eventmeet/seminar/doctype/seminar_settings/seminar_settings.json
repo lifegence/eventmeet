@@ -9,6 +9,8 @@
   "reminder_hours_before",
   "column_break_general",
   "send_feedback_request",
+  "seat_display",
+  "seat_display_threshold",
   "contact_email",
   "registration_form_section",
   "require_privacy_consent",
@@ -66,6 +68,22 @@
    "fieldname": "send_feedback_request",
    "fieldtype": "Check",
    "label": "Send Feedback Request After Seminar"
+  },
+  {
+   "default": "Exact",
+   "description": "How the seminar page shows the seats left. Exact: the number. Threshold: \"Seats available\" until the seats left fall to the threshold, then the number. Hidden: never the number. \"Sold out\" is always shown.",
+   "fieldname": "seat_display",
+   "fieldtype": "Select",
+   "label": "Seat Display",
+   "options": "Exact\nThreshold\nHidden"
+  },
+  {
+   "default": "10",
+   "depends_on": "eval:doc.seat_display!='Exact' && doc.seat_display!='Hidden'",
+   "description": "Threshold mode: the number is shown once the seats left fall to this value.",
+   "fieldname": "seat_display_threshold",
+   "fieldtype": "Int",
+   "label": "Show Seats Left From"
   },
   {
    "fieldname": "stripe_section",
@@ -242,7 +260,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-19 15:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Settings",

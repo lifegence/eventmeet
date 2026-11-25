@@ -16,6 +16,8 @@
   "ends_at",
   "registration_closes_at",
   "capacity",
+  "seat_display",
+  "seat_display_threshold",
   "venue_section",
   "venue",
   "content_section",
@@ -125,6 +127,20 @@
    "fieldname": "capacity",
    "fieldtype": "Int",
    "label": "Capacity"
+  },
+  {
+   "description": "How the seminar page shows the seats left. Empty = the setting in Seminar Settings.",
+   "fieldname": "seat_display",
+   "fieldtype": "Select",
+   "label": "Seat Display",
+   "options": "\nExact\nThreshold\nHidden"
+  },
+  {
+   "depends_on": "eval:doc.seat_display!='Exact' && doc.seat_display!='Hidden'",
+   "description": "Threshold mode: the number is shown once the seats left fall to this value. Empty or 0 = the value in Seminar Settings.",
+   "fieldname": "seat_display_threshold",
+   "fieldtype": "Int",
+   "label": "Show Seats Left From"
   },
   {
    "depends_on": "eval:doc.format!='Online'",
@@ -378,7 +394,7 @@
  "index_web_pages_for_search": 0,
  "is_published_field": "published",
  "links": [],
- "modified": "2026-11-19 16:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar",

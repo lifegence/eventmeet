@@ -76,7 +76,7 @@
 			<tr>
 				<td>{{ t.ticket.ticket_name | e }}{% if t.ticket.description %}<div class="ls-muted">{{ t.ticket.description | e }}</div>{% endif %}</td>
 				<td style="width: 25%">{% if t.ticket.price %}{{ frappe.utils.fmt_money(t.ticket.price, currency=t.ticket.currency) }}{% else %}{{ _("Free") }}{% endif %}</td>
-				<td style="width: 20%">{% if t.sold_out %}{{ _("Sold out") }}{% elif t.remaining is not none %}{{ _("{0} seats left").format(t.remaining) }}{% endif %}</td>
+				<td style="width: 20%">{% if t.label %}{{ t.label }}{% endif %}</td>
 			</tr>
 			{% endfor %}
 		</table>

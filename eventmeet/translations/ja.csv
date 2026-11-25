@@ -519,3 +519,16 @@ Please answer the survey on the following form.,以下のフォームからア�
 Survey request: not sent.,アンケート依頼：送信しません。
 "Survey request: within an hour after the end, to confirmed registrants, with the link to the external survey form.",アンケート依頼：終了後1時間以内に、申込確定の方へ外部アンケートフォームのリンクを送ります。
 "Survey request: within an hour after the end, to confirmed registrants, with the link to the built-in survey.",アンケート依頼：終了後1時間以内に、申込確定の方へ標準アンケートのリンクを送ります。
+Seat Display,残席の表示
+Exact,実数
+Threshold,しきい値
+Hidden,非表示
+Show Seats Left From,残席数を表示し始める席数
+Seats available,空きあり
+Only {0} seats left,残りわずか（あと {0} 席）
+"How the seminar page shows the seats left. Exact: the number. Threshold: ""Seats available"" until the seats left fall to the threshold, then the number. Hidden: never the number. ""Sold out"" is always shown.",セミナーページでの残席の表示方法。実数：残席数を表示します。しきい値：残席がしきい値以下になるまでは「空きあり」とだけ表示し、以下になったら残席数を表示します。非表示：残席数は表示しません。満席はどのモードでも表示します。
+How the seminar page shows the seats left. Empty = the setting in Seminar Settings.,セミナーページでの残席の表示方法。空欄＝セミナー設定に従います。
+How the seminar page shows the seats left for this ticket. Empty = the seminar's setting.,このチケットの残席の表示方法。空欄＝セミナーの設定に従います。
+Threshold mode: the number is shown once the seats left fall to this value.,しきい値モードで、残席がこの数以下になると残席数を表示します。
+Threshold mode: the number is shown once the seats left fall to this value. Empty or 0 = the value in Seminar Settings.,しきい値モードで、残席がこの数以下になると残席数を表示します。空欄または0＝セミナー設定の値に従います。
+Threshold mode: the number is shown once the seats left fall to this value. Empty or 0 = the seminar's value.,しきい値モードで、残席がこの数以下になると残席数を表示します。空欄または0＝セミナーの値に従います。
