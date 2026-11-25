@@ -227,6 +227,7 @@ The Frappe site sends emails to registrants, so an outgoing email account must b
 2. Enter the Summary, Description, Banner Image and Program. The Summary is shown in the seminar list.
 3. On the "Tickets" tab, add at least one ticket type (price 0 for free).
    - "Registration Form": choose what the form asks. Name and email are always required; "Require Company" makes the company required, "Ask Phone" can be turned off, and you can ask for the department and job title, questions for the speakers, individual consultation, and topics of interest (one per line, several can be chosen).
+   - "Seat Display": how the seminar page shows the seats left. "Exact" shows the number; "Threshold" shows only "Seats available" until the seats left fall to "Show Seats Left From" (e.g. 10), then "Only 3 seats left"; "Hidden" never shows the number. "Sold out" is shown in every mode. Empty = the value in Seminar Settings. Each ticket type can override it with the same fields (empty = the seminar's setting).
    - "Attendee Emails": the contact email, when to send the reminder (e.g. 2 hours before), when to send the join information and how to join (see 5.3).
 4. On the "Online" tab, choose the "Conference Kind". "Meeting" is a registration-based Zoom meeting; "Webinar" is a Zoom webinar (requires the Webinars add-on).
 5. On the "Website" tab, turn on "Published".

@@ -8,7 +8,7 @@ from frappe.utils import cint, flt, get_datetime, now_datetime
 from frappe.website.website_generator import WebsiteGenerator
 
 from eventmeet import website
-from eventmeet.services import conference, todo_sync
+from eventmeet.services import conference, seats, todo_sync
 
 ONLINE_ACTIVE_STATUSES = ("Open", "Closed", "Completed")
 # The Registrations tab lists this many; the full list is one click away.
@@ -241,6 +241,7 @@ class Seminar(WebsiteGenerator):
 			)
 		}
 
+		settings = frappe.get_cached_doc("Seminar Settings")
 		seminar_left = None
 		if cint(self.capacity):
 			seminar_left = max(cint(self.capacity) - count_active(self.name), 0)
@@ -252,7 +253,9 @@ class Seminar(WebsiteGenerator):
 			if cint(ticket.capacity):
 				ticket_left = max(cint(ticket.capacity) - count_active(self.name, ticket.ticket_name), 0)
 				left = ticket_left if left is None else min(left, ticket_left)
-			tickets.append({"ticket": ticket, "remaining": left, "sold_out": left == 0})
+			mode, threshold = seats.resolve(settings, self, ticket)
+			# Only the number the display mode allows reaches the template (and the page source).
+			tickets.append({"ticket": ticket, **seats.availability(left, mode, threshold)})
 		context.tickets = tickets
 
 		context.registration_block_reason = self.get_registration_block_reason()
@@ -260,7 +263,6 @@ class Seminar(WebsiteGenerator):
 			not t["sold_out"] for t in tickets
 		)
 		context.interest_options = interest_options(self)
-		settings = frappe.get_cached_doc("Seminar Settings")
 		context.privacy_consent = {
 			"required": bool(settings.require_privacy_consent),
 			"url": settings.privacy_policy_url,

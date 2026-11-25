@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.3 - 2026-11-25
+
+### Added
+
+- Seat display mode for the seminar page: Exact (the number, as before), Threshold ("Seats available" until the
+  seats left fall to a threshold, then "Only N seats left") and Hidden. Set in Seminar Settings, overridable per
+  seminar and per ticket type. Templates receive only the number the mode allows (`t.remaining`) and a ready
+  label (`t.label`).
+
 ## 0.5.2 - 2026-11-19
 
 ### Added

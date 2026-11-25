@@ -9,6 +9,8 @@
   "price",
   "currency",
   "capacity",
+  "seat_display",
+  "seat_display_threshold",
   "enabled",
   "description"
  ],
@@ -43,6 +45,20 @@
    "label": "Capacity"
   },
   {
+   "description": "How the seminar page shows the seats left for this ticket. Empty = the seminar's setting.",
+   "fieldname": "seat_display",
+   "fieldtype": "Select",
+   "label": "Seat Display",
+   "options": "\nExact\nThreshold\nHidden"
+  },
+  {
+   "depends_on": "eval:doc.seat_display!='Exact' && doc.seat_display!='Hidden'",
+   "description": "Threshold mode: the number is shown once the seats left fall to this value. Empty or 0 = the seminar's value.",
+   "fieldname": "seat_display_threshold",
+   "fieldtype": "Int",
+   "label": "Show Seats Left From"
+  },
+  {
    "default": "1",
    "fieldname": "enabled",
    "fieldtype": "Check",
@@ -58,7 +74,7 @@
  "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-09-28 12:00:00.000000",
+ "modified": "2026-11-25 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Seminar",
  "name": "Seminar Ticket Type",
